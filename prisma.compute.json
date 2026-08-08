@@ -1,0 +1,11 @@
+{
+  "region": "eu-west-3",
+  "app": {
+    "name": "shelf-library",
+    "framework": "nextjs",
+    "httpPort": 3000,
+    "build": {
+      "command": "next build"
+    }
+  }
+}
