@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Horizontale_main" data-name="Horizontale main" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160">
+  <defs>
+    <style>
+      .cls-1, .cls-2 {
+        fill: #ede7dc;
+      }
+
+      .cls-3 {
+        fill: #0f1d2e;
+      }
+
+      .cls-4 {
+        letter-spacing: .45em;
+      }
+
+      .cls-5, .cls-6 {
+        fill: #c8a56a;
+      }
+
+      .cls-2 {
+        font-family: PlayfairDisplay-Regular, 'Playfair Display';
+        font-size: 48px;
+      }
+
+      .cls-6 {
+        font-family: Inter-SemiBold, Inter;
+        font-size: 14px;
+        font-variation-settings: 'opsz' 14, 'wght' 600;
+        font-weight: 600;
+        opacity: .98;
+      }
+
+      .cls-7 {
+        letter-spacing: .42em;
+      }
+    </style>
+  </defs>
+  <g id="Text">
+    <text class="cls-2" transform="translate(141.25 102.12)"><tspan x="0" y="0">Shelf</tspan></text>
+    <text class="cls-6" transform="translate(148.69 116.54)"><tspan class="cls-4" x="0" y="0">LIBRA</tspan><tspan class="cls-7" x="71.84" y="0">R</tspan><tspan class="cls-4" x="86.89" y="0">Y</tspan></text>
+  </g>
+  <g>
+    <path class="cls-1" d="M57.46,102.12h9.73c1.56,0,2.82-1.26,2.82-2.82v-3.06h-15.37v-1.26h15.37v-46.91h-15.37v-1.26h15.37v-5.05c0-1.56-1.26-2.82-2.82-2.82h-9.73c-1.56,0-2.82,1.26-2.82,2.82v57.54c0,1.56,1.26,2.82,2.82,2.82Z"/>
+    <rect class="cls-3" x="54.64" y="46.82" width="15.37" height="1.26"/>
+    <rect class="cls-3" x="54.64" y="94.98" width="15.37" height="1.26"/>
+    <path class="cls-5" d="M88.93,44.97c0-1.56-1.26-2.82-2.82-2.82h-9.73c-1.56,0-2.82,1.26-2.82,2.82v1.22h15.37v1.26h-15.37v3.09h15.37v-5.57Z"/>
+    <path class="cls-5" d="M76.38,102.12h9.73c1.56,0,2.82-1.26,2.82-2.82v-47.51h-15.37v47.51c0,1.56,1.26,2.82,2.82,2.82Z"/>
+    <rect class="cls-3" x="73.56" y="46.19" width="15.37" height="1.26"/>
+    <rect class="cls-3" x="73.56" y="50.53" width="15.37" height="1.26"/>
+    <path class="cls-1" d="M100.77,99.8h0s-.17-.77-.17-.77l14.99-3.42-9.03-39.56-14.99,3.42-.23-.99,14.99-3.42-.1-.44c-.35-1.52-1.86-2.47-3.37-2.12l-9.49,2.16c-1.52.35-2.47,1.86-2.12,3.37l9.53,41.76Z"/>
+    <path class="cls-1" d="M104.14,101.92l9.49-2.16c1.44-.33,2.35-1.71,2.15-3.14l-14.94,3.41c.44,1.38,1.86,2.23,3.3,1.9Z"/>
+    <polygon class="cls-3" points="91.57 59.47 106.55 56.05 106.55 56.05 106.33 55.06 106.33 55.06 91.34 58.48 91.57 59.47"/>
+    <polygon class="cls-3" points="100.77 99.8 100.82 100.02 100.84 100.02 115.78 96.61 115.8 96.6 115.58 95.61 115.58 95.61 100.59 99.03 100.77 99.8"/>
+    <rect class="cls-1" x="41.82" y="106.36" width="88.15" height="10.55" rx="1.65" ry="1.65"/>
+    <rect class="cls-5" x="135.76" y="111.43" width="6.26" height=".64" rx=".21" ry=".21"/>
+    <rect class="cls-5" x="251.54" y="111.43" width="6.26" height=".64" rx=".21" ry=".21"/>
+  </g>
+</svg>

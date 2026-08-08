@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Horizontale_main" data-name="Horizontale main" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160">
+  <defs>
+    <style>
+      .cls-1 {
+        font-family: Inter-Medium, Inter;
+        font-size: 6px;
+        font-variation-settings: 'opsz' 14, 'wght' 500;
+        font-weight: 500;
+      }
+
+      .cls-1, .cls-2, .cls-3 {
+        fill: #0f1d2e;
+      }
+
+      .cls-4 {
+        letter-spacing: .39em;
+      }
+
+      .cls-5 {
+        fill: #ede7dc;
+      }
+
+      .cls-6 {
+        letter-spacing: .45em;
+      }
+
+      .cls-7 {
+        letter-spacing: .4em;
+      }
+
+      .cls-8 {
+        letter-spacing: .39em;
+      }
+
+      .cls-9, .cls-10 {
+        fill: #c8a56a;
+      }
+
+      .cls-3 {
+        font-family: PlayfairDisplay-Regular, 'Playfair Display';
+        font-size: 48px;
+      }
+
+      .cls-11 {
+        fill: #2e7d71;
+      }
+
+      .cls-12 {
+        letter-spacing: .36em;
+      }
+
+      .cls-10 {
+        font-family: Inter-SemiBold, Inter;
+        font-size: 14px;
+        font-variation-settings: 'opsz' 14, 'wght' 600;
+        font-weight: 600;
+        opacity: .98;
+      }
+
+      .cls-13 {
+        letter-spacing: .42em;
+      }
+    </style>
+  </defs>
+  <g>
+    <g>
+      <g>
+        <rect class="cls-2" x="54.83" y="30.08" width="15.37" height="63.17" rx="2.82" ry="2.82"/>
+        <rect class="cls-5" x="54.83" y="37.96" width="15.37" height="1.26"/>
+        <rect class="cls-5" x="54.83" y="86.12" width="15.37" height="1.26"/>
+      </g>
+      <g>
+        <rect class="cls-9" x="73.75" y="33.29" width="15.37" height="59.97" rx="2.82" ry="2.82"/>
+        <rect class="cls-5" x="73.75" y="37.33" width="15.37" height="1.26"/>
+        <rect class="cls-5" x="73.75" y="41.67" width="15.37" height="1.26"/>
+      </g>
+      <g>
+        <rect class="cls-11" x="96" y="44.11" width="15.37" height="48.47" rx="2.82" ry="2.82" transform="translate(-12.6 24.77) rotate(-12.85)"/>
+        <rect class="cls-5" x="91.45" y="47.89" width="15.37" height="1.02" transform="translate(-8.28 23.26) rotate(-12.85)"/>
+        <rect class="cls-5" x="100.7" y="88.45" width="15.37" height="1.02" transform="translate(-17.07 26.33) rotate(-12.85)"/>
+      </g>
+      <rect class="cls-2" x="42.01" y="97.49" width="88.15" height="10.55" rx="1.65" ry="1.65"/>
+    </g>
+    <g id="Text">
+      <text class="cls-3" transform="translate(141.43 93.25)"><tspan x="0" y="0">Shelf</tspan></text>
+      <g>
+        <rect class="cls-9" x="135.95" y="102.57" width="6.26" height=".64" rx=".21" ry=".21"/>
+        <text class="cls-10" transform="translate(148.88 107.68)"><tspan class="cls-6" x="0" y="0">LIBRA</tspan><tspan class="cls-13" x="71.84" y="0">R</tspan><tspan class="cls-6" x="86.89" y="0">Y</tspan></text>
+        <rect class="cls-9" x="251.73" y="102.57" width="6.26" height=".64" rx=".21" ry=".21"/>
+      </g>
+    </g>
+  </g>
+  <g>
+    <g>
+      <text class="cls-1" transform="translate(57.47 127.85)"><tspan class="cls-7" x="0" y="0">KN</tspan><tspan class="cls-4" x="13.46" y="0">O</tspan><tspan class="cls-7" x="20.41" y="0">WLEDGE</tspan></text>
+      <text class="cls-1" transform="translate(134.04 127.91)"><tspan class="cls-12" x="0" y="0">A</tspan><tspan class="cls-7" x="6.43" y="0">CCESS</tspan></text>
+      <text class="cls-1" transform="translate(195.17 127.98)"><tspan class="cls-7" x="0" y="0">EMP</tspan><tspan class="cls-8" x="20.14" y="0">O</tspan><tspan class="cls-7" x="27.09" y="0">WER</tspan></text>
+    </g>
+    <circle class="cls-9" cx="124.51" cy="125.94" r=".93"/>
+    <circle class="cls-9" cx="182.91" cy="125.94" r=".93"/>
+  </g>
+</svg>

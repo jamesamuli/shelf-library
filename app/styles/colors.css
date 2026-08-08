@@ -1,0 +1,106 @@
+/*
+ * Color tokens — Shelf Library brand.
+ *
+ * Core values are the six swatches printed in
+ * assets/shelf-library-brand/brand-guidelines/Brand guideline.png §03:
+ *   Deep Navy #0F1B2E · Gold #C8A56A · Teal Green #2E7D71
+ *   Warm Ivory #EDE7DC · Slate Gray #6B7280 · Charcoal #111827
+ *
+ * The guideline gives six brand colors, not a full UI system, so hovers,
+ * borders, subtle text and the danger/info roles are DERIVED from them and
+ * marked below. Anything unmarked is a guideline value used verbatim.
+ *
+ * Themes switch on <html data-theme>, not prefers-color-scheme: the app
+ * defaults to light and the user toggles explicitly (see lib/preferences.ts).
+ *
+ * Components reference semantic names only (bg-surface, text-foreground-muted),
+ * never a raw brand value, so a palette change stays confined to this file.
+ */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+
+  --color-foreground-muted: var(--foreground-muted);
+  --color-foreground-subtle: var(--foreground-subtle);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-accent: var(--accent);
+
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-ring: var(--focus-ring);
+
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+}
+
+/* Light is the default: applies with no data-theme attribute present. */
+:root,
+:root[data-theme="light"] {
+  --background: #ede7dc; /* Warm Ivory */
+  --foreground: #111827; /* Charcoal */
+
+  --surface: #ffffff;
+  --surface-muted: #f5f1e8; /* derived: ivory tinted toward white */
+
+  --foreground-muted: #6b7280; /* Slate Gray */
+  --foreground-subtle: #8b93a1; /* derived: slate lightened */
+
+  --primary: #0f1b2e; /* Deep Navy */
+  --primary-hover: #1b2e4a; /* derived */
+  --primary-foreground: #ffffff;
+
+  --secondary: #c8a56a; /* Gold */
+  --secondary-hover: #b08f52; /* derived */
+  --accent: #2e7d71; /* Teal Green */
+
+  --border: #ded7c8; /* derived: warm border for the ivory ground */
+  --border-strong: #c9c1b0; /* derived */
+
+  --success: #2e7d71; /* Teal Green */
+  --warning: #c8a56a; /* Gold */
+  --danger: #b3453f; /* derived: no red in the brand palette */
+  --info: #2f4f75; /* derived: navy lightened toward blue */
+
+  --focus-ring: #c8a56a; /* Gold */
+}
+
+:root[data-theme="dark"] {
+  --background: #111827; /* Charcoal */
+  --foreground: #ede7dc; /* Warm Ivory */
+
+  --surface: #0f1b2e; /* Deep Navy */
+  --surface-muted: #18263c; /* derived */
+
+  --foreground-muted: #9aa3b2; /* derived: slate lightened for dark ground */
+  --foreground-subtle: #6b7280; /* Slate Gray */
+
+  /* Inverts: prominent surfaces become light-on-dark. */
+  --primary: #ede7dc; /* Warm Ivory */
+  --primary-hover: #fbf7f0; /* derived */
+  --primary-foreground: #0f1b2e; /* Deep Navy */
+
+  --secondary: #d9bb84; /* derived: gold lightened for contrast on dark */
+  --secondary-hover: #e6cda1; /* derived */
+  --accent: #4fa292; /* derived: teal lightened for contrast on dark */
+
+  --border: #26374f; /* derived */
+  --border-strong: #38496380; /* derived */
+
+  --success: #4fa292; /* derived */
+  --warning: #d9bb84; /* derived */
+  --danger: #d4736d; /* derived */
+  --info: #6f92bd; /* derived */
+
+  --focus-ring: #d9bb84; /* derived */
+}

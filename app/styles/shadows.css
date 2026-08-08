@@ -1,0 +1,10 @@
+/*
+ * Shadows — semantic elevation aliases onto Tailwind's default shadow
+ * scale. Pick by elevation role, not by raw size (sm/md/xl).
+ */
+
+@theme {
+  --shadow-card: var(--shadow-sm);    /* resting cards, list rows */
+  --shadow-popover: var(--shadow-md); /* dropdowns, tooltips */
+  --shadow-modal: var(--shadow-xl);   /* dialogs, modals */
+}

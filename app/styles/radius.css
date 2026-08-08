@@ -1,0 +1,11 @@
+/*
+ * Border radius — semantic aliases onto Tailwind's default radius scale.
+ * Pick by role, not by remembering which step (md vs lg) a component
+ * used last time.
+ */
+
+@theme {
+  --radius-control: var(--radius-md); /* buttons, inputs, small chips */
+  --radius-card: var(--radius-lg);    /* cards, list items, panels */
+  --radius-panel: var(--radius-xl);   /* large surfaces, dialogs */
+}

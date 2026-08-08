@@ -1,0 +1,93 @@
+:root {
+  /* ========================================
+     Shelf Library — Brand Colors
+     ======================================== */
+
+  /* Brand */
+  --shelf-navy: #10233C;
+  --shelf-gold: #C99A3A;
+  --shelf-sage: #3F6B5A;
+  --shelf-paper: #F8F6F1;
+
+  /* Neutral */
+  --shelf-white: #FFFFFF;
+  --shelf-black: #000000;
+  --shelf-charcoal: #1E232A;
+  --shelf-slate: #5B6673;
+  --shelf-muted: #7C8793;
+  --shelf-border: #E5E8EB;
+
+  /* Semantic */
+  --shelf-success: #3F6B5A;
+  --shelf-warning: #C99A3A;
+  --shelf-danger: #B94A48;
+  --shelf-info: #3F6B8F;
+
+  /* ========================================
+     Light Theme
+     ======================================== */
+
+  --background: #F8F6F1;
+  --foreground: #1E232A;
+
+  --surface: #FFFFFF;
+  --surface-muted: #F1F3F5;
+
+  --primary: #10233C;
+  --primary-hover: #203F5D;
+
+  --secondary: #C99A3A;
+  --secondary-hover: #AE7F2D;
+
+  --accent: #3F6B5A;
+
+  --text: #1E232A;
+  --text-muted: #5B6673;
+  --text-subtle: #7C8793;
+
+  --border: #E5E8EB;
+  --border-strong: #D1D6DB;
+
+  --success: #3F6B5A;
+  --warning: #C99A3A;
+  --danger: #B94A48;
+  --info: #3F6B8F;
+
+  /* Focus */
+  --focus-ring: #C99A3A;
+}
+
+.dark {
+  /* ========================================
+     Dark Theme
+     ======================================== */
+
+  --background: #091725;
+  --foreground: #F8F9FA;
+
+  --surface: #10233C;
+  --surface-muted: #172F48;
+
+  --primary: #DCE6F0;
+  --primary-hover: #EEF3F8;
+
+  --secondary: #D7AF51;
+  --secondary-hover: #E4C879;
+
+  --accent: #709F8C;
+
+  --text: #F8F9FA;
+  --text-muted: #AEB6BF;
+  --text-subtle: #7C8793;
+
+  --border: #303840;
+  --border-strong: #424B55;
+
+  --success: #709F8C;
+  --warning: #D7AF51;
+  --danger: #D06A68;
+  --info: #6689AA;
+
+  /* Focus */
+  --focus-ring: #D7AF51;
+}

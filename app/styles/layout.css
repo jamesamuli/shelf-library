@@ -1,0 +1,29 @@
+/*
+ * Reusable layout utilities — generic structural patterns (the classic
+ * "stack / cluster / center" primitives), not tied to any specific page.
+ * They compose with Tailwind's spacing/color utilities rather than
+ * baking values in, e.g. `<div class="stack gap-content">`.
+ */
+
+@utility container-page {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 80rem; /* 1280px */
+  padding-inline: var(--spacing-page-x);
+}
+
+@utility stack {
+  display: flex;
+  flex-direction: column;
+}
+
+@utility cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@utility center {
+  display: grid;
+  place-items: center;
+}

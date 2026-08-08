@@ -1,0 +1,731 @@
+// Target schema proposal — see docs/07-target-schema.md for rationale and
+// docs/06-legacy-data-model.md for the legacy model this replaces.
+//
+// Applied to the linked Prisma Postgres database via prisma/migrations.
+//
+// Two things this file cannot express and which live in the initial migration
+// SQL instead:
+//   1. Partial unique index enforcing one active loan per item:
+//        CREATE UNIQUE INDEX one_active_loan_per_item
+//          ON loans (item_id) WHERE returned_at IS NULL;
+//   2. CHECK constraint: an item hangs off a record XOR an issue.
+// Still to add: generated tsvector columns + GIN indexes for full-text search.
+
+// Header targets Prisma 7 (current release), where the connection URL lives in
+// prisma.config.ts rather than here. On Prisma 6 the equivalent header is:
+//   generator client { provider = "prisma-client-js" }
+//   datasource db { provider = "postgresql"  url = env("DATABASE_URL") }
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+/// Legacy notices.niveau_biblio: a / m / s / b
+enum BibliographicLevel {
+  ANALYTIC
+  MONOGRAPH
+  SERIAL
+  BULLETIN
+}
+
+/// Legacy notices.niveau_hierar: 0 / 1 / 2
+enum HierarchicLevel {
+  STANDALONE
+  PARENT
+  CHILD
+}
+
+/// Legacy authors.author_type: 70 / 71 / 72
+enum AuthorType {
+  PERSON
+  CORPORATE_BODY
+  CONGRESS
+}
+
+/// Legacy responsability.responsability_type: 0 / 1 / 2
+enum ContributionLevel {
+  PRIMARY
+  OTHER
+  SECONDARY
+}
+
+enum HoldStatus {
+  PENDING
+  AVAILABLE
+  FULFILLED
+  CANCELLED
+  EXPIRED
+}
+
+enum CustomFieldDataType {
+  TEXT
+  INTEGER
+  DECIMAL
+  BOOLEAN
+  DATE
+  SINGLE_CHOICE
+  MULTI_CHOICE
+}
+
+enum CustomFieldEntity {
+  BIBLIOGRAPHIC_RECORD
+  ITEM
+  PATRON
+  AUTHOR
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+model BibliographicRecord {
+  id                 Int                @id @default(autoincrement())
+  bibliographicLevel BibliographicLevel @default(MONOGRAPH) @map("bibliographic_level")
+  hierarchicLevel    HierarchicLevel    @default(STANDALONE) @map("hierarchic_level")
+
+  title         String
+  parallelTitle String? @map("parallel_title")
+  subtitle      String?
+
+  /// Legacy notices.code — holds ISBN, ISSN or EAN.
+  standardNumber String? @map("standard_number")
+
+  publicationYear  Int?      @map("publication_year")
+  publicationDate  DateTime? @map("publication_date") @db.Date
+  editionStatement String?   @map("edition_statement")
+  pageCount        String?   @map("page_count")
+  physicalDetails  String?   @map("physical_details")
+  dimensions       String?
+  /// Legacy notices.prix — varchar in legacy, real money type here.
+  price            Decimal?  @db.Decimal(10, 2)
+
+  generalNote  String? @map("general_note")
+  contentNote  String? @map("content_note")
+  abstract     String?
+  /// Legacy notices.thumbnail_url — a mediumblob holding a URL.
+  thumbnailUrl String? @map("thumbnail_url")
+
+  documentTypeId        Int?    @map("document_type_id")
+  statusId              Int?    @map("status_id")
+  classificationIndexId Int?    @map("classification_index_id")
+  seriesId              Int?    @map("series_id")
+  collectionId          Int?    @map("collection_id")
+  parentRecordId        Int?    @map("parent_record_id")
+  /// Volume number within the parent record. Legacy notices.tnvol.
+  volumeNumber          String? @map("volume_number")
+
+  customFields Json     @default("{}") @map("custom_fields")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  documentType        DocumentType?         @relation(fields: [documentTypeId], references: [id], onDelete: Restrict)
+  status              RecordStatus?         @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  classificationIndex ClassificationIndex?  @relation(fields: [classificationIndexId], references: [id], onDelete: SetNull)
+  series              Series?               @relation(fields: [seriesId], references: [id], onDelete: SetNull)
+  collection          Collection?           @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  parentRecord        BibliographicRecord?  @relation("RecordHierarchy", fields: [parentRecordId], references: [id], onDelete: Restrict)
+  childRecords        BibliographicRecord[] @relation("RecordHierarchy")
+
+  contributions    Contribution[]
+  recordPublishers RecordPublisher[]
+  recordSubjects   RecordSubject[]
+  languages        RecordLanguage[]
+  items            Item[]
+  issues           Issue[]
+  holds            Hold[]
+  relationsFrom    RecordRelation[]  @relation("RelationSource")
+  relationsTo      RecordRelation[]  @relation("RelationTarget")
+
+  @@index([title])
+  @@index([standardNumber])
+  @@index([bibliographicLevel])
+  @@map("bibliographic_records")
+}
+
+model DocumentType {
+  id              Int     @id @default(autoincrement())
+  label           String
+  isVisibleInOpac Boolean @default(true) @map("is_visible_in_opac")
+
+  records BibliographicRecord[]
+
+  @@map("document_types")
+}
+
+/// Legacy notice_statut — controls OPAC vs staff visibility.
+model RecordStatus {
+  id                    Int     @id @default(autoincrement())
+  label                 String
+  opacLabel             String? @map("opac_label")
+  isRecordVisibleInOpac Boolean @default(true) @map("is_record_visible_in_opac")
+  areItemsVisibleInOpac Boolean @default(true) @map("are_items_visible_in_opac")
+
+  /// Legacy notice_visible_opac_abon / expl_visible_opac_abon: when set, the
+  /// record (or its holdings) is visible only to a signed-in patron. The
+  /// master switch above still has to be on — these narrow it, they do not
+  /// override it.
+  isRecordSubscriberOnly Boolean @default(false) @map("is_record_subscriber_only")
+  areItemsSubscriberOnly Boolean @default(false) @map("are_items_subscriber_only")
+
+  records BibliographicRecord[]
+
+  @@map("record_statuses")
+}
+
+/// Legacy notices_relations — typed record-to-record links.
+model RecordRelation {
+  id             Int    @id @default(autoincrement())
+  sourceRecordId Int    @map("source_record_id")
+  targetRecordId Int    @map("target_record_id")
+  relationType   String @map("relation_type")
+  rank           Int    @default(0)
+
+  sourceRecord BibliographicRecord @relation("RelationSource", fields: [sourceRecordId], references: [id], onDelete: Cascade)
+  targetRecord BibliographicRecord @relation("RelationTarget", fields: [targetRecordId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceRecordId, targetRecordId, relationType])
+  @@index([targetRecordId])
+  @@map("record_relations")
+}
+
+/// Legacy notices_langues.
+model RecordLanguage {
+  recordId     Int    @map("record_id")
+  languageCode String @map("language_code") @db.Char(3)
+  rank         Int    @default(0)
+
+  record BibliographicRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  @@id([recordId, languageCode])
+  @@map("record_languages")
+}
+
+// ---------------------------------------------------------------------------
+// Authorities
+// ---------------------------------------------------------------------------
+
+model Author {
+  id         Int        @id @default(autoincrement())
+  authorType AuthorType @default(PERSON) @map("author_type")
+  /// Entry element — surname for a person, body name for a corporate author.
+  name       String
+  /// Legacy author_rejete — the "rejected" part, i.e. forename.
+  forename   String?
+  /// Free-text life/activity dates, e.g. "1902-1968".
+  dates      String?
+  isni       String?
+  website    String?
+  comment    String?
+
+  /// Legacy author_see — points at the preferred form of a non-preferred heading.
+  seeAlsoId  Int?     @map("see_also_id")
+  seeAlso    Author?  @relation("AuthorSeeAlso", fields: [seeAlsoId], references: [id], onDelete: SetNull)
+  referredBy Author[] @relation("AuthorSeeAlso")
+
+  customFields Json     @default("{}") @map("custom_fields")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  contributions Contribution[]
+
+  @@index([name])
+  @@index([authorType])
+  @@map("authors")
+}
+
+/// Legacy responsability — replaces its composite-PK-plus-autoincrement design.
+model Contribution {
+  id       Int @id @default(autoincrement())
+  recordId Int @map("record_id")
+  authorId Int @map("author_id")
+
+  /// UNIMARC relator code, e.g. "070" author, "730" translator.
+  relatorCode String            @map("relator_code") @db.VarChar(4)
+  level       ContributionLevel @default(PRIMARY)
+  rank        Int               @default(0)
+
+  record BibliographicRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  author Author              @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@unique([recordId, authorId, relatorCode, level])
+  @@index([authorId])
+  @@map("contributions")
+}
+
+model Publisher {
+  id      Int     @id @default(autoincrement())
+  name    String
+  city    String?
+  country String?
+  website String?
+  comment String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  recordPublishers RecordPublisher[]
+
+  @@index([name])
+  @@map("publishers")
+}
+
+/// Replaces legacy's fixed ed1_id / ed2_id slots.
+model RecordPublisher {
+  recordId    Int @map("record_id")
+  publisherId Int @map("publisher_id")
+  rank        Int @default(0)
+
+  record    BibliographicRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  publisher Publisher           @relation(fields: [publisherId], references: [id], onDelete: Restrict)
+
+  @@id([recordId, publisherId])
+  @@index([publisherId])
+  @@map("record_publishers")
+}
+
+/// Legacy collections + sub_collections, unified via self-reference.
+model Collection {
+  id       Int     @id @default(autoincrement())
+  name     String
+  issn     String?
+  parentId Int?    @map("parent_id")
+
+  parent   Collection?  @relation("CollectionHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children Collection[] @relation("CollectionHierarchy")
+
+  records BibliographicRecord[]
+
+  @@index([name])
+  @@map("collections")
+}
+
+model Series {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  records BibliographicRecord[]
+
+  @@index([name])
+  @@map("series")
+}
+
+/// Legacy indexint — Dewey-style shelf classification.
+model ClassificationIndex {
+  id      Int     @id @default(autoincrement())
+  code    String  @unique
+  comment String?
+
+  records BibliographicRecord[]
+
+  @@map("classification_indexes")
+}
+
+/// Legacy noeuds — thesaurus tree structure, labels held separately.
+model Subject {
+  id        Int     @id @default(autoincrement())
+  parentId  Int?    @map("parent_id")
+  /// Materialized path. Consider migrating to ltree for subtree queries.
+  path      String?
+  isVisible Boolean @default(true) @map("is_visible")
+
+  parent   Subject?  @relation("SubjectHierarchy", fields: [parentId], references: [id], onDelete: Restrict)
+  children Subject[] @relation("SubjectHierarchy")
+
+  labels         SubjectLabel[]
+  recordSubjects RecordSubject[]
+
+  @@index([parentId])
+  @@map("subjects")
+}
+
+/// Legacy categories — per-language label for a subject node.
+model SubjectLabel {
+  subjectId    Int     @map("subject_id")
+  languageCode String  @map("language_code") @db.VarChar(5)
+  label        String
+  scopeNote    String? @map("scope_note")
+  publicNote   String? @map("public_note")
+
+  subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@id([subjectId, languageCode])
+  @@index([label])
+  @@map("subject_labels")
+}
+
+/// Legacy notices_categories.
+model RecordSubject {
+  recordId  Int @map("record_id")
+  subjectId Int @map("subject_id")
+  /// Groups subjects into a composite heading. Legacy num_vedette.
+  headingNo Int @default(0) @map("heading_no")
+  rank      Int @default(0)
+
+  record  BibliographicRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  subject Subject             @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+  @@id([recordId, subjectId, headingNo])
+  @@index([subjectId])
+  @@map("record_subjects")
+}
+
+// ---------------------------------------------------------------------------
+// Holdings
+// ---------------------------------------------------------------------------
+
+model Item {
+  id         Int     @id @default(autoincrement())
+  barcode    String  @unique
+  /// Shelf mark. Legacy expl_cote.
+  callNumber String? @map("call_number")
+
+  /// Exactly one of recordId / issueId must be set — enforced by a CHECK
+  /// constraint in the migration, which Prisma cannot express.
+  recordId Int? @map("record_id")
+  issueId  Int? @map("issue_id")
+
+  locationId        Int? @map("location_id")
+  sectionId         Int? @map("section_id")
+  statusId          Int? @map("status_id")
+  statisticalCodeId Int? @map("statistical_code_id")
+
+  price      Decimal?  @db.Decimal(10, 2)
+  note       String?
+  acquiredOn DateTime? @map("acquired_on") @db.Date
+  lastLoanAt DateTime? @map("last_loan_at")
+
+  customFields Json     @default("{}") @map("custom_fields")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  record          BibliographicRecord? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  issue           Issue?               @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  location        Location?            @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  section         Section?             @relation(fields: [sectionId], references: [id], onDelete: Restrict)
+  status          ItemStatus?          @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  statisticalCode StatisticalCode?     @relation(fields: [statisticalCodeId], references: [id], onDelete: SetNull)
+
+  loans Loan[]
+
+  @@index([recordId])
+  @@index([issueId])
+  @@index([callNumber])
+  @@map("items")
+}
+
+/// Legacy bulletins — a serial issue, which items can hang off directly.
+model Issue {
+  id        Int       @id @default(autoincrement())
+  /// The serial record this issue belongs to.
+  recordId  Int       @map("record_id")
+  number    String
+  title     String?
+  dateLabel String?   @map("date_label")
+  issueDate DateTime? @map("issue_date") @db.Date
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  record BibliographicRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  items  Item[]
+  holds  Hold[]
+
+  @@index([recordId])
+  @@map("issues")
+}
+
+model Location {
+  id              Int     @id @default(autoincrement())
+  label           String
+  isVisibleInOpac Boolean @default(true) @map("is_visible_in_opac")
+
+  items       Item[]
+  patrons     Patron[]
+  pickupHolds Hold[]
+
+  @@map("locations")
+}
+
+model Section {
+  id              Int     @id @default(autoincrement())
+  label           String
+  isVisibleInOpac Boolean @default(true) @map("is_visible_in_opac")
+
+  items Item[]
+
+  @@map("sections")
+}
+
+model ItemStatus {
+  id              Int     @id @default(autoincrement())
+  label           String
+  opacLabel       String? @map("opac_label")
+  allowsLoan      Boolean @default(true) @map("allows_loan")
+  allowsHold      Boolean @default(false) @map("allows_hold")
+  isVisibleInOpac Boolean @default(true) @map("is_visible_in_opac")
+
+  items Item[]
+
+  @@map("item_statuses")
+}
+
+/// Legacy docs_codestat — reporting bucket, no behavioral effect.
+model StatisticalCode {
+  id    Int    @id @default(autoincrement())
+  label String
+
+  items Item[]
+
+  @@map("statistical_codes")
+}
+
+// ---------------------------------------------------------------------------
+// Patrons
+// ---------------------------------------------------------------------------
+
+model Patron {
+  id      Int    @id @default(autoincrement())
+  barcode String @unique
+
+  lastName  String  @map("last_name")
+  firstName String? @map("first_name")
+  email     String?
+  phone     String?
+
+  addressLine1 String? @map("address_line1")
+  addressLine2 String? @map("address_line2")
+  postalCode   String? @map("postal_code")
+  city         String?
+  country      String?
+
+  birthYear Int? @map("birth_year")
+
+  /// Hash only. Legacy's empr_password_is_encrypted flag is not carried over —
+  /// plaintext is not a representable state here. Null when the patron
+  /// authenticates externally (e.g. LDAP) or has no OPAC account.
+  passwordHash String? @map("password_hash")
+  login        String? @unique
+
+  categoryId Int? @map("category_id")
+  statusId   Int? @map("status_id")
+  locationId Int? @map("location_id")
+
+  enrolledOn   DateTime? @map("enrolled_on") @db.Date
+  expiresOn    DateTime? @map("expires_on") @db.Date
+  blockedUntil DateTime? @map("blocked_until") @db.Date
+
+  /// Set instead of deleting, so loan history stays queryable.
+  anonymizedAt DateTime? @map("anonymized_at")
+
+  /// Null until the patron's first successful sign-in. Mirrors
+  /// staff_users.last_login_at so both portals can tell a first visit apart.
+  lastLoginAt DateTime? @map("last_login_at")
+
+  customFields Json     @default("{}") @map("custom_fields")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  category PatronCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  status   PatronStatus?   @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  location Location?       @relation(fields: [locationId], references: [id], onDelete: Restrict)
+
+  loans Loan[]
+  holds Hold[]
+
+  @@index([lastName])
+  @@index([categoryId])
+  @@map("patrons")
+}
+
+model PatronCategory {
+  id                     Int     @id @default(autoincrement())
+  label                  String
+  membershipDurationDays Int     @default(365) @map("membership_duration_days")
+  membershipFee          Decimal @default(0) @map("membership_fee") @db.Decimal(10, 2)
+  minimumAge             Int?    @map("minimum_age")
+  maximumAge             Int?    @map("maximum_age")
+  loanQuota              Int?    @map("loan_quota")
+  loanDurationDays       Int?    @map("loan_duration_days")
+
+  patrons Patron[]
+
+  @@map("patron_categories")
+}
+
+/// Legacy empr_statut carried ~20 allow_* flags; only the ones the CDI is
+/// confirmed to use should live here (open question 3 in docs/07-target-schema.md).
+model PatronStatus {
+  id              Int     @id @default(autoincrement())
+  label           String
+  allowsLoan      Boolean @default(true) @map("allows_loan")
+  allowsHold      Boolean @default(true) @map("allows_hold")
+  allowsRenewal   Boolean @default(true) @map("allows_renewal")
+  allowsOpacLogin Boolean @default(true) @map("allows_opac_login")
+
+  patrons Patron[]
+
+  @@map("patron_statuses")
+}
+
+// ---------------------------------------------------------------------------
+// Circulation
+// ---------------------------------------------------------------------------
+
+/// Append-only ledger. Replaces legacy pret + pret_archive.
+/// Active loan = returned_at IS NULL, enforced unique per item by a partial
+/// index created in the migration (see header comment).
+model Loan {
+  id       Int @id @default(autoincrement())
+  itemId   Int @map("item_id")
+  patronId Int @map("patron_id")
+
+  loanedAt   DateTime  @default(now()) @map("loaned_at")
+  dueOn      DateTime  @map("due_on") @db.Date
+  returnedAt DateTime? @map("returned_at")
+
+  renewalCount Int @default(0) @map("renewal_count")
+  /// Overdue notice level already sent. Legacy niveau_relance.
+  noticeLevel  Int @default(0) @map("notice_level")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Restrict)
+  patron Patron @relation(fields: [patronId], references: [id], onDelete: Restrict)
+
+  @@index([itemId])
+  @@index([patronId])
+  @@index([dueOn])
+  @@index([returnedAt])
+  @@map("loans")
+}
+
+/// Replaces legacy resa + resa_archive. Holds are placed on a record (or a
+/// serial issue), not a specific item — matching legacy behavior.
+model Hold {
+  id       Int  @id @default(autoincrement())
+  patronId Int  @map("patron_id")
+  recordId Int? @map("record_id")
+  issueId  Int? @map("issue_id")
+
+  status     HoldStatus @default(PENDING)
+  placedAt   DateTime   @default(now()) @map("placed_at")
+  expiresOn  DateTime?  @map("expires_on") @db.Date
+  resolvedAt DateTime?  @map("resolved_at")
+
+  pickupLocationId Int? @map("pickup_location_id")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  patron         Patron               @relation(fields: [patronId], references: [id], onDelete: Restrict)
+  record         BibliographicRecord? @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  issue          Issue?               @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  pickupLocation Location?            @relation(fields: [pickupLocationId], references: [id], onDelete: SetNull)
+
+  @@index([patronId])
+  @@index([recordId])
+  @@index([status])
+  @@map("holds")
+}
+
+// ---------------------------------------------------------------------------
+// Staff and access control
+// ---------------------------------------------------------------------------
+
+/// Legacy users, minus ~90 columns of UI and cataloging defaults, which now
+/// live in the preferences jsonb.
+model StaffUser {
+  id           Int     @id @default(autoincrement())
+  username     String  @unique
+  passwordHash String  @map("password_hash")
+  lastName     String  @map("last_name")
+  firstName    String? @map("first_name")
+  email        String?
+  isActive     Boolean @default(true) @map("is_active")
+
+  /// UI and cataloging defaults. Not relational data.
+  preferences Json @default("{}")
+
+  lastLoginAt DateTime? @map("last_login_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  roles StaffUserRole[]
+
+  @@map("staff_users")
+}
+
+/// Replaces the users.rights bitmask and the BLOB-serialized acces_profiles
+/// rules, so "who can do X" is answerable in SQL.
+model Role {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  permissions RolePermission[]
+  users       StaffUserRole[]
+
+  @@map("roles")
+}
+
+model RolePermission {
+  roleId     Int    @map("role_id")
+  /// Dotted permission key, e.g. "catalog.record.edit".
+  permission String
+
+  role Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([roleId, permission])
+  @@index([permission])
+  @@map("role_permissions")
+}
+
+model StaffUserRole {
+  staffUserId Int @map("staff_user_id")
+  roleId      Int @map("role_id")
+
+  staffUser StaffUser @relation(fields: [staffUserId], references: [id], onDelete: Cascade)
+  role      Role      @relation(fields: [roleId], references: [id], onDelete: Cascade)
+
+  @@id([staffUserId, roleId])
+  @@map("staff_user_roles")
+}
+
+// ---------------------------------------------------------------------------
+// Custom fields
+// ---------------------------------------------------------------------------
+
+/// Replaces ~60 legacy EAV tables. Values live in each entity's
+/// custom_fields jsonb column; this table records what an admin declared.
+model CustomFieldDefinition {
+  id       Int                 @id @default(autoincrement())
+  entity   CustomFieldEntity
+  /// Key used inside the entity's custom_fields jsonb object.
+  key      String
+  label    String
+  dataType CustomFieldDataType @map("data_type")
+
+  isRequired   Boolean @default(false) @map("is_required")
+  isRepeatable Boolean @default(false) @map("is_repeatable")
+  isSearchable Boolean @default(false) @map("is_searchable")
+  rank         Int     @default(0)
+
+  /// Allowed values for SINGLE_CHOICE / MULTI_CHOICE, as [{value, label}].
+  choices Json @default("[]")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([entity, key])
+  @@map("custom_field_definitions")
+}

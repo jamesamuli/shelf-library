@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Horizontale_main" data-name="Horizontale main" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #ede7dc;
+      }
+
+      .cls-2, .cls-3 {
+        fill: #0f1d2e;
+      }
+
+      .cls-4 {
+        letter-spacing: .45em;
+      }
+
+      .cls-5, .cls-6 {
+        fill: #c8a56a;
+      }
+
+      .cls-3 {
+        font-family: PlayfairDisplay-Regular, 'Playfair Display';
+        font-size: 48px;
+      }
+
+      .cls-7 {
+        fill: #2e7d71;
+      }
+
+      .cls-6 {
+        font-family: Inter-SemiBold, Inter;
+        font-size: 14px;
+        font-variation-settings: 'opsz' 14, 'wght' 600;
+        font-weight: 600;
+        opacity: .98;
+      }
+
+      .cls-8 {
+        letter-spacing: .42em;
+      }
+    </style>
+  </defs>
+  <g>
+    <g>
+      <rect class="cls-2" x="54.64" y="38.95" width="15.37" height="63.17" rx="2.82" ry="2.82"/>
+      <rect class="cls-1" x="54.64" y="46.82" width="15.37" height="1.26"/>
+      <rect class="cls-1" x="54.64" y="94.98" width="15.37" height="1.26"/>
+    </g>
+    <g>
+      <rect class="cls-5" x="73.56" y="42.15" width="15.37" height="59.97" rx="2.82" ry="2.82"/>
+      <rect class="cls-1" x="73.56" y="46.19" width="15.37" height="1.26"/>
+      <rect class="cls-1" x="73.56" y="50.53" width="15.37" height="1.26"/>
+    </g>
+    <g>
+      <rect class="cls-7" x="95.81" y="52.98" width="15.37" height="48.47" rx="2.82" ry="2.82" transform="translate(-14.58 24.95) rotate(-12.85)"/>
+      <rect class="cls-1" x="91.26" y="56.75" width="15.37" height="1.02" transform="translate(-10.26 23.44) rotate(-12.85)"/>
+      <rect class="cls-1" x="100.51" y="97.31" width="15.37" height="1.02" transform="translate(-19.05 26.51) rotate(-12.85)"/>
+    </g>
+    <rect class="cls-2" x="41.82" y="106.36" width="88.15" height="10.55" rx="1.65" ry="1.65"/>
+  </g>
+  <g id="Text">
+    <text class="cls-3" transform="translate(141.25 102.12)"><tspan x="0" y="0">Shelf</tspan></text>
+    <g>
+      <rect class="cls-5" x="135.76" y="111.43" width="6.26" height=".64" rx=".21" ry=".21"/>
+      <text class="cls-6" transform="translate(148.69 116.54)"><tspan class="cls-4" x="0" y="0">LIBRA</tspan><tspan class="cls-8" x="71.84" y="0">R</tspan><tspan class="cls-4" x="86.89" y="0">Y</tspan></text>
+      <rect class="cls-5" x="251.54" y="111.43" width="6.26" height=".64" rx=".21" ry=".21"/>
+    </g>
+  </g>
+</svg>

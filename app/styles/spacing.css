@@ -1,0 +1,15 @@
+/*
+ * Spacing — semantic layout rhythm on top of Tailwind's numeric scale.
+ * Tailwind's default spacing (p-4, gap-2, ...) already covers component-
+ * level spacing; these names are for the handful of recurring structural
+ * gaps, so page layout doesn't depend on remembering "sections use gap-12".
+ * Each generates matching p-/m-/gap-/space-*  utilities.
+ */
+
+@theme {
+  --spacing-inline: 0.5rem;  /* tightly related inline items, e.g. icon + label */
+  --spacing-content: 1rem;   /* gap between related content blocks */
+  --spacing-section: 3rem;   /* gap between major page sections */
+  --spacing-page-x: 1.5rem;  /* page horizontal gutter */
+  --spacing-page-y: 2rem;    /* page vertical padding */
+}
