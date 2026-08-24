@@ -13,32 +13,41 @@ in the browser and documented in `docs/`.
 - `docs/` and `assets/` folders established.
 - No application feature exists yet.
 
-## Phase 1 — Public catalog (OPAC), read-only
+## Phase 1 — Public catalog (OPAC), read-only (done, 2026-08-08)
 
-- Catalog search (by title/author/keyword) and browsing by category.
-- Notice (bibliographic record) detail page.
-- No authentication, no write paths.
-- Legacy reference: root `catalog.php` / search flow, `notices`,
-  `notices_*`, `authorities`, `categories`, `exemplaires` (for
-  availability display).
-- Why first: highest visible value, lowest risk (no writes, no auth), and
-  forces the data-layer decision (see [01-architecture.md](01-architecture.md))
-  on a low-stakes feature.
+- Full-text search over records, authors and subjects; accent-insensitive.
+- Record detail with holdings and live availability.
+- Public: renders signed out. Subscriber-only visibility honoured.
+- Written up in [10-catalogue.md](10-catalogue.md).
+- Not done, and their own modules: browsing by subject/author/collection,
+  and result facets.
 
-## Phase 2 — Patron accounts and circulation
+## Phase 2 — Patron accounts and circulation (loans done, 2026-08-08)
 
-- Patron login, loan history, current loans, holds/reservations.
+- **Done:** authentication (both portals), check-out, check-in, renewal,
+  the staff dashboard and desk, and the patron's own loans and history.
+  Written up in [11-circulation.md](11-circulation.md).
+- **Also done:** reader enrolment with CSV class import
+  ([13-readers.md](13-readers.md)), and staff-side reservations —
+  current / overdue / to-reshelve, with assign, lend, delete and clear
+  ([14-reservations.md](14-reservations.md)).
+- **Not done:** readers placing their own holds from the OPAC, and check-in
+  trapping a returned copy for the next reader. See item 4.7 in
+  [09-deferred.md](09-deferred.md).
 - Legacy reference: `empr*`, `pret`, `pret_archive`, `resa`, `circ.php`,
   `account.php`.
-- Depends on: an auth approach being decided (open decision in
-  [01-architecture.md](01-architecture.md)) and a write-capable data layer.
 
-## Phase 3 — Back-office cataloging
+## Phase 3 — Back-office cataloging (done, 2026-08-08)
 
-- Staff-only: create/edit bibliographic records and copies.
-- Legacy reference: `admin/notices`, `edit.php`, `exemplaires`.
-- Depends on: staff auth/ACL (separate from patron auth — legacy keeps
-  these distinct via `users`/`acces_profiles` vs `empr`).
+- Record list, create, edit and delete; copies added, edited and deleted
+  on the record they belong to. Written up in
+  [12-cataloguing.md](12-cataloguing.md).
+- Authorities (authors, publishers, subjects) are created inline by typing
+  them. A dedicated authorities module — merging, renaming, the subject
+  hierarchy — does not exist.
+- Legacy reference: `catalog.php`, `catalog/notices`, `catalog/expl`.
+- **Still unguarded:** any signed-in staff user can edit or delete
+  anything. Authorization is deferred item 3.1 and should land next.
 
 ## Phase 4 — Lower-traffic back-office modules
 

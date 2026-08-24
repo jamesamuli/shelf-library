@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { fill, messagesFor, type Messages } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { searchCatalogue, type SearchHit } from "@/lib/catalogue";
+import { getSession } from "../(auth)/_lib/session";
 import { SearchBar } from "./_components/search-bar";
 
 export const metadata: Metadata = { title: "Catalogue" };
@@ -47,9 +48,13 @@ export default async function CataloguePage({
   const query = typeof params.q === "string" ? params.q : "";
   const page = Number(typeof params.page === "string" ? params.page : "1") || 1;
 
-  const messages = messagesFor(await getLocale());
+  const [messages, session] = await Promise.all([
+    getLocale().then(messagesFor),
+    getSession("opac"),
+  ]);
   const c = messages.catalogue;
-  const results = await searchCatalogue(query, page);
+  // Subscriber-only records join the results once a patron is signed in.
+  const results = await searchCatalogue(query, page, session !== null);
 
   const pageHref = (target: number) =>
     `/catalogue?${new URLSearchParams({ ...(query ? { q: query } : {}), page: String(target) })}`;

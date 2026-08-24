@@ -13,7 +13,11 @@ the legacy 514-table schema) and [07-target-schema.md](07-target-schema.md)
 
 Features: [08-authentication.md](08-authentication.md) — the two sign-in
 portals (Gestion / OPAC). [10-catalogue.md](10-catalogue.md) — the public
-catalogue (search + record detail).
+catalogue (search + record detail). [11-circulation.md](11-circulation.md) —
+check-out, check-in, renewal, and the patron's own loans.
+[12-cataloguing.md](12-cataloguing.md) — the back office: records and copies.
+[13-readers.md](13-readers.md) — enrolling readers and the CSV class import.
+[14-reservations.md](14-reservations.md) — holds, and the reshelving worklist.
 
 **[09-deferred.md](09-deferred.md) — everything knowingly left undone.**
 Check it before starting a phase, and add to it whenever something is

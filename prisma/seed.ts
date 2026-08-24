@@ -64,6 +64,13 @@ async function main() {
       }),
     ]);
 
+  // Exercises the overridable "not for loan" refusal at the desk.
+  const referenceStatus = await prisma.itemStatus.upsert({
+    where: { id: 2 },
+    update: {},
+    create: { id: 2, label: "Consultation sur place", allowsLoan: false },
+  });
+
   const author = await prisma.author.upsert({
     where: { id: 1 },
     update: {},
@@ -136,6 +143,20 @@ async function main() {
     },
   });
 
+  // A second copy of the same title, not for loan.
+  await prisma.item.upsert({
+    where: { barcode: "CDI-000002" },
+    update: {},
+    create: {
+      barcode: "CDI-000002",
+      callNumber: "100 BAC",
+      recordId: record.id,
+      locationId: location.id,
+      sectionId: section.id,
+      statusId: referenceStatus.id,
+    },
+  });
+
   const [patronCategory, patronStatus] = await Promise.all([
     prisma.patronCategory.upsert({
       where: { id: 1 },
@@ -148,6 +169,19 @@ async function main() {
       create: { id: 1, label: "Actif" },
     }),
   ]);
+
+  // A couple of classes so the import template works against real data.
+  for (const label of ["6ème B", "5ème A", "4ème C", "3ème A"]) {
+    const existing = await prisma.schoolClass.findUnique({ where: { label } });
+    if (!existing) await prisma.schoolClass.create({ data: { label } });
+  }
+
+  // No quota, longer loans — the second half of the duration/quota rules.
+  const staffCategory = await prisma.patronCategory.upsert({
+    where: { id: 2 },
+    update: {},
+    create: { id: 2, label: "Enseignant", loanDurationDays: 28 },
+  });
 
   const staffPassword = resolvePassword("SEED_STAFF_PASSWORD");
   const patronPassword = resolvePassword("SEED_PATRON_PASSWORD");
@@ -174,6 +208,37 @@ async function main() {
       firstName: "Camille",
       passwordHash: patronPasswordHash,
       categoryId: patronCategory.id,
+      statusId: patronStatus.id,
+      locationId: location.id,
+    },
+  });
+
+  // Desk-only patrons: no password, so neither can sign into the OPAC. They
+  // exist to exercise the check-out refusals — an expired card, and a reader
+  // with no quota.
+  const expired = new Date();
+  expired.setFullYear(expired.getFullYear() - 1);
+  await prisma.patron.upsert({
+    where: { barcode: "E-2025-0009" },
+    update: { expiresOn: expired },
+    create: {
+      barcode: "E-2025-0009",
+      lastName: "Leroy",
+      firstName: "Adrien",
+      categoryId: patronCategory.id,
+      statusId: patronStatus.id,
+      locationId: location.id,
+      expiresOn: expired,
+    },
+  });
+  await prisma.patron.upsert({
+    where: { barcode: "P-2026-0002" },
+    update: {},
+    create: {
+      barcode: "P-2026-0002",
+      lastName: "Nkurunziza",
+      firstName: "Aline",
+      categoryId: staffCategory.id,
       statusId: patronStatus.id,
       locationId: location.id,
     },

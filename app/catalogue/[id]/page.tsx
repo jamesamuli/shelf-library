@@ -3,13 +3,15 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
+import { formatDate } from "@/lib/dates";
 import { getRecord } from "@/lib/catalogue";
+import { getSession } from "../../(auth)/_lib/session";
 
 export async function generateMetadata({
   params,
 }: PageProps<"/catalogue/[id]">): Promise<Metadata> {
   const { id } = await params;
-  const record = await getRecord(Number(id));
+  const record = await getRecord(Number(id), (await getSession("opac")) !== null);
   return { title: record?.title ?? "Catalogue" };
 }
 
@@ -29,8 +31,9 @@ export default async function RecordPage({
   const numericId = Number(id);
   if (!Number.isInteger(numericId)) notFound();
 
-  const record = await getRecord(numericId);
-  const messages = messagesFor(await getLocale());
+  const [locale, session] = await Promise.all([getLocale(), getSession("opac")]);
+  const messages = messagesFor(locale);
+  const record = await getRecord(numericId, session !== null);
   const c = messages.catalogue;
 
   // Not found and "hidden from the OPAC" are deliberately indistinguishable.
@@ -49,15 +52,7 @@ export default async function RecordPage({
     );
   }
 
-  const authors = record.contributions.map((contribution) =>
-    [contribution.author.forename, contribution.author.name]
-      .filter(Boolean)
-      .join(" "),
-  );
-  const publishers = record.recordPublishers.map((rp) => rp.publisher.name);
-  const subjects = record.recordSubjects.flatMap((rs) =>
-    rs.subject.labels.map((label) => label.label),
-  );
+  const { authors, publishers, subjects } = record;
 
   return (
     <article className="stack gap-content">
@@ -106,18 +101,18 @@ export default async function RecordPage({
             </Field>
           ) : null}
           {record.documentType ? (
-            <Field label={c.documentType}>{record.documentType.label}</Field>
+            <Field label={c.documentType}>{record.documentType}</Field>
           ) : null}
           {record.collection ? (
-            <Field label={c.collection}>{record.collection.name}</Field>
+            <Field label={c.collection}>{record.collection}</Field>
           ) : null}
           {record.series ? (
-            <Field label={c.series}>{record.series.name}</Field>
+            <Field label={c.series}>{record.series}</Field>
           ) : null}
-          {record.classificationIndex ? (
+          {record.classification ? (
             <Field label={c.classification}>
               <span className="font-mono">
-                {record.classificationIndex.code}
+                {record.classification}
               </span>
             </Field>
           ) : null}
@@ -170,12 +165,16 @@ export default async function RecordPage({
                         <span className="text-foreground-muted">
                           {item.dueOn
                             ? fill(c.onLoanUntil, {
-                                date: item.dueOn.toLocaleDateString("fr-FR"),
+                                date: formatDate(item.dueOn, locale),
                               })
                             : c.allOnLoan}
                         </span>
                       ) : (
-                        <span className="text-success">
+                        <span
+                          className={
+                            item.isLoanable ? "text-success" : "text-foreground-muted"
+                          }
+                        >
                           {item.status ?? c.onShelf}
                         </span>
                       )}

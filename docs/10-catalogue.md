@@ -106,10 +106,9 @@ Z39.50, and the multi-source selector — deferred per
 
 ## 4. Open questions
 
-1. **Is subscriber-only visibility (`*_abon`) actually used?** The schema
-   has no equivalent column yet, so this build treats every OPAC-visible
-   record as public. Adding it later is one column plus one clause, but if
-   the CDI relies on it the answer changes now.
+1. ~~Is subscriber-only visibility (`*_abon`) used?~~ **Answered: yes,
+   keep legacy behaviour.** Implemented — see "Subscriber-only visibility"
+   below.
 2. **Implicit truncation threshold** — legacy uses "longer than 2
    characters". Keep as is unless the CDI has a preference.
 3. **Indexing language** — legacy supports per-record indexing language.
@@ -152,13 +151,34 @@ Data layer: `lib/catalogue.ts`. Full-text migrations:
    term predicates are ANDed across those. Author-plus-title is the most
    natural query a reader makes.
 
+### Subscriber-only visibility
+
+Legacy's `notice_visible_opac_abon` / `expl_visible_opac_abon` are kept, as
+`record_statuses.is_record_subscriber_only` and `.are_items_subscriber_only`
+(migration `20260808050000_subscriber_only_visibility`).
+
+They **narrow** the master switch, they do not override it. A record is
+public when it is OPAC-visible and not subscriber-only; it appears for a
+signed-in patron when both flags are on. The same pair governs holdings
+independently, so a record can be public while its copies are not.
+
+Both catalogue queries take an `isSubscriber` flag derived from the OPAC
+session, so an anonymous visitor and a signed-in patron genuinely see
+different result sets rather than the UI hiding rows after the fact.
+
 ### Performance
 
-Warm, against the remote database: search ≈260 ms (one raw query), record
-detail ≈1.6 s. The gap is Prisma's `include`, which issues a round trip per
-relation — about eight of them. Recorded in
-[09-deferred.md](09-deferred.md); the fix is to fetch the detail in one
-query as the search already does.
+Record detail was ≈1.6 s warm because Prisma's `include` issues a round trip
+per relation — about eight. It is now a single query that aggregates
+authors, publishers, subjects and holdings in SQL, the same shape search
+already used.
+
+Warm, against the remote database:
+
+| | before | after |
+|---|---|---|
+| Search | ≈260 ms | ≈300 ms |
+| Record detail | ≈1.6 s | ≈320 ms |
 
 ### Verified
 
@@ -167,6 +187,12 @@ Search by title, author, subject and abstract; prefix truncation (`pest` →
 matching nothing; the empty-results state; record detail with holdings and
 a live due date; the not-found state; French and English; light and dark;
 375 px with no page overflow.
+
+Subscriber-only was tested against the live database: a subscriber-only
+record returns 0 search hits and a hidden detail page for an anonymous
+visitor, and 1 hit with a visible page once signed in; a holdings-only
+restriction keeps the record public while its copies disappear for
+anonymous visitors.
 
 Visibility was tested against the live database rather than assumed: a
 status hiding a record removes it from both search and detail; a status

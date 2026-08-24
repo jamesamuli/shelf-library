@@ -145,6 +145,14 @@ model BibliographicRecord {
   relationsFrom    RecordRelation[]  @relation("RelationSource")
   relationsTo      RecordRelation[]  @relation("RelationTarget")
 
+  /// GENERATED column, created and maintained by SQL migrations — Prisma's
+  /// schema language cannot express `GENERATED ALWAYS AS ... STORED`.
+  /// Declared here only so `migrate dev` sees it as existing rather than as
+  /// drift and offers to DROP it. `Unsupported` keeps it out of the client
+  /// API, which is correct: nothing may write a generated column.
+  searchVector Unsupported("tsvector")? @map("search_vector")
+
+  @@index([searchVector], type: Gin)
   @@index([title])
   @@index([standardNumber])
   @@index([bibliographicLevel])
@@ -237,6 +245,14 @@ model Author {
 
   contributions Contribution[]
 
+  /// GENERATED column, created and maintained by SQL migrations — Prisma's
+  /// schema language cannot express `GENERATED ALWAYS AS ... STORED`.
+  /// Declared here only so `migrate dev` sees it as existing rather than as
+  /// drift and offers to DROP it. `Unsupported` keeps it out of the client
+  /// API, which is correct: nothing may write a generated column.
+  searchVector Unsupported("tsvector")? @map("search_vector")
+
+  @@index([searchVector], type: Gin)
   @@index([name])
   @@index([authorType])
   @@map("authors")
@@ -357,7 +373,15 @@ model SubjectLabel {
 
   subject Subject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
 
+  /// GENERATED column, created and maintained by SQL migrations — Prisma's
+  /// schema language cannot express `GENERATED ALWAYS AS ... STORED`.
+  /// Declared here only so `migrate dev` sees it as existing rather than as
+  /// drift and offers to DROP it. `Unsupported` keeps it out of the client
+  /// API, which is correct: nothing may write a generated column.
+  searchVector Unsupported("tsvector")? @map("search_vector")
+
   @@id([subjectId, languageCode])
+  @@index([searchVector], type: Gin)
   @@index([label])
   @@map("subject_labels")
 }
@@ -414,7 +438,9 @@ model Item {
   status          ItemStatus?          @relation(fields: [statusId], references: [id], onDelete: Restrict)
   statisticalCode StatisticalCode?     @relation(fields: [statisticalCodeId], references: [id], onDelete: SetNull)
 
-  loans Loan[]
+  loans      Loan[]
+  holds      Hold[]
+  reshelving ReshelvingItem?
 
   @@index([recordId])
   @@index([issueId])
@@ -498,7 +524,10 @@ model Patron {
 
   lastName  String  @map("last_name")
   firstName String? @map("first_name")
-  email     String?
+  /// Unique: the school email is the entry point for creating a reader, so it
+  /// identifies them as firmly as the barcode does. Still nullable — a reader
+  /// without one is valid, just not creatable from the new-reader form.
+  email     String? @unique
   phone     String?
 
   addressLine1 String? @map("address_line1")
@@ -509,15 +538,21 @@ model Patron {
 
   birthYear Int? @map("birth_year")
 
+  /// Legacy empr_sexe. 'F', 'M', or null — display only, nothing branches on it.
+  gender String?
+  /// Legacy empr_msg: free-form note shown to staff on the reader's file.
+  notes  String?
+
   /// Hash only. Legacy's empr_password_is_encrypted flag is not carried over —
   /// plaintext is not a representable state here. Null when the patron
   /// authenticates externally (e.g. LDAP) or has no OPAC account.
   passwordHash String? @map("password_hash")
   login        String? @unique
 
-  categoryId Int? @map("category_id")
-  statusId   Int? @map("status_id")
-  locationId Int? @map("location_id")
+  categoryId    Int? @map("category_id")
+  statusId      Int? @map("status_id")
+  locationId    Int? @map("location_id")
+  schoolClassId Int? @map("school_class_id")
 
   enrolledOn   DateTime? @map("enrolled_on") @db.Date
   expiresOn    DateTime? @map("expires_on") @db.Date
@@ -534,16 +569,31 @@ model Patron {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  category PatronCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  status   PatronStatus?   @relation(fields: [statusId], references: [id], onDelete: Restrict)
-  location Location?       @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  category    PatronCategory? @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  status      PatronStatus?   @relation(fields: [statusId], references: [id], onDelete: Restrict)
+  location    Location?       @relation(fields: [locationId], references: [id], onDelete: Restrict)
+  schoolClass SchoolClass?    @relation(fields: [schoolClassId], references: [id], onDelete: SetNull)
 
   loans Loan[]
   holds Hold[]
 
   @@index([lastName])
   @@index([categoryId])
+  @@index([schoolClassId])
   @@map("patrons")
+}
+
+/// A class group ("6ème B"). Legacy filed this under empr_codestat, a shared
+/// "statistical code" table; here it is its own list because a class is how a
+/// CDI organises its whole population, and because the bulk import needs a
+/// closed list to validate against instead of accepting typos.
+model SchoolClass {
+  id    Int    @id @default(autoincrement())
+  label String @unique
+
+  patrons Patron[]
+
+  @@map("school_classes")
 }
 
 model PatronCategory {
@@ -619,9 +669,14 @@ model Hold {
 
   status     HoldStatus @default(PENDING)
   placedAt   DateTime   @default(now()) @map("placed_at")
+  /// Set when a copy is assigned: the end of the pickup window. Null while the
+  /// hold is still waiting for a copy — legacy's 0000-00-00.
   expiresOn  DateTime?  @map("expires_on") @db.Date
   resolvedAt DateTime?  @map("resolved_at")
 
+  /// The copy set aside for this reader. Legacy resa.resa_cb, but a real
+  /// reference rather than a loose barcode string.
+  itemId           Int? @map("item_id")
   pickupLocationId Int? @map("pickup_location_id")
 
   createdAt DateTime @default(now()) @map("created_at")
@@ -630,12 +685,27 @@ model Hold {
   patron         Patron               @relation(fields: [patronId], references: [id], onDelete: Restrict)
   record         BibliographicRecord? @relation(fields: [recordId], references: [id], onDelete: Cascade)
   issue          Issue?               @relation(fields: [issueId], references: [id], onDelete: Cascade)
+  item           Item?                @relation(fields: [itemId], references: [id], onDelete: SetNull)
   pickupLocation Location?            @relation(fields: [pickupLocationId], references: [id], onDelete: SetNull)
 
   @@index([patronId])
   @@index([recordId])
+  @@index([itemId])
   @@index([status])
   @@map("holds")
+}
+
+/// Legacy resa_ranger: copies pulled off the shelf for a hold that has since
+/// gone away, and which therefore have to be put back. A worklist, cleared by
+/// scanning the barcode.
+model ReshelvingItem {
+  id        Int      @id @default(autoincrement())
+  itemId    Int      @unique @map("item_id")
+  flaggedAt DateTime @default(now()) @map("flagged_at")
+
+  item Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@map("reshelving_items")
 }
 
 // ---------------------------------------------------------------------------

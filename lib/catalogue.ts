@@ -29,6 +29,37 @@ export type SearchResults = {
   pageCount: number;
 };
 
+export type Holding = {
+  id: number;
+  barcode: string;
+  callNumber: string | null;
+  location: string | null;
+  section: string | null;
+  status: string | null;
+  /** False for reference copies — on the shelf, but not borrowable. */
+  isLoanable: boolean;
+  isOnLoan: boolean;
+  /** ISO date string, or null when not on loan. */
+  dueOn: string | null;
+};
+
+export type RecordDetail = {
+  id: number;
+  title: string;
+  subtitle: string | null;
+  abstract: string | null;
+  publicationYear: number | null;
+  standardNumber: string | null;
+  documentType: string | null;
+  collection: string | null;
+  series: string | null;
+  classification: string | null;
+  authors: string[];
+  publishers: string[];
+  subjects: string[];
+  holdings: Holding[];
+};
+
 /**
  * Splits free user input into safe prefix-matched tsquery terms.
  *
@@ -45,31 +76,31 @@ export function parseTerms(input: string): string[] {
 }
 
 /**
- * Visibility, holdings and availability in one pass.
- *
- * - A record shows only when its status is OPAC-visible.
- * - An item counts only when its section and status are OPAC-visible; a null
- *   section/status is treated as visible (legacy required both, but its
- *   columns were NOT NULL with a 0 sentinel).
- * - "Available" means no open loan, mirroring legacy's LEFT JOIN on `pret`.
+ * Record-level OPAC visibility, mirroring legacy's
+ * `notice_visible_opac` + `notice_visible_opac_abon`: the master switch must
+ * be on, and a subscriber-only record additionally needs a signed-in patron.
  */
-const HOLDINGS_LATERAL = Prisma.sql`
-  LEFT JOIN LATERAL (
-    SELECT
-      count(*)::int AS total,
-      count(*) FILTER (WHERE l.id IS NULL)::int AS available
-    FROM items i
-    LEFT JOIN sections sec ON sec.id = i.section_id
-    LEFT JOIN item_statuses ist ON ist.id = i.status_id
-    LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
-    WHERE i.record_id = r.id
-      AND COALESCE(sec.is_visible_in_opac, true)
-      AND COALESCE(ist.is_visible_in_opac, true)
-  ) holdings ON true
+const visibleRecords = (isSubscriber: boolean) => Prisma.sql`
+  JOIN record_statuses st
+    ON st.id = r.status_id
+   AND st.is_record_visible_in_opac
+   AND (NOT st.is_record_subscriber_only OR ${isSubscriber})
 `;
 
-const VISIBLE = Prisma.sql`
-  JOIN record_statuses st ON st.id = r.status_id AND st.is_record_visible_in_opac
+/**
+ * Holdings visibility, applied on top of the record being visible at all:
+ * the record's status must expose its items (`expl_visible_opac`, and
+ * `expl_visible_opac_abon` for subscriber-only), and each item's own section
+ * and status must be OPAC-visible. A null section/status counts as visible —
+ * legacy's columns were NOT NULL with a 0 sentinel, ours are nullable.
+ *
+ * "Available" means no open loan, mirroring legacy's LEFT JOIN on `pret`.
+ */
+const visibleHoldings = (isSubscriber: boolean) => Prisma.sql`
+  st.are_items_visible_in_opac
+  AND (NOT st.are_items_subscriber_only OR ${isSubscriber})
+  AND COALESCE(sec.is_visible_in_opac, true)
+  AND COALESCE(ist.is_visible_in_opac, true)
 `;
 
 type HitRow = {
@@ -86,6 +117,7 @@ type HitRow = {
 export async function searchCatalogue(
   rawQuery: string,
   page: number,
+  isSubscriber = false,
 ): Promise<SearchResults> {
   const terms = parseTerms(rawQuery);
   const currentPage = Math.max(1, page);
@@ -145,9 +177,22 @@ export async function searchCatalogue(
         holdings.total,
         holdings.available
       FROM bibliographic_records r
-      ${VISIBLE}
+      ${visibleRecords(isSubscriber)}
       LEFT JOIN document_types dt ON dt.id = r.document_type_id
-      ${HOLDINGS_LATERAL}
+      LEFT JOIN LATERAL (
+        SELECT
+          count(*)::int AS total,
+          -- A reference copy is on the shelf but cannot be borrowed, so it
+          -- must not be counted as available.
+          count(*) FILTER (
+            WHERE l.id IS NULL AND COALESCE(ist.allows_loan, true)
+          )::int AS available
+        FROM items i
+        LEFT JOIN sections sec ON sec.id = i.section_id
+        LEFT JOIN item_statuses ist ON ist.id = i.status_id
+        LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
+        WHERE i.record_id = r.id AND ${visibleHoldings(isSubscriber)}
+      ) holdings ON true
       WHERE true ${match}
       ${order}
       LIMIT ${PER_PAGE} OFFSET ${offset}
@@ -155,7 +200,7 @@ export async function searchCatalogue(
     prisma.$queryRaw<{ count: bigint }[]>`
       SELECT count(*)::bigint AS count
       FROM bibliographic_records r
-      ${VISIBLE}
+      ${visibleRecords(isSubscriber)}
       WHERE true ${match}
     `,
   ]);
@@ -179,70 +224,118 @@ export async function searchCatalogue(
   };
 }
 
-export type RecordDetail = NonNullable<Awaited<ReturnType<typeof getRecord>>>;
+type DetailRow = {
+  id: number;
+  title: string;
+  subtitle: string | null;
+  abstract: string | null;
+  publication_year: number | null;
+  standard_number: string | null;
+  document_type: string | null;
+  collection: string | null;
+  series: string | null;
+  classification: string | null;
+  authors: string[] | null;
+  publishers: string[] | null;
+  subjects: string[] | null;
+  holdings: Holding[] | null;
+};
 
 /**
- * Null when the record does not exist or its status hides it from the OPAC.
+ * Null when the record does not exist or its status hides it from this viewer.
+ *
+ * One round trip. Prisma's `include` issues a query per relation, which cost
+ * ~1.6s against the remote database versus ~260ms for the single-query search;
+ * the metadata and holdings are aggregated in SQL instead.
  *
  * Wrapped in React `cache` because both `generateMetadata` and the page body
- * need the record — without it every detail view runs the whole query twice.
+ * need the record, and without it each detail view would fetch twice.
  */
-export const getRecord = cache(async function getRecord(id: number) {
-  const record = await prisma.bibliographicRecord.findFirst({
-    where: { id, status: { isRecordVisibleInOpac: true } },
-    include: {
-      documentType: true,
-      status: true,
-      collection: true,
-      series: true,
-      classificationIndex: true,
-      contributions: {
-        include: { author: true },
-        orderBy: [{ level: "asc" }, { rank: "asc" }],
-      },
-      recordPublishers: { include: { publisher: true } },
-      recordSubjects: {
-        include: { subject: { include: { labels: true } } },
-      },
-      // Each `include` is a separate round trip to a remote database, so only
-      // relations the detail page actually renders belong here.
-    },
-  });
+export const getRecord = cache(async function getRecord(
+  id: number,
+  isSubscriber = false,
+): Promise<RecordDetail | null> {
+  const rows = await prisma.$queryRaw<DetailRow[]>`
+    SELECT
+      r.id,
+      r.title,
+      r.subtitle,
+      r.abstract,
+      r.publication_year,
+      r.standard_number,
+      dt.label AS document_type,
+      col.name AS collection,
+      ser.name AS series,
+      ci.code AS classification,
+      ARRAY(
+        SELECT btrim(coalesce(a.forename, '') || ' ' || a.name)
+        FROM contributions c
+        JOIN authors a ON a.id = c.author_id
+        WHERE c.record_id = r.id
+        ORDER BY c.level, c.rank
+      ) AS authors,
+      ARRAY(
+        SELECT p.name
+        FROM record_publishers rp
+        JOIN publishers p ON p.id = rp.publisher_id
+        WHERE rp.record_id = r.id
+        ORDER BY rp.rank
+      ) AS publishers,
+      ARRAY(
+        SELECT sl.label
+        FROM record_subjects rs
+        JOIN subject_labels sl ON sl.subject_id = rs.subject_id
+        WHERE rs.record_id = r.id
+        ORDER BY rs.rank
+      ) AS subjects,
+      COALESCE((
+        SELECT json_agg(h ORDER BY h.barcode)
+        FROM (
+          SELECT
+            i.id,
+            i.barcode,
+            i.call_number   AS "callNumber",
+            loc.label       AS location,
+            sec.label       AS section,
+            COALESCE(ist.opac_label, ist.label) AS status,
+            COALESCE(ist.allows_loan, true) AS "isLoanable",
+            (l.id IS NOT NULL) AS "isOnLoan",
+            l.due_on        AS "dueOn"
+          FROM items i
+          LEFT JOIN locations loc ON loc.id = i.location_id
+          LEFT JOIN sections sec ON sec.id = i.section_id
+          LEFT JOIN item_statuses ist ON ist.id = i.status_id
+          LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
+          WHERE i.record_id = r.id AND ${visibleHoldings(isSubscriber)}
+        ) h
+      ), '[]'::json) AS holdings
+    FROM bibliographic_records r
+    ${visibleRecords(isSubscriber)}
+    LEFT JOIN document_types dt ON dt.id = r.document_type_id
+    LEFT JOIN collections col ON col.id = r.collection_id
+    LEFT JOIN series ser ON ser.id = r.series_id
+    LEFT JOIN classification_indexes ci ON ci.id = r.classification_index_id
+    WHERE r.id = ${id}
+    LIMIT 1
+  `;
 
-  if (!record) return null;
-
-  // Holdings are only listed when the record's status allows it, then filtered
-  // again by each item's own section and status visibility.
-  const items = record.status?.areItemsVisibleInOpac
-    ? await prisma.item.findMany({
-        where: {
-          recordId: id,
-          AND: [
-            { OR: [{ section: null }, { section: { isVisibleInOpac: true } }] },
-            { OR: [{ status: null }, { status: { isVisibleInOpac: true } }] },
-          ],
-        },
-        include: {
-          location: true,
-          section: true,
-          status: true,
-          loans: { where: { returnedAt: null }, take: 1 },
-        },
-        orderBy: { barcode: "asc" },
-      })
-    : [];
+  const row = rows[0];
+  if (!row) return null;
 
   return {
-    ...record,
-    holdings: items.map((item) => ({
-      id: item.id,
-      barcode: item.barcode,
-      callNumber: item.callNumber,
-      location: item.location?.label ?? null,
-      section: item.section?.label ?? null,
-      status: item.status?.opacLabel ?? item.status?.label ?? null,
-      isOnLoan: item.loans.length > 0,
-      dueOn: item.loans[0]?.dueOn ?? null,
-    })),
+    id: row.id,
+    title: row.title,
+    subtitle: row.subtitle,
+    abstract: row.abstract,
+    publicationYear: row.publication_year,
+    standardNumber: row.standard_number,
+    documentType: row.document_type,
+    collection: row.collection,
+    series: row.series,
+    classification: row.classification,
+    authors: row.authors ?? [],
+    publishers: row.publishers ?? [],
+    subjects: row.subjects ?? [],
+    holdings: row.holdings ?? [],
   };
 });
