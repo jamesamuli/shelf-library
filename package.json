@@ -12,7 +12,6 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
-    "@tailwindcss/oxide-win32-x64-msvc": "^4.3.3",
     "dotenv": "^17.4.2",
     "next": "16.3.0",
     "pg": "^8.22.0",
