@@ -1,5 +1,5 @@
 import { templateCsv } from "@/lib/patron-import";
-import { requireSession } from "../../../../(auth)/_lib/session";
+import { requirePermission } from "../../../../(auth)/_lib/session";
 
 /**
  * The import template, with real headers and filled example rows.
@@ -9,7 +9,7 @@ import { requireSession } from "../../../../(auth)/_lib/session";
  * back.
  */
 export async function GET() {
-  await requireSession("gestion");
+  await requirePermission("readers.manage");
 
   return new Response(`﻿${templateCsv()}`, {
     headers: {

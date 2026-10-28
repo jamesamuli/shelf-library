@@ -4,8 +4,7 @@ Everything knowingly left undone, so it is decided later rather than
 discovered later. Add to this file whenever something is deferred; delete
 entries when they land.
 
-Last reviewed: 2026-08-14, after an app-wide run-and-fix pass over every
-route and every domain rule.
+Last reviewed: 2026-09-14, after the authorization module.
 
 ## 1. Blocking before real users touch this
 
@@ -50,11 +49,14 @@ matching feature starts.
 Sign-in itself works; these are the pieces around it. See
 [08-authentication.md](08-authentication.md).
 
-- **3.1 Authorization. Now the most urgent item here.** `roles` /
-  `role_permissions` exist and `scripts/create-admin.ts` assigns one, but
-  nothing reads them. Gestion can now delete records, delete copies and
-  lend on someone's behalf, and every signed-in staff account can do all of
-  it. Legacy gated this per record (`gestion_acces_active`).
+- **3.1 Authorization — done**, see
+  [15-authorization.md](15-authorization.md). Seven permission keys, three
+  roles, checked in every Server Action and on every page. What is *not*
+  done: staff accounts still cannot be created or disabled from the UI (the
+  screen only assigns roles to existing accounts — `scripts/create-admin.ts`
+  makes them), there is no audit trail of who deleted what, and legacy's
+  second layer of per-location / per-category ACLs in `admin/acces` is out of
+  scope for a single-site CDI.
 - **3.2 Password reset.** Currently an information page telling users who
   to contact. A real reset needs mail transport, which the app does not
   have. Legacy used `askmdp.php`.
@@ -230,6 +232,12 @@ Not our bugs, but they will bite whoever touches these next.
   to a GET-only route handler leaves the router believing the page *is* that
   route, and the next Server Action POSTs to it and gets a 405. Use a plain
   `<a download>`. This cost an afternoon on the reader import.
+- **7.13 A `"use client"` module may not reach the database, however
+  innocent the import looks.** The staff table imported `PERMISSIONS` — a
+  frozen object of label strings — from a module that also exported a
+  Prisma-backed lookup, and the build failed with `Can't resolve 'dns'`.
+  Splitting the pure catalogue from the query fixed it. The rule is about the
+  *module*, not the value.
 - **7.12 Never hand a whole Prisma row to a Client Component.** Both option
   helpers returned full rows to `<select>`s that only ever read `id` and
   `label`, which shipped `PatronCategory.membershipFee` and the

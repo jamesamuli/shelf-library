@@ -7,15 +7,21 @@ import {
   toDateInput,
   EMPTY_PATRON,
 } from "@/lib/patrons";
-import { requireSession } from "../../../(auth)/_lib/session";
+import { getStaffContext } from "../../../(auth)/_lib/session";
+import { Denied } from "../../_components/denied";
 import { ReaderForm } from "./_components/reader-form";
 import { ImportPanel } from "./_components/import-panel";
 
 export const metadata: Metadata = { title: "Nouveau lecteur" };
 
 export default async function ReadersPage() {
-  const [locale] = await Promise.all([getLocale(), requireSession("gestion")]);
+  const [locale, { granted }] = await Promise.all([
+    getLocale(),
+    getStaffContext(),
+  ]);
   const messages = messagesFor(locale);
+
+  if (!granted.has("readers.manage")) return <Denied messages={messages} />;
   const r = messages.readers;
 
   const options = await getPatronOptions();

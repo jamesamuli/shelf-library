@@ -22,6 +22,7 @@ export type CirculationMessageKey =
   | "errAlreadyOnLoanHere"
   | "errAlreadyOnLoanElsewhere"
   | "errQuotaReached"
+  | "errForbidden"
   | "errNotOnLoan"
   | "errLoanNotFound"
   | "errRenewNotAllowed"

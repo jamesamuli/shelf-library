@@ -14,7 +14,7 @@ import type {
   ItemFormState,
   RecordFormState,
 } from "./_lib/state";
-import { requireSession } from "../../(auth)/_lib/session";
+import { requirePermission } from "../../(auth)/_lib/session";
 
 const text = (formData: FormData, key: string) => String(formData.get(key) ?? "");
 
@@ -46,7 +46,7 @@ export async function saveRecordAction(
   _previous: RecordFormState,
   formData: FormData,
 ): Promise<RecordFormState> {
-  await requireSession("gestion");
+  await requirePermission("catalog.edit");
 
   const rawId = text(formData, "id");
   const id = rawId ? Number(rawId) : null;
@@ -80,7 +80,7 @@ export async function deleteRecordAction(
   _previous: RecordFormState,
   formData: FormData,
 ): Promise<RecordFormState> {
-  await requireSession("gestion");
+  await requirePermission("catalog.delete");
 
   const id = Number(text(formData, "id"));
   if (!Number.isInteger(id)) return { kind: "error", key: "errNotFound" };
@@ -102,7 +102,7 @@ export async function saveItemAction(
   _previous: ItemFormState,
   formData: FormData,
 ): Promise<ItemFormState> {
-  await requireSession("gestion");
+  await requirePermission("catalog.edit");
 
   const recordId = Number(text(formData, "recordId"));
   const rawItemId = text(formData, "itemId");
@@ -141,7 +141,7 @@ export async function deleteItemAction(
   _previous: ItemFormState,
   formData: FormData,
 ): Promise<ItemFormState> {
-  await requireSession("gestion");
+  await requirePermission("catalog.delete");
 
   const itemId = Number(text(formData, "itemId"));
   const recordId = Number(text(formData, "recordId"));

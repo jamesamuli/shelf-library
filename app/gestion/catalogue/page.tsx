@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { listRecords } from "@/lib/cataloguing";
-import { requireSession } from "../../(auth)/_lib/session";
+import { getStaffContext } from "../../(auth)/_lib/session";
+import { Denied } from "../_components/denied";
 
 export const metadata: Metadata = { title: "Catalogage" };
 
@@ -11,9 +12,11 @@ export default async function CataloguingList({
   searchParams,
 }: PageProps<"/gestion/catalogue">) {
   const [params, locale] = await Promise.all([searchParams, getLocale()]);
-  await requireSession("gestion");
+  const { granted } = await getStaffContext();
 
   const messages = messagesFor(locale);
+
+  if (!granted.has("catalog.edit")) return <Denied messages={messages} />;
   const c = messages.cataloguing;
   const query = typeof params.q === "string" ? params.q : "";
   const page = Number(typeof params.page === "string" ? params.page : "1") || 1;

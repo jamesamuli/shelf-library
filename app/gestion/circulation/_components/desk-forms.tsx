@@ -129,10 +129,13 @@ export function CheckOutForm({
   patronId,
   messages,
   locale,
+  canOverride,
 }: {
   patronId: number;
   messages: Messages;
   locale: Locale;
+  /** The server refuses a forced loan regardless; this hides a dead button. */
+  canOverride: boolean;
 }) {
   const [state, formAction, pending] = useActionState(checkOutAction, IDLE);
   const c = messages.circulation;
@@ -147,7 +150,7 @@ export function CheckOutForm({
       label={c.itemLabel}
       placeholder={c.itemPlaceholder}
       submitLabel={c.checkOutAction}
-      forceLabel={c.checkOutAnyway}
+      forceLabel={canOverride ? c.checkOutAnyway : undefined}
       /* Once a patron is open, lending is what you came to do. Check-in must
          not autofocus as well — the last one to mount would win, and the
          cursor would sit in the wrong box. */
@@ -191,11 +194,13 @@ export function LoanActions({
   itemBarcode,
   messages,
   locale,
+  canOverride,
 }: {
   loanId: number;
   itemBarcode: string;
   messages: Messages;
   locale: Locale;
+  canOverride: boolean;
 }) {
   const [renewState, renew, renewPending] = useActionState(renewAction, IDLE);
   const [returnState, returnItem, returnPending] = useActionState(
@@ -215,7 +220,7 @@ export function LoanActions({
           </button>
         </form>
 
-        {renewState.kind === "error" && renewState.overridable ? (
+        {canOverride && renewState.kind === "error" && renewState.overridable ? (
           <form action={renew}>
             <input type="hidden" name="loanId" value={loanId} />
             <input type="hidden" name="force" value="1" />

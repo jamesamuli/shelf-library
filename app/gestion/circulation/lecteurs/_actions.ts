@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { createPatron, type PatronInput } from "@/lib/patrons";
 import { importPatrons, previewImport } from "@/lib/patron-import";
 import type { ImportState, ReaderFormState } from "./_lib/state";
-import { requireSession } from "../../../(auth)/_lib/session";
+import { requirePermission } from "../../../(auth)/_lib/session";
 
 const text = (formData: FormData, key: string) => String(formData.get(key) ?? "");
 
@@ -29,7 +29,7 @@ export async function createPatronAction(
   previous: ReaderFormState,
   formData: FormData,
 ): Promise<ReaderFormState> {
-  await requireSession("gestion");
+  await requirePermission("readers.manage");
 
   const input = readPatron(formData);
   const result = await createPatron(input);
@@ -57,7 +57,7 @@ export async function previewImportAction(
   _previous: ImportState,
   formData: FormData,
 ): Promise<ImportState> {
-  await requireSession("gestion");
+  await requirePermission("readers.manage");
 
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) {
@@ -80,7 +80,7 @@ export async function confirmImportAction(
   _previous: ImportState,
   formData: FormData,
 ): Promise<ImportState> {
-  await requireSession("gestion");
+  await requirePermission("readers.manage");
 
   const content = text(formData, "text");
   if (!content.trim()) return { kind: "error", key: "errFileEmpty" };

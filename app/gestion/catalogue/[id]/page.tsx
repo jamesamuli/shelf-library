@@ -4,7 +4,8 @@ import type { Metadata } from "next";
 import { messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { getCataloguingOptions, getRecordForEdit } from "@/lib/cataloguing";
-import { requireSession } from "../../../(auth)/_lib/session";
+import { getStaffContext } from "../../../(auth)/_lib/session";
+import { Denied } from "../../_components/denied";
 import { RecordForm } from "../_components/record-form";
 import { CopiesEditor } from "../_components/copies-editor";
 
@@ -14,7 +15,7 @@ export default async function EditRecordPage({
   params,
 }: PageProps<"/gestion/catalogue/[id]">) {
   const [{ id }, locale] = await Promise.all([params, getLocale()]);
-  await requireSession("gestion");
+  const { granted } = await getStaffContext();
 
   const numericId = Number(id);
   if (!Number.isInteger(numericId)) notFound();
@@ -26,6 +27,8 @@ export default async function EditRecordPage({
   if (!record) notFound();
 
   const messages = messagesFor(locale);
+
+  if (!granted.has("catalog.edit")) return <Denied messages={messages} />;
   const c = messages.cataloguing;
 
   return (
@@ -55,6 +58,7 @@ export default async function EditRecordPage({
           values={record.values}
           documentTypes={options.documentTypes}
           recordStatuses={options.recordStatuses}
+          canDelete={granted.has("catalog.delete")}
           copyCount={record.items.length}
           messages={messages}
         />
@@ -63,6 +67,7 @@ export default async function EditRecordPage({
       <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
         <h2 className="font-serif text-heading-3">{c.copiesTitle}</h2>
         <CopiesEditor
+          canDelete={granted.has("catalog.delete")}
           recordId={record.id}
           copies={record.items}
           locations={options.locations}

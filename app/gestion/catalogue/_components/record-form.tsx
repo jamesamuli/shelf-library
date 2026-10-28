@@ -71,6 +71,7 @@ export function RecordForm({
   recordStatuses,
   copyCount,
   messages,
+  canDelete,
 }: {
   id: number | null;
   values: RecordInput;
@@ -78,6 +79,8 @@ export function RecordForm({
   recordStatuses: Option[];
   copyCount: number;
   messages: Messages;
+  /** The action refuses anyway; this keeps a button that cannot work off the page. */
+  canDelete: boolean;
 }) {
   const [state, formAction, pending] = useActionState(
     saveRecordAction,
@@ -231,7 +234,7 @@ export function RecordForm({
       {/* Sibling form: deleting must not carry the edits above with it. The
           refusal when copies exist is the whole safety net, so it is shown
           rather than the button being hidden. */}
-      {id === null ? null : (
+      {id === null || !canDelete ? null : (
         <form action={deleteFormAction} className="border-t border-border pt-4">
           <input type="hidden" name="id" value={id} />
           <button

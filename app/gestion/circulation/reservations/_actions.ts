@@ -10,7 +10,7 @@ import {
   type HoldRefusal,
 } from "@/lib/holds";
 import type { HoldActionState, HoldMessageKey } from "./_lib/state";
-import { requireSession } from "../../../(auth)/_lib/session";
+import { requirePermission } from "../../../(auth)/_lib/session";
 
 const text = (formData: FormData, key: string) => String(formData.get(key) ?? "");
 
@@ -42,7 +42,7 @@ export async function holdAction(
   _previous: HoldActionState,
   formData: FormData,
 ): Promise<HoldActionState> {
-  await requireSession("gestion");
+  await requirePermission("holds.manage");
 
   const intent = text(formData, "intent");
   const holdId = Number(text(formData, "holdId"));

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useId, useState } from "react";
 import { fill, type Messages } from "@/lib/i18n";
+import type { Permission } from "@/lib/permissions";
 
 function DashboardIcon() {
   return (
@@ -106,6 +107,23 @@ function ChevronIcon() {
   );
 }
 
+function StaffIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      className="size-5 shrink-0"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="3.5" />
+      <path d="M5 20a7 7 0 0 1 14 0" strokeLinecap="round" />
+      <path d="m16.5 11.5 1.6 1.6 3-3" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /** The public catalogue: same content, seen as a reader sees it. */
 function PublicViewIcon() {
   return (
@@ -130,6 +148,8 @@ type Item = {
   href: string;
   label: string;
   icon: React.ReactNode;
+  /** Omitted from the nav when the signed-in account lacks this. */
+  needs?: Permission;
   children?: Item[];
 };
 
@@ -281,7 +301,13 @@ function NavSection({
  * `startsWith`: a parent lit up alongside its own selected child reads as two
  * selections, and the reader cannot tell which page they are on.
  */
-export function SidebarNav({ messages }: { messages: Messages }) {
+export function SidebarNav({
+  messages,
+  granted,
+}: {
+  messages: Messages;
+  granted: Permission[];
+}) {
   const pathname = usePathname();
   const c = messages.circulation;
 
@@ -291,16 +317,19 @@ export function SidebarNav({ messages }: { messages: Messages }) {
       href: "/gestion/circulation",
       label: c.navCirculation,
       icon: <CirculationIcon />,
+      needs: "circulation.loan",
       children: [
         {
           href: "/gestion/circulation/reservations",
           label: messages.holds.navHolds,
           icon: <HoldsIcon />,
+          needs: "holds.manage",
         },
         {
           href: "/gestion/circulation/lecteurs",
           label: messages.readers.navReaders,
           icon: <ReadersIcon />,
+          needs: "readers.manage",
         },
       ],
     },
@@ -308,9 +337,32 @@ export function SidebarNav({ messages }: { messages: Messages }) {
       href: "/gestion/catalogue",
       label: messages.cataloguing.navCataloguing,
       icon: <CatalogueIcon />,
+      needs: "catalog.edit",
+    },
+    {
+      href: "/gestion/personnel",
+      label: messages.staff.navStaff,
+      icon: <StaffIcon />,
+      needs: "staff.manage",
     },
     { href: "/catalogue", label: c.navCatalogue, icon: <PublicViewIcon /> },
   ];
+
+  /**
+   * A link to a screen that would only refuse you is worse than no link at
+   * all, so the nav shows what this account can actually open — legacy did the
+   * same, assembling its menu from `SESSrights` in `includes/misc.inc.php`.
+   * Hiding is presentation only: every page and action re-checks server-side.
+   */
+  const allowed = new Set(granted);
+  const visible = items
+    .filter((item) => !item.needs || allowed.has(item.needs))
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter(
+        (child) => !child.needs || allowed.has(child.needs),
+      ),
+    }));
 
   // Cataloguing has sub-pages of its own (nouveau, edit) with no nav entry of
   // their own, so it stays selected while you are inside one.
@@ -322,8 +374,8 @@ export function SidebarNav({ messages }: { messages: Messages }) {
   return (
     <nav aria-label={c.navDashboard}>
       <ul className="stack gap-1">
-        {items.map((item) =>
-          item.children ? (
+        {visible.map((item) =>
+          item.children && item.children.length > 0 ? (
             <NavSection
               key={item.href}
               item={item}

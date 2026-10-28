@@ -134,6 +134,8 @@ type CirculationCopy = {
   errAlreadyOnLoanElsewhere: string;
   /** Contains a {detail} placeholder. */
   errQuotaReached: string;
+  /** Shown when the signed-in account lacks the privilege for an action. */
+  errForbidden: string;
   errNotOnLoan: string;
   errLoanNotFound: string;
   errRenewNotAllowed: string;
@@ -330,12 +332,31 @@ type HoldsCopy = {
   errNoCopyAssigned: string;
 };
 
+type StaffCopy = {
+  navStaff: string;
+  title: string;
+  intro: string;
+  colUser: string;
+  colRoles: string;
+  colPermissions: string;
+  save: string;
+  noPermissions: string;
+  inactive: string;
+  rolesTitle: string;
+  rolesIntro: string;
+  /** Contains a {name} placeholder. */
+  saved: string;
+  errNotFound: string;
+  errLastAdmin: string;
+};
+
 type Messages = {
   catalogue: CatalogueCopy;
   circulation: CirculationCopy;
   cataloguing: CataloguingCopy;
   readers: ReadersCopy;
   holds: HoldsCopy;
+  staff: StaffCopy;
   brandTagline: string;
   /** First-ever sign-in on this device. */
   welcome: string;
@@ -343,6 +364,8 @@ type Messages = {
   welcomeBack: string;
   signInSubtitle: string;
   portalNavLabel: string;
+  accessDeniedTitle: string;
+  accessDeniedHint: string;
   /** Both contain a {section} placeholder. */
   expandSection: string;
   collapseSection: string;
@@ -482,6 +505,7 @@ const fr: Messages = {
     errAlreadyOnLoanHere: "Ce document est déjà emprunté par ce lecteur.",
     errAlreadyOnLoanElsewhere: "Ce document est déjà emprunté par {detail}.",
     errQuotaReached: "Quota atteint ({detail} emprunts).",
+    errForbidden: "Votre compte n’a pas le droit d’effectuer cette action.",
     errNotOnLoan: "« {detail} » n’était pas en prêt.",
     errLoanNotFound: "Cet emprunt n’est plus en cours.",
     errRenewNotAllowed: "Le statut de ce lecteur n’autorise pas la prolongation.",
@@ -617,6 +641,23 @@ const fr: Messages = {
     errDuplicateInFile: "Adresse en double dans le fichier.",
     errUnknownValue: "Valeur inconnue.",
   },
+  staff: {
+    navStaff: "Personnel",
+    title: "Personnel",
+    intro: "Qui a le droit de faire quoi dans la gestion.",
+    colUser: "Compte",
+    colRoles: "Rôles",
+    colPermissions: "Droits accordés",
+    save: "Enregistrer",
+    noPermissions: "Aucun droit — ce compte peut se connecter mais rien faire.",
+    inactive: "désactivé",
+    rolesTitle: "Rôles disponibles",
+    rolesIntro: "Un rôle est un ensemble de droits. Modifiable dans lib/roles.ts.",
+    saved: "Rôles de {name} enregistrés.",
+    errNotFound: "Compte introuvable.",
+    errLastAdmin:
+      "Impossible : plus personne ne pourrait gérer les comptes. Donnez d’abord ce rôle à quelqu’un d’autre.",
+  },
   holds: {
     navHolds: "Réservations",
     title: "Réservations",
@@ -674,6 +715,9 @@ const fr: Messages = {
   welcomeBack: "Bon retour",
   signInSubtitle: "Connectez-vous à votre espace Shelf Library.",
   portalNavLabel: "Choix de l’espace",
+  accessDeniedTitle: "Accès refusé",
+  accessDeniedHint:
+    "Votre compte n’a pas le droit d’accéder à cette page. Contactez la personne qui gère les comptes du CDI.",
   expandSection: "Déplier {section}",
   collapseSection: "Replier {section}",
   portals: {
@@ -830,6 +874,7 @@ const en: Messages = {
     errAlreadyOnLoanHere: "This patron already has this copy.",
     errAlreadyOnLoanElsewhere: "This copy is already on loan to {detail}.",
     errQuotaReached: "Loan quota reached ({detail} loans).",
+    errForbidden: "Your account is not allowed to perform this action.",
     errNotOnLoan: "“{detail}” was not on loan.",
     errLoanNotFound: "That loan is no longer open.",
     errRenewNotAllowed: "This patron's status does not allow renewals.",
@@ -963,6 +1008,23 @@ const en: Messages = {
     errDuplicateInFile: "Duplicate address within the file.",
     errUnknownValue: "Unknown value.",
   },
+  staff: {
+    navStaff: "Staff",
+    title: "Staff",
+    intro: "Who is allowed to do what in the back office.",
+    colUser: "Account",
+    colRoles: "Roles",
+    colPermissions: "Granted",
+    save: "Save",
+    noPermissions: "No rights — this account can sign in but do nothing.",
+    inactive: "disabled",
+    rolesTitle: "Available roles",
+    rolesIntro: "A role is a set of rights. Edit them in lib/roles.ts.",
+    saved: "Roles saved for {name}.",
+    errNotFound: "Account not found.",
+    errLastAdmin:
+      "Refused: nobody would be left able to manage accounts. Give this role to someone else first.",
+  },
   holds: {
     navHolds: "Reservations",
     title: "Reservations",
@@ -1019,6 +1081,9 @@ const en: Messages = {
   welcomeBack: "Welcome back",
   signInSubtitle: "Sign in to your Shelf Library account.",
   portalNavLabel: "Choose a portal",
+  accessDeniedTitle: "Access denied",
+  accessDeniedHint:
+    "Your account is not allowed to open this page. Ask whoever manages accounts for the library.",
   expandSection: "Expand {section}",
   collapseSection: "Collapse {section}",
   portals: {

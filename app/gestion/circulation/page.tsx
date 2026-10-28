@@ -4,7 +4,8 @@ import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { formatDate } from "@/lib/dates";
 import { findPatron, getPatronDesk } from "@/lib/circulation";
-import { requireSession } from "../../(auth)/_lib/session";
+import { getStaffContext } from "../../(auth)/_lib/session";
+import { Denied } from "../_components/denied";
 import {
   CheckInForm,
   CheckOutForm,
@@ -39,9 +40,11 @@ export default async function CirculationDesk({
   searchParams,
 }: PageProps<"/gestion/circulation">) {
   const [params, locale] = await Promise.all([searchParams, getLocale()]);
-  await requireSession("gestion");
+  const { granted } = await getStaffContext();
 
   const messages = messagesFor(locale);
+
+  if (!granted.has("circulation.loan")) return <Denied messages={messages} />;
   const c = messages.circulation;
 
   const requested = typeof params.patron === "string" ? params.patron : "";
@@ -142,6 +145,7 @@ export default async function CirculationDesk({
 
               <Panel title={c.checkOutTitle} intro={c.checkOutIntro}>
                 <CheckOutForm
+                  canOverride={granted.has("circulation.override")}
                   patronId={desk.patron.id}
                   messages={messages}
                   locale={locale}
@@ -192,6 +196,7 @@ export default async function CirculationDesk({
                           </span>
                         </div>
                         <LoanActions
+                          canOverride={granted.has("circulation.override")}
                           loanId={loan.id}
                           itemBarcode={loan.itemBarcode}
                           messages={messages}

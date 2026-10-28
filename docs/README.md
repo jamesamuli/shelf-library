@@ -19,6 +19,9 @@ check-out, check-in, renewal, and the patron's own loans.
 [13-readers.md](13-readers.md) — enrolling readers and the CSV class import.
 [14-reservations.md](14-reservations.md) — holds, and the reshelving worklist.
 
+[15-authorization.md](15-authorization.md) — who may do what, and why the
+bitmask did not survive the port.
+
 **[09-deferred.md](09-deferred.md) — everything knowingly left undone.**
 Check it before starting a phase, and add to it whenever something is
 deferred.

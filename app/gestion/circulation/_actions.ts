@@ -9,7 +9,7 @@ import {
   type RenewRefusal,
 } from "@/lib/circulation";
 import type { CirculationMessageKey, DeskState } from "./_lib/messages";
-import { requireSession } from "../../(auth)/_lib/session";
+import { getStaffContext, requirePermission } from "../../(auth)/_lib/session";
 
 /**
  * Desk actions. Results are message keys plus values, not sentences — the
@@ -45,11 +45,15 @@ export async function checkOutAction(
   _previous: DeskState,
   formData: FormData,
 ): Promise<DeskState> {
-  await requireSession("gestion");
+  const { granted } = await getStaffContext();
+  if (!granted.has("circulation.loan")) {
+    return { kind: "error", key: "errForbidden", values: {} };
+  }
 
   const patronId = Number(formData.get("patronId"));
   const barcode = String(formData.get("barcode") ?? "");
-  const force = formData.get("force") === "1";
+  // `force` rides in on the form, so it is a claim, not an authorization.
+  const force = formData.get("force") === "1" && granted.has("circulation.override");
 
   if (!Number.isInteger(patronId)) {
     return { kind: "error", key: "errPatronNotFound", values: {} };
@@ -80,7 +84,7 @@ export async function checkInAction(
   _previous: DeskState,
   formData: FormData,
 ): Promise<DeskState> {
-  await requireSession("gestion");
+  await requirePermission("circulation.loan");
 
   const result = await checkIn(String(formData.get("barcode") ?? ""));
   if (!result.ok) {
@@ -108,10 +112,13 @@ export async function renewAction(
   _previous: DeskState,
   formData: FormData,
 ): Promise<DeskState> {
-  await requireSession("gestion");
+  const { granted } = await getStaffContext();
+  if (!granted.has("circulation.loan")) {
+    return { kind: "error", key: "errForbidden", values: {} };
+  }
 
   const loanId = Number(formData.get("loanId"));
-  const force = formData.get("force") === "1";
+  const force = formData.get("force") === "1" && granted.has("circulation.override");
   if (!Number.isInteger(loanId)) {
     return { kind: "error", key: "errLoanNotFound", values: {} };
   }

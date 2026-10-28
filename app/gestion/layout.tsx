@@ -4,7 +4,7 @@ import { PreferencesBar } from "@/app/_components/preferences-bar";
 import { messagesFor } from "@/lib/i18n";
 import { getLocale, getTheme } from "@/lib/preferences";
 import { logout } from "../(auth)/_actions/logout";
-import { requireSession } from "../(auth)/_lib/session";
+import { getStaffContext } from "../(auth)/_lib/session";
 import { SidebarNav } from "./_components/sidebar-nav";
 
 /**
@@ -15,8 +15,8 @@ import { SidebarNav } from "./_components/sidebar-nav";
  * brand's primary colour, not a light-mode surface.
  */
 export default async function GestionLayout({ children }: LayoutProps<"/">) {
-  const [session, theme, locale] = await Promise.all([
-    requireSession("gestion"),
+  const [{ session, granted }, theme, locale] = await Promise.all([
+    getStaffContext(),
     getTheme(),
     getLocale(),
   ]);
@@ -36,7 +36,7 @@ export default async function GestionLayout({ children }: LayoutProps<"/">) {
           {messages.portals.gestion.name}
         </p>
 
-        <SidebarNav messages={messages} />
+        <SidebarNav messages={messages} granted={[...granted]} />
 
         <form action={logout} className="mt-auto">
           <input type="hidden" name="portal" value="gestion" />

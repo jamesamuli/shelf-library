@@ -37,6 +37,17 @@ in the browser and documented in `docs/`.
 - Legacy reference: `empr*`, `pret`, `pret_archive`, `resa`, `circ.php`,
   `account.php`.
 
+## Phase 2b — Authorization (done, 2026-09-14)
+
+- Seven permission keys, three roles (Administrateur, Bibliothécaire,
+  Aide-documentaliste), enforced in every Server Action and on every page,
+  with a `/gestion/personnel` screen for assigning them.
+- Replaces legacy's 27-bit `users.rights` mask, which was tested once per
+  module at the entry point and never again.
+- Written up in [15-authorization.md](15-authorization.md).
+- Legacy reference: `includes/config.inc.php`, `includes/sessions.inc.php`,
+  `admin/users`.
+
 ## Phase 3 — Back-office cataloging (done, 2026-08-08)
 
 - Record list, create, edit and delete; copies added, edited and deleted

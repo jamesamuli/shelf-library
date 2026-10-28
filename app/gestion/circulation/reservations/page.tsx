@@ -4,7 +4,8 @@ import { messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { formatDate } from "@/lib/dates";
 import { countHolds, listHolds, listReshelving, type HoldView } from "@/lib/holds";
-import { requireSession } from "../../../(auth)/_lib/session";
+import { getStaffContext } from "../../../(auth)/_lib/session";
+import { Denied } from "../../_components/denied";
 import { PlaceHoldForm, ReshelveForm } from "./_components/hold-actions";
 import { HoldsTable } from "./_components/holds-table";
 
@@ -54,9 +55,11 @@ export default async function ReservationsPage({
   searchParams,
 }: PageProps<"/gestion/circulation/reservations">) {
   const [params, locale] = await Promise.all([searchParams, getLocale()]);
-  await requireSession("gestion");
+  const { granted } = await getStaffContext();
 
   const messages = messagesFor(locale);
+
+  if (!granted.has("holds.manage")) return <Denied messages={messages} />;
   const h = messages.holds;
 
   const requested = typeof params.onglet === "string" ? params.onglet : "encours";

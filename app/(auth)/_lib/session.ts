@@ -2,6 +2,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { PortalSlug } from "./portals";
+import type { Permission } from "@/lib/permissions";
+import { permissionsFor } from "@/lib/staff";
 
 /**
  * Stateless signed-cookie sessions, replacing legacy's server-side PHP
@@ -130,5 +132,32 @@ export async function destroySession(portal: PortalSlug) {
 export async function requireSession(portal: PortalSlug) {
   const session = await getSession(portal);
   if (!session) redirect(`/login/${portal}`);
+  return session;
+}
+
+/**
+ * Staff session plus the permissions it carries. Legacy resolved this once in
+ * `checkUser()` and then trusted `SESSrights` for the rest of the request; we
+ * re-read per request so a revoked role stops working immediately.
+ */
+export async function getStaffContext() {
+  const session = await requireSession("gestion");
+  const staffUserId = Number(session.sub);
+  return { session, staffUserId, granted: await permissionsFor(staffUserId) };
+}
+
+/**
+ * Guard for a Server Action. Returns nothing on success and throws on refusal:
+ * an action that reaches its body is authorized, so there is no boolean for a
+ * caller to forget to check.
+ *
+ * Pages use `getStaffContext` and render a refusal panel instead — a thrown
+ * error would be an unhelpful 500 where the reader wants an explanation.
+ */
+export async function requirePermission(permission: Permission) {
+  const { session, granted } = await getStaffContext();
+  if (!granted.has(permission)) {
+    throw new Error(`Forbidden: ${session.sub} lacks ${permission}`);
+  }
   return session;
 }

@@ -55,6 +55,7 @@ function CopyForm({
   sections,
   itemStatuses,
   messages,
+  canDelete,
 }: {
   recordId: number;
   copy: CopyRow | null;
@@ -62,6 +63,7 @@ function CopyForm({
   sections: Option[];
   itemStatuses: Option[];
   messages: Messages;
+  canDelete: boolean;
 }) {
   const [saveState, save, savePending] = useActionState(saveItemAction, ITEM_IDLE);
   const [deleteState, remove, deletePending] = useActionState(
@@ -171,7 +173,7 @@ function CopyForm({
         </div>
       </form>
 
-      {copy ? (
+      {copy && canDelete ? (
         <form action={remove}>
           <input type="hidden" name="itemId" value={copy.id} />
           <input type="hidden" name="recordId" value={recordId} />
@@ -197,6 +199,7 @@ export function CopiesEditor({
   sections,
   itemStatuses,
   messages,
+  canDelete,
 }: {
   recordId: number;
   copies: CopyRow[];
@@ -204,6 +207,7 @@ export function CopiesEditor({
   sections: Option[];
   itemStatuses: Option[];
   messages: Messages;
+  canDelete: boolean;
 }) {
   const c = messages.cataloguing;
 
@@ -222,6 +226,7 @@ export function CopiesEditor({
           sections={sections}
           itemStatuses={itemStatuses}
           messages={messages}
+          canDelete={canDelete}
         />
       ))}
 
@@ -237,6 +242,7 @@ export function CopiesEditor({
         sections={sections}
         itemStatuses={itemStatuses}
         messages={messages}
+        canDelete={canDelete}
       />
     </div>
   );

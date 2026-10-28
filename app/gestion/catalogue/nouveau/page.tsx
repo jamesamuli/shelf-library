@@ -3,14 +3,20 @@ import type { Metadata } from "next";
 import { messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { EMPTY_RECORD, getCataloguingOptions } from "@/lib/cataloguing";
-import { requireSession } from "../../../(auth)/_lib/session";
+import { getStaffContext } from "../../../(auth)/_lib/session";
+import { Denied } from "../../_components/denied";
 import { RecordForm } from "../_components/record-form";
 
 export const metadata: Metadata = { title: "Nouvelle notice" };
 
 export default async function NewRecordPage() {
-  const [locale] = await Promise.all([getLocale(), requireSession("gestion")]);
+  const [locale, { granted }] = await Promise.all([
+    getLocale(),
+    getStaffContext(),
+  ]);
   const messages = messagesFor(locale);
+
+  if (!granted.has("catalog.edit")) return <Denied messages={messages} />;
   const c = messages.cataloguing;
   const options = await getCataloguingOptions();
 
@@ -32,6 +38,7 @@ export default async function NewRecordPage() {
           values={EMPTY_RECORD}
           documentTypes={options.documentTypes}
           recordStatuses={options.recordStatuses}
+          canDelete={granted.has("catalog.delete")}
           copyCount={0}
           messages={messages}
         />
