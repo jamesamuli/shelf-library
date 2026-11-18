@@ -76,7 +76,7 @@ export default async function ReservationsPage({
   return (
     <div className="stack gap-section">
       <header className="stack gap-inline">
-        <h1 className="font-serif text-heading-1">{h.title}</h1>
+        <h1 className="font-heading text-heading-1">{h.title}</h1>
         <p className="text-body text-foreground-muted">{h.intro}</p>
       </header>
 
@@ -95,7 +95,7 @@ export default async function ReservationsPage({
         <div className="stack gap-content">
           <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
             <div className="stack gap-1">
-              <h2 className="font-serif text-heading-3">{h.reshelvingTitle}</h2>
+              <h2 className="font-heading text-heading-3">{h.reshelvingTitle}</h2>
               <p className="text-caption text-foreground-muted">
                 {h.reshelvingIntro}
               </p>
@@ -151,7 +151,7 @@ export default async function ReservationsPage({
 
           <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
             <div className="stack gap-1">
-              <h2 className="font-serif text-heading-3">{h.newTitle}</h2>
+              <h2 className="font-heading text-heading-3">{h.newTitle}</h2>
               <p className="text-caption text-foreground-muted">{h.newIntro}</p>
             </div>
             <PlaceHoldForm messages={messages} />

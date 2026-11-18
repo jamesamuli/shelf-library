@@ -345,7 +345,7 @@ export function SidebarNav({
       icon: <StaffIcon />,
       needs: "staff.manage",
     },
-    { href: "/catalogue", label: c.navCatalogue, icon: <PublicViewIcon /> },
+    { href: "/", label: c.navCatalogue, icon: <PublicViewIcon /> },
   ];
 
   /**

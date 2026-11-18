@@ -8,10 +8,81 @@
 
 @theme inline {
   --font-sans: var(--font-inter);
-  --font-serif: var(--font-playfair);
+  --font-heading: var(--font-rajdhani);
   --font-mono: var(--font-geist-mono);
+}
+
+/*
+ * `animate-drift`: a slow float-and-tilt loop for decorative pieces (the books
+ * behind the sign-in page). Each element sets its own resting angle in
+ * `--tilt`, and its own duration and delay, so no two move in step. Uses the
+ * individual translate/rotate properties, leaving `transform` to the element.
+ */
+@theme {
+  --animate-drift: drift 14s ease-in-out infinite;
+
+  @keyframes drift {
+    0%,
+    100% {
+      translate: 0 0;
+      rotate: var(--tilt, 0deg);
+    }
+    25% {
+      translate: 1.25rem -1.5rem;
+      rotate: calc(var(--tilt, 0deg) + 10deg);
+    }
+    50% {
+      translate: 0 -3rem;
+      rotate: var(--tilt, 0deg);
+    }
+    75% {
+      translate: -1.25rem -1.5rem;
+      rotate: calc(var(--tilt, 0deg) - 10deg);
+    }
+  }
+
+  /*
+   * `animate-fall`: top to bottom of the nearest size container, swaying and
+   * turning on the way. Container-height units (cqh) rather than vh, so a
+   * book crosses the whole backdrop however tall the page is.
+   */
+  --animate-fall: fall 20s linear infinite;
+
+  @keyframes fall {
+    from {
+      translate: 0 -12cqh;
+      rotate: var(--tilt, 0deg);
+    }
+    50% {
+      translate: 2.5rem 50cqh;
+      rotate: calc(var(--tilt, 0deg) + 160deg);
+    }
+    to {
+      translate: 0 112cqh;
+      rotate: calc(var(--tilt, 0deg) + 320deg);
+    }
+  }
+}
+
+/*
+ * The whole interface is scaled up 15% from tablet width (CDI request, for
+ * legibility; first tried at 30%, which crowded laptop screens). Type, spacing, radii and component widths are all
+ * rem-based, so raising the root size zooms them together, and a percentage
+ * still honours the reader's own browser font setting. Breakpoints are
+ * unaffected — media queries measure rem against the browser default — and
+ * phones stay at 100%, the size the phone layout is built for.
+ */
+@media (width >= 48rem) {
+  html {
+    font-size: 115%;
+  }
 }
 
 body {
   @apply bg-background text-foreground font-sans text-body;
+}
+
+/* The page behind an open modal (the phone sheets) stays put. */
+:root:has(dialog:modal) {
+  overflow: hidden;
 }

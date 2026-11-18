@@ -138,6 +138,7 @@ model BibliographicRecord {
   contributions    Contribution[]
   recordPublishers RecordPublisher[]
   recordSubjects   RecordSubject[]
+  recordGenres     RecordGenre[]
   languages        RecordLanguage[]
   items            Item[]
   issues           Issue[]
@@ -400,6 +401,37 @@ model RecordSubject {
   @@id([recordId, subjectId, headingNo])
   @@index([subjectId])
   @@map("record_subjects")
+}
+
+/// Literary genre / form, shown as the OPAC home's "Découvrir" tiles. Legacy
+/// has no equivalent — see docs/16-opac-home.md for why subjects won't do.
+model Genre {
+  id      Int     @id @default(autoincrement())
+  /// URL key: /catalogue?genre=<slug>.
+  slug    String  @unique
+  labelFr String  @map("label_fr")
+  labelEn String? @map("label_en")
+  /// Keys into fixed sets in app/catalogue/_components/genre-tile.tsx; an
+  /// unknown key falls back rather than failing.
+  icon    String
+  colour  String
+  rank    Int     @default(0)
+
+  recordGenres RecordGenre[]
+
+  @@map("genres")
+}
+
+model RecordGenre {
+  recordId Int @map("record_id")
+  genreId  Int @map("genre_id")
+
+  record BibliographicRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  genre  Genre               @relation(fields: [genreId], references: [id], onDelete: Restrict)
+
+  @@id([recordId, genreId])
+  @@index([genreId])
+  @@map("record_genres")
 }
 
 // ---------------------------------------------------------------------------

@@ -16,8 +16,30 @@ import type { Locale } from "./preferences";
 type PortalCopy = {
   name: string;
   subtitle: string;
+  /** Who signs in here, under the card's icon. */
+  audience: string;
+  /** How they sign in, under "Se connecter". */
+  signInHint: string;
+};
+
+/** Only staff have a username field: readers sign in with Google. */
+type StaffPortalCopy = PortalCopy & {
   identifierLabel: string;
   identifierPlaceholder: string;
+};
+
+type GoogleCopy = {
+  signIn: string;
+  /** Shown for a moment in the popup before it closes. */
+  signedIn: string;
+  /** Keyed by the `?google=` failure code the callback sends back. */
+  errors: {
+    cancelled: string;
+    invalid: string;
+    domain: string;
+    "no-account": string;
+    unavailable: string;
+  };
 };
 
 type CatalogueCopy = {
@@ -60,6 +82,36 @@ type CatalogueCopy = {
   notFound: string;
   notFoundHint: string;
   myAccount: string;
+  welcomeTitle: string;
+  welcomeSchool: string;
+  newArrivals: string;
+  scrollBack: string;
+  scrollForward: string;
+  searchPanelTitle: string;
+  searchTipsTitle: string;
+  searchTips: string[];
+  discover: string;
+  /** Names the phone's bottom bar. */
+  dockLabel: string;
+  practicalTitle: string;
+  hoursTitle: string;
+  borrowTitle: string;
+  /** Contains a {days} placeholder. */
+  borrowText: string;
+  renewTitle: string;
+  /** Contains a {count} placeholder; the account link follows it. */
+  renewText: string;
+  returnTitle: string;
+  returnText: string;
+  placeTitle: string;
+  emailTitle: string;
+  phoneTitle: string;
+  closePanel: string;
+  genres: string;
+  /** Contains a {genre} placeholder. */
+  genreFilter: string;
+  /** Contains a {genre} placeholder. */
+  clearGenre: string;
 };
 
 type CirculationCopy = {
@@ -177,6 +229,8 @@ type CataloguingCopy = {
   fieldAuthors: string;
   fieldPublishers: string;
   fieldSubjects: string;
+  fieldGenres: string;
+  hintGenres: string;
   hintOnePerLine: string;
   hintAuthorFormat: string;
   optionNone: string;
@@ -358,30 +412,31 @@ type Messages = {
   holds: HoldsCopy;
   staff: StaffCopy;
   brandTagline: string;
-  /** First-ever sign-in on this device. */
-  welcome: string;
-  /** Every subsequent visit. */
-  welcomeBack: string;
-  signInSubtitle: string;
-  portalNavLabel: string;
+  /** First line of the sign-in heading; the school's name follows, as on the home. */
+  signInTitle: string;
+  /** Names the two-tab switch on the sign-in page. */
+  signInChoice: string;
+  google: GoogleCopy;
   accessDeniedTitle: string;
   accessDeniedHint: string;
   /** Both contain a {section} placeholder. */
   expandSection: string;
   collapseSection: string;
-  portals: { gestion: PortalCopy; opac: PortalCopy };
+  portals: { gestion: StaffPortalCopy; opac: PortalCopy };
   password: string;
   passwordPlaceholder: string;
   showPassword: string;
   hidePassword: string;
   forgotPassword: string;
   signIn: string;
+  skipToContent: string;
+  home: string;
+  /** Shown when the pointer rests on a book drifting behind the sign-in page. */
+  quotes: { text: string; author: string }[];
   signingIn: string;
   noAccount: string;
-  trust: { title: string; detail: string }[];
   forgotTitle: string;
   forgotGestion: string;
-  forgotOpac: string;
   backToSignIn: string;
   /** Both contain a {name} placeholder. */
   greetingFirst: string;
@@ -389,10 +444,12 @@ type Messages = {
   signedInAs: string;
   signOut: string;
   themeLabel: string;
+  /** Short labels on the theme switch, beside its icon. */
+  themeDark: string;
+  themeLight: string;
   toLight: string;
   toDark: string;
   languageLabel: string;
-  unknownPortal: string;
   /** Contains a {label} placeholder. */
   identifierRequired: string;
   passwordRequired: string;
@@ -420,7 +477,7 @@ const fr: Messages = {
     previous: "Précédent",
     next: "Suivant",
     pageOf: "Page {page} sur {pageCount}",
-    backToResults: "Retour aux résultats",
+    backToResults: "Retour au catalogue",
     authors: "Auteur(s)",
     publisher: "Éditeur",
     year: "Année",
@@ -442,6 +499,35 @@ const fr: Messages = {
     notFound: "Notice introuvable",
     notFoundHint: "Cette notice n’existe pas ou n’est pas publiée au catalogue.",
     myAccount: "Mon compte",
+    welcomeTitle: "Bienvenue au CDI",
+    welcomeSchool: "École Française de Bujumbura",
+    newArrivals: "Nouveautés",
+    scrollBack: "Nouveautés précédentes",
+    scrollForward: "Nouveautés suivantes",
+    searchPanelTitle: "Rechercher un document",
+    searchTipsTitle: "Astuces",
+    searchTips: [
+      "Mélangez titre et auteur : « camus peste » fonctionne.",
+      "Les accents sont facultatifs : « etranger » trouve « L’Étranger ».",
+      "Le début d’un mot suffit : « biblio » trouve « bibliothèque ».",
+    ],
+    discover: "Découvrir",
+    dockLabel: "Explorer le catalogue",
+    practicalTitle: "Infos pratiques",
+    hoursTitle: "Horaires",
+    borrowTitle: "Emprunter",
+    borrowText: "Jusqu’à {days} jours par document.",
+    renewTitle: "Prolonger",
+    renewText: "Jusqu’à {count} fois, en ligne depuis",
+    returnTitle: "Rendre",
+    returnText: "Au comptoir du CDI.",
+    placeTitle: "Nous trouver",
+    emailTitle: "Écrire au CDI",
+    phoneTitle: "Téléphone",
+    closePanel: "Fermer",
+    genres: "Genre(s)",
+    genreFilter: "Genre : {genre}",
+    clearGenre: "Retirer le filtre « {genre} »",
   },
   circulation: {
     navDashboard: "Tableau de bord",
@@ -547,6 +633,8 @@ const fr: Messages = {
     fieldAuthors: "Auteurs",
     fieldPublishers: "Éditeurs",
     fieldSubjects: "Sujets",
+    fieldGenres: "Genres",
+    hintGenres: "Classent la notice dans les tuiles « Découvrir » de l’accueil du catalogue.",
     hintOnePerLine: "Un par ligne.",
     hintAuthorFormat: "Un par ligne, au format « Nom, Prénom ».",
     optionNone: "—",
@@ -711,10 +799,22 @@ const fr: Messages = {
     errNoCopyAssigned: "Affectez d’abord un exemplaire à cette réservation.",
   },
   brandTagline: "Portail documentaire du CDI.",
-  welcome: "Bienvenue",
-  welcomeBack: "Bon retour",
-  signInSubtitle: "Connectez-vous à votre espace Shelf Library.",
-  portalNavLabel: "Choix de l’espace",
+  signInTitle: "Connexion au CDI",
+  signInChoice: "Je me connecte en tant que",
+  google: {
+    signIn: "Se connecter avec Google",
+    signedIn: "Connexion réussie — retour à Shelf Library…",
+    errors: {
+      cancelled: "Connexion Google annulée.",
+      invalid: "La connexion Google n’a pas abouti. Réessayez.",
+      domain:
+        "Seuls les comptes de l’école, en @efbujumbura.com, sont acceptés. Choisissez votre compte de l’école.",
+      "no-account":
+        "Aucun compte lecteur n’est associé à cette adresse. Adressez-vous au CDI.",
+      unavailable:
+        "La connexion Google est indisponible pour le moment. Réessayez plus tard ou adressez-vous au CDI.",
+    },
+  },
   accessDeniedTitle: "Accès refusé",
   accessDeniedHint:
     "Votre compte n’a pas le droit d’accéder à cette page. Contactez la personne qui gère les comptes du CDI.",
@@ -724,14 +824,16 @@ const fr: Messages = {
     gestion: {
       name: "Gestion",
       subtitle: "Administration",
+      audience: "Administrateur ou gestionnaire",
+      signInHint: "Connectez-vous avec votre identifiant Shelf Library",
       identifierLabel: "Identifiant",
       identifierPlaceholder: "Saisissez votre identifiant",
     },
     opac: {
       name: "OPAC",
       subtitle: "Catalogue public",
-      identifierLabel: "Numéro de carte",
-      identifierPlaceholder: "Saisissez votre numéro de carte",
+      audience: "Élève ou enseignant",
+      signInHint: "Connectez-vous avec votre compte efbujumbura.com",
     },
   },
   password: "Mot de passe",
@@ -740,28 +842,47 @@ const fr: Messages = {
   hidePassword: "Masquer le mot de passe",
   forgotPassword: "Mot de passe oublié ?",
   signIn: "Se connecter",
+  skipToContent: "Aller au contenu",
+  home: "Accueil",
+  quotes: [
+    {
+      text: "La lecture de tous les bons livres est comme une conversation avec les plus honnêtes gens des siècles passés.",
+      author: "René Descartes",
+    },
+    {
+      text: "Je n’ai jamais eu de chagrin qu’une heure de lecture ne m’ait ôté.",
+      author: "Montesquieu",
+    },
+    {
+      text: "Chaque lecteur est, quand il lit, le propre lecteur de soi-même.",
+      author: "Marcel Proust",
+    },
+    {
+      text: "Je m’étais toujours figuré le paradis sous l’espèce d’une bibliothèque.",
+      author: "Jorge Luis Borges",
+    },
+    {
+      text: "La lecture est à l’esprit ce que l’exercice est au corps.",
+      author: "Joseph Addison",
+    },
+    { text: "Un lecteur vit mille vies avant de mourir.", author: "George R. R. Martin" },
+  ],
   signingIn: "Connexion…",
   noAccount: "Pas encore de compte ? Contactez le responsable du CDI.",
-  trust: [
-    { title: "Sécurisé", detail: "Vos données sont protégées" },
-    { title: "Fiable", detail: "Conçu pour les bibliothèques" },
-    { title: "Open source", detail: "Porté par la communauté" },
-  ],
   forgotTitle: "Mot de passe oublié",
   forgotGestion:
     "Contactez l’administrateur de Shelf Library pour réinitialiser votre mot de passe.",
-  forgotOpac:
-    "Présentez-vous au CDI avec votre carte pour faire réinitialiser votre mot de passe.",
   backToSignIn: "Retour à la connexion",
   greetingFirst: "Bienvenue, {name}",
   greetingReturning: "Bon retour, {name}",
   signedInAs: "Connecté en tant que",
   signOut: "Se déconnecter",
   themeLabel: "Thème",
+  themeDark: "Sombre",
+  themeLight: "Clair",
   toLight: "Passer en mode clair",
   toDark: "Passer en mode sombre",
   languageLabel: "Langue",
-  unknownPortal: "Portail inconnu.",
   identifierRequired: "{label} requis.",
   passwordRequired: "Mot de passe requis.",
   badCredentials: "Identifiant ou mot de passe incorrect.",
@@ -789,7 +910,7 @@ const en: Messages = {
     previous: "Previous",
     next: "Next",
     pageOf: "Page {page} of {pageCount}",
-    backToResults: "Back to results",
+    backToResults: "Back to the catalogue",
     authors: "Author(s)",
     publisher: "Publisher",
     year: "Year",
@@ -811,6 +932,35 @@ const en: Messages = {
     notFound: "Record not found",
     notFoundHint: "This record does not exist or is not published to the catalogue.",
     myAccount: "My account",
+    welcomeTitle: "Welcome to the library",
+    welcomeSchool: "École Française de Bujumbura",
+    newArrivals: "New arrivals",
+    scrollBack: "Previous new arrivals",
+    scrollForward: "More new arrivals",
+    searchPanelTitle: "Find a document",
+    searchTipsTitle: "Tips",
+    searchTips: [
+      "Mix title and author: “camus peste” works.",
+      "Accents are optional: “etranger” finds “L’Étranger”.",
+      "The start of a word is enough: “biblio” finds “bibliothèque”.",
+    ],
+    discover: "Discover",
+    dockLabel: "Explore the catalogue",
+    practicalTitle: "Practical information",
+    hoursTitle: "Opening hours",
+    borrowTitle: "Borrow",
+    borrowText: "Up to {days} days per item.",
+    renewTitle: "Renew",
+    renewText: "Up to {count} times, online from",
+    returnTitle: "Return",
+    returnText: "At the library desk.",
+    placeTitle: "Find us",
+    emailTitle: "Email the library",
+    phoneTitle: "Phone",
+    closePanel: "Close",
+    genres: "Genre(s)",
+    genreFilter: "Genre: {genre}",
+    clearGenre: "Remove the “{genre}” filter",
   },
   circulation: {
     navDashboard: "Dashboard",
@@ -916,6 +1066,8 @@ const en: Messages = {
     fieldAuthors: "Authors",
     fieldPublishers: "Publishers",
     fieldSubjects: "Subjects",
+    fieldGenres: "Genres",
+    hintGenres: "Files the record under the “Discover” tiles on the catalogue home.",
     hintOnePerLine: "One per line.",
     hintAuthorFormat: "One per line, as “Surname, Forename”.",
     optionNone: "—",
@@ -1077,10 +1229,20 @@ const en: Messages = {
     errNoCopyAssigned: "Assign a copy to this reservation first.",
   },
   brandTagline: "Library resource centre portal.",
-  welcome: "Welcome",
-  welcomeBack: "Welcome back",
-  signInSubtitle: "Sign in to your Shelf Library account.",
-  portalNavLabel: "Choose a portal",
+  signInTitle: "Sign in to the library",
+  signInChoice: "I am signing in as",
+  google: {
+    signIn: "Sign in with Google",
+    signedIn: "Signed in — returning to Shelf Library…",
+    errors: {
+      cancelled: "Google sign-in was cancelled.",
+      invalid: "Google sign-in did not complete. Please try again.",
+      domain:
+        "Only school accounts ending in @efbujumbura.com are accepted. Please choose your school account.",
+      "no-account": "No reader account is linked to this address. Please ask at the library.",
+      unavailable: "Google sign-in is unavailable right now. Please try again later or ask at the library.",
+    },
+  },
   accessDeniedTitle: "Access denied",
   accessDeniedHint:
     "Your account is not allowed to open this page. Ask whoever manages accounts for the library.",
@@ -1090,14 +1252,16 @@ const en: Messages = {
     gestion: {
       name: "Gestion",
       subtitle: "Administration",
+      audience: "Administrator or manager",
+      signInHint: "Sign in with your Shelf Library username",
       identifierLabel: "Username",
       identifierPlaceholder: "Enter your username",
     },
     opac: {
       name: "OPAC",
       subtitle: "Public catalogue",
-      identifierLabel: "Card number",
-      identifierPlaceholder: "Enter your card number",
+      audience: "Student or teacher",
+      signInHint: "Sign in with your efbujumbura.com account",
     },
   },
   password: "Password",
@@ -1106,28 +1270,41 @@ const en: Messages = {
   hidePassword: "Hide password",
   forgotPassword: "Forgot password?",
   signIn: "Sign in",
+  skipToContent: "Skip to content",
+  home: "Home",
+  quotes: [
+    {
+      text: "The reading of all good books is like a conversation with the finest minds of past centuries.",
+      author: "René Descartes",
+    },
+    { text: "Reading is to the mind what exercise is to the body.", author: "Joseph Addison" },
+    { text: "A reader lives a thousand lives before he dies.", author: "George R. R. Martin" },
+    {
+      text: "I have always imagined that Paradise will be a kind of library.",
+      author: "Jorge Luis Borges",
+    },
+    {
+      text: "The more that you read, the more things you will know.",
+      author: "Dr. Seuss",
+    },
+    { text: "So many books, so little time.", author: "Frank Zappa" },
+  ],
   signingIn: "Signing in…",
   noAccount: "Don’t have an account? Contact the library staff.",
-  trust: [
-    { title: "Secure", detail: "Your data is safe" },
-    { title: "Reliable", detail: "Built for libraries" },
-    { title: "Open source", detail: "Community driven" },
-  ],
   forgotTitle: "Forgot password",
   forgotGestion:
     "Contact your Shelf Library administrator to reset your password.",
-  forgotOpac:
-    "Bring your card to the library desk to have your password reset.",
   backToSignIn: "Back to sign in",
   greetingFirst: "Welcome, {name}",
   greetingReturning: "Welcome back, {name}",
   signedInAs: "Signed in as",
   signOut: "Sign out",
   themeLabel: "Theme",
+  themeDark: "Dark",
+  themeLight: "Light",
   toLight: "Switch to light mode",
   toDark: "Switch to dark mode",
   languageLabel: "Language",
-  unknownPortal: "Unknown portal.",
   identifierRequired: "{label} is required.",
   passwordRequired: "Password is required.",
   badCredentials: "Incorrect username or password.",
@@ -1145,4 +1322,4 @@ export function fill(template: string, values: Record<string, string>) {
   return template.replace(/\{(\w+)\}/g, (match, key) => values[key] ?? match);
 }
 
-export type { Messages, PortalCopy };
+export type { Messages };

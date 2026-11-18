@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { HorizontalLogo } from "@/app/_components/horizontal-logo";
+import { EfbLogo } from "@/app/_components/efb-logo";
+import { ShelfMark } from "@/app/_components/shelf-mark";
 import { PreferencesBar } from "@/app/_components/preferences-bar";
 import { messagesFor } from "@/lib/i18n";
 import { getLocale, getTheme } from "@/lib/preferences";
@@ -27,9 +28,17 @@ export default async function GestionLayout({ children }: LayoutProps<"/">) {
       <aside className="stack gap-content bg-[#0f1b2e] p-4 lg:w-64 lg:shrink-0">
         <Link
           href="/gestion"
-          className="rounded-control outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
+          className="cluster gap-3 rounded-control outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
         >
-          <HorizontalLogo theme="dark" className="w-32" />
+          {/* The sidebar is navy in both themes: ivory books, navy gaps. */}
+          <ShelfMark
+            label="Shelf Library"
+            ink="fill-[#ede7dc]"
+            gap="fill-[#0f1b2e]"
+            className="h-12 w-auto"
+          />
+          <span aria-hidden="true" className="h-10 w-px bg-white/20" />
+          <EfbLogo className="size-[4.2rem] sm:size-14" />
         </Link>
 
         <p className="text-caption uppercase tracking-wide text-white/50">

@@ -26,7 +26,7 @@ function Panel({
   return (
     <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
       <div className="stack gap-1">
-        <h2 className="font-serif text-heading-3">{title}</h2>
+        <h2 className="font-heading text-heading-3">{title}</h2>
         {intro ? (
           <p className="text-caption text-foreground-muted">{intro}</p>
         ) : null}
@@ -54,7 +54,7 @@ export default async function CirculationDesk({
   return (
     <div className="stack gap-section">
       <header className="stack gap-inline">
-        <h1 className="font-serif text-heading-1">{c.deskTitle}</h1>
+        <h1 className="font-heading text-heading-1">{c.deskTitle}</h1>
         <p className="text-body text-foreground-muted">{c.deskIntro}</p>
       </header>
 

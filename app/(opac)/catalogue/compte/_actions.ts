@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { renewLoan, type RenewRefusal } from "@/lib/circulation";
 import type { CirculationMessageKey } from "@/app/gestion/circulation/_lib/messages";
 import type { AccountState } from "./_lib/state";
-import { requireSession } from "../../(auth)/_lib/session";
+import { requireSession } from "@/app/(auth)/_lib/session";
 
 const ERRORS: Record<RenewRefusal, CirculationMessageKey> = {
   LOAN_NOT_FOUND: "errLoanNotFound",

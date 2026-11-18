@@ -31,23 +31,6 @@ function cookieName(portal: PortalSlug) {
   return `pmb_${portal}_session`;
 }
 
-/**
- * Remembers that *this device* has completed a sign-in at least once, so the
- * login screen can greet a first-time visitor with "Welcome" instead of
- * "Welcome back".
- *
- * Device-scoped rather than account-scoped by necessity: the greeting is
- * rendered before anyone has identified themselves, so there is no account to
- * look up yet. It deliberately survives sign-out — having signed out does not
- * make you a first-time visitor.
- */
-const RETURNING_COOKIE = "pmb_returning";
-const RETURNING_MAX_AGE = 60 * 60 * 24 * 365;
-
-export async function hasSignedInBefore() {
-  return (await cookies()).get(RETURNING_COOKIE)?.value === "1";
-}
-
 function secret() {
   const value = process.env.AUTH_SECRET;
   if (!value) {
@@ -107,15 +90,6 @@ export async function createSession(
     sameSite: "lax",
     path: "/",
     maxAge: SESSION_TTL_SECONDS,
-  });
-
-  // Only ever set after credentials actually verified.
-  cookieStore.set(RETURNING_COOKIE, "1", {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: RETURNING_MAX_AGE,
   });
 }
 

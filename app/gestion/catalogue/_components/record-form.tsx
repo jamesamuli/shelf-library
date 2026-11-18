@@ -69,6 +69,7 @@ export function RecordForm({
   values,
   documentTypes,
   recordStatuses,
+  genres,
   copyCount,
   messages,
   canDelete,
@@ -77,6 +78,7 @@ export function RecordForm({
   values: RecordInput;
   documentTypes: Option[];
   recordStatuses: Option[];
+  genres: Option[];
   copyCount: number;
   messages: Messages;
   /** The action refuses anyway; this keeps a button that cannot work off the page. */
@@ -216,6 +218,34 @@ export function RecordForm({
               className={`${FIELD} py-2`}
             />
           </Field>
+
+          {genres.length === 0 ? null : (
+            <fieldset className="stack gap-1.5 sm:col-span-2">
+              <legend className="mb-1.5 text-caption font-medium text-foreground-muted">
+                {c.fieldGenres}
+              </legend>
+              <div className="cluster gap-2">
+                {genres.map((genre) => (
+                  <label
+                    key={genre.id}
+                    className="cluster min-h-11 gap-2 rounded-control border border-border px-3 text-body-sm has-[:checked]:border-accent has-[:checked]:bg-surface-muted"
+                  >
+                    <input
+                      type="checkbox"
+                      name="genreIds"
+                      value={genre.id}
+                      // Same cross-deploy guard as `shown` above: an older
+                      // state object has no genreIds at all.
+                      defaultChecked={(shown.genreIds ?? []).includes(String(genre.id))}
+                      className="size-4 accent-accent"
+                    />
+                    {genre.label}
+                  </label>
+                ))}
+              </div>
+              <span className="text-caption text-foreground-subtle">{c.hintGenres}</span>
+            </fieldset>
+          )}
         </div>
 
         <div className="cluster gap-2">

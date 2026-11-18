@@ -18,6 +18,8 @@ check-out, check-in, renewal, and the patron's own loans.
 [12-cataloguing.md](12-cataloguing.md) — the back office: records and copies.
 [13-readers.md](13-readers.md) — enrolling readers and the CSV class import.
 [14-reservations.md](14-reservations.md) — holds, and the reshelving worklist.
+[16-opac-home.md](16-opac-home.md) — the catalogue's landing page: new
+arrivals and the genre tiles.
 
 [15-authorization.md](15-authorization.md) — who may do what, and why the
 bitmask did not survive the port.

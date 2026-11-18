@@ -4,8 +4,8 @@ import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { formatDate } from "@/lib/dates";
 import { getPatronAccount, type LoanRow } from "@/lib/circulation";
-import { logout } from "../../(auth)/_actions/logout";
-import { requireSession } from "../../(auth)/_lib/session";
+import { logout } from "@/app/(auth)/_actions/logout";
+import { requireSession } from "@/app/(auth)/_lib/session";
 import { RenewButton } from "./_components/renew-button";
 
 export const metadata: Metadata = { title: "Mon compte" };
@@ -35,7 +35,7 @@ export default async function AccountPage() {
     <div className="stack gap-section">
       <header className="cluster justify-between gap-content">
         <div className="stack gap-inline">
-          <h1 className="font-serif text-heading-1">{c.accountTitle}</h1>
+          <h1 className="font-heading text-heading-1">{c.accountTitle}</h1>
           <p className="text-body text-foreground-muted">
             {fill(messages.greetingReturning, { name: session.name })}
           </p>
@@ -52,7 +52,7 @@ export default async function AccountPage() {
       </header>
 
       <section className="stack gap-content">
-        <h2 className="font-serif text-heading-3">{c.accountCurrent}</h2>
+        <h2 className="font-heading text-heading-3">{c.accountCurrent}</h2>
 
         {account.current.length === 0 ? (
           <p className="rounded-card border border-border bg-surface p-6 text-center text-body-sm text-foreground-muted">
@@ -98,7 +98,7 @@ export default async function AccountPage() {
       </section>
 
       <section className="stack gap-content">
-        <h2 className="font-serif text-heading-3">{c.accountHistory}</h2>
+        <h2 className="font-heading text-heading-3">{c.accountHistory}</h2>
 
         {account.history.length === 0 ? (
           <p className="text-body-sm text-foreground-muted">

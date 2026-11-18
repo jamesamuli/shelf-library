@@ -30,7 +30,7 @@ export async function SessionPanel({
   return (
     <main className="container-page flex flex-1 flex-col justify-center py-page-y">
       <div className="mx-auto w-full max-w-md stack gap-content rounded-panel border border-border bg-surface p-6 shadow-card sm:p-8">
-        <h1 className="font-serif text-heading-2">{greeting}</h1>
+        <h1 className="font-heading text-heading-2">{greeting}</h1>
         <p className="text-body-sm text-foreground-muted">
           {messages.portals[portal].name} — {messages.portals[portal].subtitle}
         </p>

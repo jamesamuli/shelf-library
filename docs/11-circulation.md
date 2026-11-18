@@ -143,7 +143,7 @@ later than the current one. Staff may override the count; patrons may not.
 | `app/gestion/layout.tsx` | Staff shell; the session guard lives here, once. |
 | `app/gestion/page.tsx` | Dashboard: five counters plus recent loans. |
 | `app/gestion/circulation/` | The desk: patron, check-out, loans, check-in. |
-| `app/catalogue/compte/` | Patron's own loans, history, self-renewal. |
+| `app/(opac)/catalogue/compte/` | Patron's own loans, history, self-renewal. |
 | `lib/dates.ts` | Locale-aware, UTC-pinned date formatting. |
 
 UX decisions that depart from legacy:

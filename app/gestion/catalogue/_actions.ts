@@ -30,6 +30,7 @@ function readRecord(formData: FormData): RecordInput {
     authors: text(formData, "authors"),
     publishers: text(formData, "publishers"),
     subjects: text(formData, "subjects"),
+    genreIds: formData.getAll("genreIds").map(String),
   };
 }
 
@@ -70,6 +71,7 @@ export async function saveRecordAction(
   }
 
   revalidatePath("/gestion/catalogue");
+  revalidatePath("/");
   revalidatePath(`/catalogue/${result.id}`);
   if (id === null) redirect(`/gestion/catalogue/${result.id}`);
 

@@ -25,10 +25,24 @@ each one bundles size, line-height, letter-spacing, and a default weight:
 `text-display`, `text-heading-1`, `text-heading-2`, `text-heading-3`,
 `text-body` (default body copy), `text-body-sm`, `text-caption`.
 
-Faces (Brand guideline §04): **Playfair Display** for headings — pair a
-heading role with `font-serif` — and **Inter** for body, which is the
-default `font-sans`. Both load via `next/font/google` in
-[app/layout.tsx](../app/layout.tsx).
+Faces: **Rajdhani** for headings — pair a heading role with `font-heading`
+— and **Inter** for body, which is the default `font-sans` (Brand guideline
+§04). The guideline names Playfair Display for headings; the CDI chose
+Rajdhani instead (2026-11-18), and the utility was renamed from
+`font-serif` to `font-heading` so the name stops describing a face it no
+longer is. Rajdhani is condensed with a small x-height, so the heading
+roles are a step larger and carry no negative tracking. Playfair is no
+longer loaded at all, since the logo became the monogram (see Logo). All
+load via `next/font/google` in [app/layout.tsx](../app/layout.tsx); Geist
+Mono is not preloaded, being used only on record pages and in Gestion.
+
+**The interface is scaled 115 % from 48rem (768 px) up** — `html {
+font-size: 115% }` in `app/globals.css` (CDI request for legibility,
+2026-11-18; first tried at 130 %, which crowded laptop screens).
+Everything rem-based grows together; breakpoints do not move, because
+media queries measure rem against the browser default. Phones stay at
+100 %, the size their layout is built for. Borders, shadows and other px
+values do not scale.
 
 Reach for the roles before a raw `text-2xl`/`text-lg`. Tabular/identifier
 data — call numbers, barcodes, ISBNs — should use `font-mono` (Geist Mono,
@@ -51,6 +65,11 @@ Defined in `app/styles/colors.css`, built from the six swatches in
 Deep Navy `#0F1B2E`, Gold `#C8A56A`, Teal Green `#2E7D71`, Warm Ivory
 `#EDE7DC`, Slate Gray `#6B7280`, Charcoal `#111827`.
 
+**Light runs on white, not Warm Ivory** — the CDI asked for a whiter,
+easier-to-read page (2026-11-18). Ivory survives as `surface-muted` (the
+new-arrivals band, tips, table heads), and the two secondary text colours
+were darkened to 7.6:1 and 4.8:1 on white.
+
 The guideline gives six brand colors, not a full UI system, so hovers,
 borders, subtle text and the danger/info roles are **derived** from them.
 Every derived value is marked `/* derived */` in the file; anything
@@ -72,6 +91,18 @@ The kit's `colors/css-variables.css` gives slightly different hexes than
 the guideline (navy `#10233C` vs `#0F1B2E`) and is **not** used — the
 guideline is authoritative, by decision. Still worth reconciling at source
 so the kit does not contradict itself.
+
+## Motion
+
+Two keyframe tokens, in `app/globals.css`, both for the decorative books
+behind the sign-in page: **`animate-drift`**, a slow float-and-tilt loop
+(14 s by default), and **`animate-fall`**, top to bottom of the nearest
+size container in `cqh` units, so it spans the backdrop however tall the
+page is (20 s; its container needs `container-type: size`). An element sets its resting angle in
+`--tilt` and its own `animation-duration`/`-delay`, so several never move
+in step; it animates the individual `translate`/`rotate` properties and
+leaves `transform` alone. Anything that moves pairs it with
+`motion-reduce:animate-none` (or `motion-reduce:transition-none`).
 
 ## Border radius
 
@@ -124,15 +155,33 @@ public). Baseline bar for every screen:
   focus rings are enough — don't strip them with `outline-none` without
   replacing them).
 - Sufficient contrast against both light and dark `background` values.
+  That includes the focus ring: `ring` is Deep Navy in light (gold on white
+  is only 2.3:1, under the 3:1 a focus indicator needs) and light gold in
+  dark.
+- A skip link ("Aller au contenu") as the first Tab stop wherever a header
+  sits before the content — the OPAC layout has one.
 - Semantic HTML first (`<nav>`, `<main>`, `<button>`, real form labels)
   before reaching for ARIA attributes.
 
 ## Icons
 
-Still no icon dependency. The authentication screens hand-roll the four
-SVGs they need (user, lock, eye, plus the logo mark). If a third screen
-needs icons, switch to a single small set rather than spreading more
-hand-written SVGs across components.
+**`lucide-react`**, adopted with the OPAC home (genre tiles, carousel
+arrows, availability badge, filter chip, phone bottom bar). Import named icons only, so the
+bundle carries just those; mark decorative ones `aria-hidden="true"`. New
+icons come from this set. Older screens still hand-roll their SVGs —
+convert them when next touched ([09-deferred.md](09-deferred.md) 7.1).
+
+### Genre tile colours
+
+Eight derived hues in `app/styles/colors.css` (`bg-genre-indigo`,
+`border-genre-teal`, …), one per tile. They are named by hue rather than by
+genre because which genre wears which colour is data (`genres.colour`).
+Saturated and warm (CDI request, 2026-11-18 — a first muted set read as
+washed out; the cool `slate` was replaced by `terracotta`, with a migration
+moving the row). Each carries a white icon at ≥ 4.5:1 (lowest: teal,
+4.86:1), and unlike the semantic slots they do not switch with the theme.
+Colour is confined to a tile's icon block and border; the label stays on
+the plain surface.
 
 ## Theme and language
 
@@ -140,27 +189,59 @@ Both are user preferences held in cookies and read on the server
 (`lib/preferences.ts`), so the first paint is already correct — no flash of
 the wrong theme and no client-side i18n runtime.
 
-- **Theme** switches on `<html data-theme>`, *not* `prefers-color-scheme`.
-  The app opens in **light** regardless of the OS setting, and the user
-  toggles explicitly.
+- **Theme** switches on `<html data-theme>`. On **desktop** the app opens in
+  **light** regardless of the OS setting, and the user toggles explicitly.
+  On a **phone** with no choice made yet (CDI request, 2026-11-18) the
+  server leaves `data-theme` off and the device's light/dark mode applies
+  through `prefers-color-scheme` — the server cannot know it, so CSS
+  decides. The dark palette is one `@utility theme-dark`, applied both
+  for `[data-theme="dark"]` and for a dark device with no `data-theme`, so
+  it is never written twice. Anything theme-dependent rendered on the
+  server must then cover both: the Shelf lockup (`ThemedLogo` sends both
+  variants and a media query shows one) and the theme switch (both
+  buttons, the one switching away from what is on screen shown).
+- **"Phone"** is the `Sec-CH-UA-Mobile` client hint, else a mobile user
+  agent; tablets mostly report as desktops and keep desktop defaults.
 - **Language** is `fr` (default) or `en`, with strings in `lib/i18n.ts` — a
   plain typed dictionary rather than an i18n library, since two locales and
   one feature do not justify a dependency. Every value must stay a plain
   string: the dictionary is passed to Client Components, and functions
   cannot cross that boundary (placeholders use `{braces}` + `fill()`).
+  A phone with no choice made yet starts from its `Accept-Language`: the
+  first of our two locales it lists, by `q` order, else French.
 
 Both switches are plain forms posting to Server Actions, so they work
-without JavaScript. They live in `app/(auth)/_components/preferences-bar.tsx`.
+without JavaScript, and a choice made with them (a cookie) always wins over
+a device default. The theme switch's short label is translated ("Sombre" /
+"Clair"); a globe marks the language switch. They live in `app/_components/preferences-bar.tsx`. On
+phones they compact for a one-row header: the theme switch is icon-only
+and the language control shows only the other language, as a one-tap
+switch.
 
 ## Logo
 
-The horizontal lockup, one variant per theme: `Horizontal logo
-whitemode.svg` for light, `Horizontal logo darkmode.svg` for dark.
+**The Shelf monogram** — the icon-only mark, `01-logo/icon/Icon only.svg`
+— inlined as `app/_components/shelf-mark.tsx` (CDI decision,
+2026-11-18). The horizontal lockup it replaced drew "Shelf" / "LIBRARY" as
+live `<text>` in Playfair Display and Inter, which kept an extra font
+family loading on every page and needed a light and a dark variant (both
+sent while a phone followed its device theme). The monogram is shapes
+only, and its fills are theme tokens, so one copy follows light and dark:
+`ink` (default `fill-primary`) for the navy books and shelf, `gap` for
+the bands across the spines — the colour of whatever the mark sits on
+(`fill-surface` in headers, `fill-surface-muted` on cover stand-ins).
+Gestion's sidebar is navy in both themes and passes ivory ink and navy
+gaps. With a `label` it is the logo (`role="img"`, "Shelf Library");
+without, decoration.
 
-Its wordmark is `<text>` in Playfair Display and Inter, so it **must be
-inlined in the document** — an `<img>` or `background-image` is an isolated
-document and cannot use the page's fonts. `app/(auth)/_components/
-horizontal-logo.tsx` embeds the markup with `font-family` rewritten to the
-`next/font` CSS variables, and prefixes the generic `.cls-N` class names per
-variant so the two cannot collide. It is generated from the source files —
-regenerate rather than hand-editing.
+The school's mark sits beside it, after a thin rule (catalogue header,
+sign-in page, Gestion sidebar) — and alone on phones, where the monogram
+steps aside, 20 % larger there (3.6 rem in the catalogue and sign-in
+headers, 4.2 rem in the Gestion sidebar; CDI request):
+`app/_components/efb-logo.tsx`. The source is
+`assets/shelf-library-brand/01-logo/EFB/Logo EFB.png`, copied to
+`public/efb-logo.png` and statically imported so `next/image` serves a
+resized copy — the original is ~900 KB.
+
+The same monogram, unlabelled, is the placeholder on cover-less
+new-arrival cards.

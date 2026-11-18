@@ -11,7 +11,8 @@ the record detail page including holdings and availability.
 
 **Out, deliberately:** browsing by subject/category is its own module (it
 needs the thesaurus tree UI), as are facets, saved searches, the basket
-(`cart.php`), reading lists, and reviews. One module at a time.
+(`cart.php`), reading lists, and reviews. One module at a time. (Later: the
+landing page and its genre filter — [16-opac-home.md](16-opac-home.md).)
 
 ## 1. Legacy implementation
 
@@ -118,7 +119,7 @@ Z39.50, and the multi-source selector — deferred per
 
 | Route | Purpose |
 |---|---|
-| `/catalogue` | Search + results, public |
+| `/catalogue` | Search + results, public; the bare URL redirects to the home at `/` |
 | `/catalogue/[id]` | Record detail with holdings, public |
 | `/catalogue/compte` | Patron account (moved here so `/catalogue` could be public) |
 

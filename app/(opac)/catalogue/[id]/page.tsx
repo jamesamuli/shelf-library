@@ -5,7 +5,7 @@ import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { formatDate } from "@/lib/dates";
 import { getRecord } from "@/lib/catalogue";
-import { getSession } from "../../(auth)/_lib/session";
+import { getSession } from "@/app/(auth)/_lib/session";
 
 export async function generateMetadata({
   params,
@@ -40,10 +40,10 @@ export default async function RecordPage({
   if (!record) {
     return (
       <div className="mx-auto max-w-md stack gap-content rounded-card border border-border bg-surface p-6 text-center">
-        <h1 className="font-serif text-heading-3">{c.notFound}</h1>
+        <h1 className="font-heading text-heading-3">{c.notFound}</h1>
         <p className="text-body-sm text-foreground-muted">{c.notFoundHint}</p>
         <Link
-          href="/catalogue"
+          href="/"
           className="min-h-11 cluster items-center justify-center rounded-control border border-border px-4 text-body-sm outline-offset-2 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
         >
           {c.backToResults}
@@ -52,19 +52,19 @@ export default async function RecordPage({
     );
   }
 
-  const { authors, publishers, subjects } = record;
+  const { authors, publishers, subjects, genres } = record;
 
   return (
     <article className="stack gap-content">
       <Link
-        href="/catalogue"
+        href="/"
         className="text-caption text-accent underline-offset-2 hover:underline"
       >
         ← {c.backToResults}
       </Link>
 
       <header className="stack gap-inline">
-        <h1 className="font-serif text-heading-1">{record.title}</h1>
+        <h1 className="font-heading text-heading-1">{record.title}</h1>
         {record.subtitle ? (
           <p className="text-body text-foreground-muted">{record.subtitle}</p>
         ) : null}
@@ -103,6 +103,21 @@ export default async function RecordPage({
           {record.documentType ? (
             <Field label={c.documentType}>{record.documentType}</Field>
           ) : null}
+          {genres.length > 0 ? (
+            <Field label={c.genres}>
+              <span className="cluster gap-1.5">
+                {genres.map((genre) => (
+                  <Link
+                    key={genre.slug}
+                    href={`/catalogue?genre=${encodeURIComponent(genre.slug)}`}
+                    className="rounded-control bg-surface-muted px-2 py-0.5 text-caption text-accent outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                  >
+                    {locale === "en" ? (genre.labelEn ?? genre.labelFr) : genre.labelFr}
+                  </Link>
+                ))}
+              </span>
+            </Field>
+          ) : null}
           {record.collection ? (
             <Field label={c.collection}>{record.collection}</Field>
           ) : null}
@@ -134,7 +149,7 @@ export default async function RecordPage({
       </section>
 
       <section className="stack gap-inline">
-        <h2 className="font-serif text-heading-3">
+        <h2 className="font-heading text-heading-3">
           {c.holdings}{" "}
           <span className="text-body-sm font-normal text-foreground-muted">
             ({fill(c.copies, { count: String(record.holdings.length) })})

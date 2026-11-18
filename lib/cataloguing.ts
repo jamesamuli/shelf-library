@@ -1,5 +1,6 @@
 import { Prisma } from "../generated/prisma/client";
 import { prisma } from "./prisma";
+import type { Locale } from "./preferences";
 
 /**
  * Back-office cataloguing: records and their copies.
@@ -24,6 +25,7 @@ export type RecordInput = {
   publishers: string;
   /** One subject per line. */
   subjects: string;
+  genreIds: string[];
 };
 
 export type FieldError = "TITLE_REQUIRED" | "YEAR_INVALID";
@@ -129,10 +131,18 @@ export async function saveRecord(
   const errors = validate(input);
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
-  const [authorIds, publisherIds, subjectIds] = await Promise.all([
+  const [authorIds, publisherIds, subjectIds, genres] = await Promise.all([
     resolveAuthors(lines(input.authors)),
     resolvePublishers(lines(input.publishers)),
     resolveSubjects(lines(input.subjects)),
+    // Checkbox values come from the browser: keep only genres that exist,
+    // rather than letting a stale or forged id fail the whole save.
+    prisma.genre.findMany({
+      where: {
+        id: { in: input.genreIds.map(optionalId).filter((id) => id !== null) },
+      },
+      select: { id: true },
+    }),
   ]);
 
   const scalars = {
@@ -166,6 +176,9 @@ export async function saveRecord(
     recordSubjects: {
       create: subjectIds.map((subjectId, index) => ({ subjectId, rank: index })),
     },
+    recordGenres: {
+      create: genres.map((genre) => ({ genreId: genre.id })),
+    },
   };
 
   if (id === null) {
@@ -179,6 +192,7 @@ export async function saveRecord(
     prisma.contribution.deleteMany({ where: { recordId: id } }),
     prisma.recordPublisher.deleteMany({ where: { recordId: id } }),
     prisma.recordSubject.deleteMany({ where: { recordId: id } }),
+    prisma.recordGenre.deleteMany({ where: { recordId: id } }),
     prisma.bibliographicRecord.update({
       where: { id },
       data: { ...scalars, ...links },
@@ -340,6 +354,7 @@ export async function getRecordForEdit(id: number) {
         include: { subject: { include: { labels: true } } },
         orderBy: { rank: "asc" },
       },
+      recordGenres: { select: { genreId: true } },
       items: {
         include: {
           location: true,
@@ -373,6 +388,7 @@ export async function getRecordForEdit(id: number) {
         .map((s) => s.subject.labels[0]?.label ?? "")
         .filter(Boolean)
         .join("\n"),
+      genreIds: record.recordGenres.map((g) => String(g.genreId)),
     } satisfies RecordInput,
     items: record.items.map((item) => ({
       id: item.id,
@@ -397,16 +413,24 @@ export async function getRecordForEdit(id: number) {
  */
 const OPTION = { id: true, label: true } as const;
 
-export async function getCataloguingOptions() {
-  const [documentTypes, recordStatuses, locations, sections, itemStatuses] =
+export async function getCataloguingOptions(locale: Locale) {
+  const [documentTypes, recordStatuses, locations, sections, itemStatuses, genreRows] =
     await Promise.all([
       prisma.documentType.findMany({ select: OPTION, orderBy: { label: "asc" } }),
       prisma.recordStatus.findMany({ select: OPTION, orderBy: { label: "asc" } }),
       prisma.location.findMany({ select: OPTION, orderBy: { label: "asc" } }),
       prisma.section.findMany({ select: OPTION, orderBy: { label: "asc" } }),
       prisma.itemStatus.findMany({ select: OPTION, orderBy: { label: "asc" } }),
+      prisma.genre.findMany({
+        select: { id: true, labelFr: true, labelEn: true },
+        orderBy: [{ rank: "asc" }, { id: "asc" }],
+      }),
     ]);
-  return { documentTypes, recordStatuses, locations, sections, itemStatuses };
+  const genres = genreRows.map((g) => ({
+    id: g.id,
+    label: locale === "en" ? (g.labelEn ?? g.labelFr) : g.labelFr,
+  }));
+  return { documentTypes, recordStatuses, locations, sections, itemStatuses, genres };
 }
 
 export const EMPTY_RECORD: RecordInput = {
@@ -420,4 +444,5 @@ export const EMPTY_RECORD: RecordInput = {
   authors: "",
   publishers: "",
   subjects: "",
+  genreIds: [],
 };

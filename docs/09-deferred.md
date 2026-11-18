@@ -69,6 +69,13 @@ Sign-in itself works; these are the pieces around it. See
 - **3.6 Session hardening.** No rotation on privilege change, no refresh,
   no "remember me". CSRF currently rests on `SameSite=lax` plus Next's
   built-in Server Action protections.
+- **3.8 `patrons.password_hash` and `patrons.login` no longer sign anyone
+  in** since readers use Google only (`login` is still filled in when a
+  reader is created, but nothing reads it). Kept so imported legacy data
+  loses nothing; drop them in a migration, with the reader form's login
+  field, once the CDI confirms there is no way back to card + password
+  sign-in. The same goes for 3.5's bcrypt path,
+  which now only concerns staff.
 - **3.7 Multi-database selector.** Legacy offered one at login when several
   PMB databases were configured. Probably not wanted — confirm and delete
   this line.
@@ -107,8 +114,39 @@ Sign-in itself works; these are the pieces around it. See
   ```
 
   Anything beyond those three lines is real drift.
-- **4.5 Catalogue browse and facets.** Search exists; browsing by subject,
-  by author, by collection, and result facets do not. Their own modules.
+- **4.5 Catalogue browse and facets.** Search exists, and so does a single
+  genre filter (the home's tiles — [16-opac-home.md](16-opac-home.md)).
+  Browsing by subject, by author, by collection, and multi-value facets with
+  counts do not. Their own modules.
+- **4.14 Genre management screen.** The tiles are data (`genres`), but
+  editing them — rename, reorder, recolour, add, remove — is SQL for now.
+  A small Gestion screen behind `catalog.edit` would do; the icon and colour
+  pickers choose from the closed sets listed in
+  [16-opac-home.md](16-opac-home.md) §6.
+- **4.15 Monthly suggestions.** The CDI floated suggesting books "based on
+  different months" as an alternative to plain new arrivals. Not built;
+  needs a definition first — seasonal themes (subjects tagged per month),
+  what circulated most last month, or a librarian's monthly pick.
+- **4.16 Library name and practical details setting.** The OPAC welcome
+  names the École Française de Bujumbura from the dictionary, and the
+  home's opening hours, place and contact live in `lib/library-info.ts`
+  (empty, so hidden, until the CDI fills them in). Legacy keeps such
+  things in `parametres`; a settings screen would let the CDI edit them
+  without a deploy.
+- **4.17 Covers beyond the home.** Covers show on new-arrival cards only —
+  not yet in the results list or on the record page. The record form has
+  no field for `thumbnail_url` either, so ISBN-derived Open Library covers
+  are the only source in practice. "See all new arrivals" (results sorted
+  by date) is also not built.
+- **4.19 Cache the home's data across visitors.** New arrivals and genres
+  are queried on every request — most of the home's time to first byte.
+  Next 16's way is Cache Components (`cacheComponents: true` + `"use
+  cache"`, with `cacheTag` revalidated by the cataloguing actions). It is
+  an app-wide switch that changes how every page treats cookies and
+  dynamic data, so it wants its own task rather than riding on another.
+- **4.18 Legacy home blocks not ported.** Thesaurus browser, section
+  browser, the two Dewey browsers ("marguerite", "100 cases"), newsletters
+  (`bannettes`), virtual shelves (`etageres`), info pages and RSS.
 - **4.7 Holds: built for staff, not yet joined up.** The Réservations screens
   exist (see [14-reservations.md](14-reservations.md)), but three connections
   are still missing: readers cannot place their own holds from the OPAC,
@@ -176,21 +214,25 @@ Not our bugs, but they will bite whoever touches these next.
   French. We follow the dashboards (French default, English available).
 - **6.3 The mockups label the public portal "OPUS"**; we use OPAC, by
   decision.
+- **6.4 Sample record *Devenir* has the wrong ISBN.** `prisma/seed.ts`
+  gives it 9782081471757, which is Houellebecq's *Sérotonine*; the OPAC
+  home shows that cover. Correct it in the seed and in the database — the
+  French edition of *Devenir* (Fayard, 2018) has its own ISBN.
 
 ## 7. Smaller cleanups
 
-- **7.1 Icon strategy.** The auth screens hand-roll their SVGs (user, lock,
-  eye, chart, book, sun, moon). At the third screen needing icons, switch
-  to a single small set rather than spreading more by hand.
+- **7.1 Icon strategy.** `lucide-react` arrived with the OPAC home, which
+  needed ten icons. The auth screens, sidebar and search bar still hand-roll
+  theirs (user, lock, eye, chart, book, sun, moon, magnifier); move them
+  over when those files are next touched, not as a sweep.
 - **7.2 i18n approach.** A plain typed dictionary, deliberately not a
   library. Revisit at a third locale, or when plural/date formatting is
   needed.
 - **7.3 Stray parent-directory package files.** `next build` warns it
   ignored `package-lock.json` in `D:\Coding` because it sits outside the
   repo. Harmless, but it suggests a stray `package.json` one level up.
-- **7.4 The default `/` route** redirects to the login screen because
-  nothing else exists. Replace with a real landing page once the portals
-  have content.
+- **7.4 The default `/` route** — done: it is the OPAC home
+  ([16-opac-home.md](16-opac-home.md)).
 - **7.5 Gestion has four nav sections**, against nine in the mockup. The rest
   are omitted rather than stubbed. Add each when its module lands. Screens
   that belong to a section nest under it (Réservations and Lecteurs under
@@ -246,6 +288,14 @@ Not our bugs, but they will bite whoever touches these next.
   passed to Client Components" on every render of the readers screen.
   TypeScript cannot catch this: a wider object satisfies a narrower prop type.
   `select` exactly what the component needs.
+- **7.14 Playwright screenshots fake a hydration mismatch.** By default a
+  screenshot hides the text caret by injecting `caret-color: transparent`
+  on inputs; if that lands before hydration, React reports a mismatch on
+  every `<input>`. Pass `caret: "initial"` before chasing it.
+- **7.15 Device defaults on desktop too?** A phone with no saved choice
+  now opens in its own language and light/dark mode; desktop keeps light
+  and French, per the earlier decision. Extending it is a one-line change
+  in `lib/preferences.ts` (drop the `isPhone()` test) — a CDI call.
 - **7.11 Restart `next dev` after `prisma generate`.** The client is cached
   on `globalThis` across HMR, so a newly added model reads as `undefined` and
   the page dies with "Cannot read properties of undefined (reading

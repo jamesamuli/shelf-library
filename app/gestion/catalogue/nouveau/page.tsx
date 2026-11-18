@@ -18,7 +18,7 @@ export default async function NewRecordPage() {
 
   if (!granted.has("catalog.edit")) return <Denied messages={messages} />;
   const c = messages.cataloguing;
-  const options = await getCataloguingOptions();
+  const options = await getCataloguingOptions(locale);
 
   return (
     <div className="stack gap-section">
@@ -29,7 +29,7 @@ export default async function NewRecordPage() {
         >
           ← {c.backToList}
         </Link>
-        <h1 className="font-serif text-heading-1">{c.newRecordTitle}</h1>
+        <h1 className="font-heading text-heading-1">{c.newRecordTitle}</h1>
       </div>
 
       <section className="rounded-card border border-border bg-surface p-4 sm:p-6">
@@ -38,6 +38,7 @@ export default async function NewRecordPage() {
           values={EMPTY_RECORD}
           documentTypes={options.documentTypes}
           recordStatuses={options.recordStatuses}
+          genres={options.genres}
           canDelete={granted.has("catalog.delete")}
           copyCount={0}
           messages={messages}

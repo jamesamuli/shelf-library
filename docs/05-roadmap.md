@@ -22,6 +22,16 @@ in the browser and documented in `docs/`.
 - Not done, and their own modules: browsing by subject/author/collection,
   and result facets.
 
+## Phase 1b — OPAC home (done, 2026-11-18)
+
+- Landing page modelled on the Hibouthèque layout the CDI asked for, in the
+  Shelf brand: new arrivals with covers, search panel, genre tiles.
+- Genres become a controlled list on records, ticked on the record form;
+  a tile is a genre filter on search.
+- Written up in [16-opac-home.md](16-opac-home.md).
+- Not done: a screen to manage the tiles, monthly suggestions, covers
+  outside the home (deferred items 4.14–4.17).
+
 ## Phase 2 — Patron accounts and circulation (loans done, 2026-08-08)
 
 - **Done:** authentication (both portals), check-out, check-in, renewal,

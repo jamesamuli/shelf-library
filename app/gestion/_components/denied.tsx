@@ -10,7 +10,7 @@ import type { Messages } from "@/lib/i18n";
 export function Denied({ messages }: { messages: Messages }) {
   return (
     <div className="mx-auto max-w-md stack gap-content rounded-card border border-border bg-surface p-6 text-center">
-      <h1 className="font-serif text-heading-3">{messages.accessDeniedTitle}</h1>
+      <h1 className="font-heading text-heading-3">{messages.accessDeniedTitle}</h1>
       <p className="text-body-sm text-foreground-muted">
         {messages.accessDeniedHint}
       </p>

@@ -21,7 +21,7 @@ function Stat({
     <div className="stack gap-1 rounded-card border border-border bg-surface p-4">
       <span className="text-caption text-foreground-muted">{label}</span>
       <span
-        className={`font-serif text-heading-2 ${tone === "warning" && value > 0 ? "text-warning" : ""}`}
+        className={`font-heading text-heading-2 ${tone === "warning" && value > 0 ? "text-warning" : ""}`}
       >
         {value}
       </span>
@@ -41,7 +41,7 @@ export default async function GestionDashboard() {
   return (
     <div className="stack gap-section">
       <header className="stack gap-inline">
-        <h1 className="font-serif text-heading-1">
+        <h1 className="font-heading text-heading-1">
           {fill(c.dashboardTitle, { name: session.name })}
         </h1>
         <p className="text-body text-foreground-muted">{c.dashboardIntro}</p>
@@ -57,7 +57,7 @@ export default async function GestionDashboard() {
 
       <section className="stack gap-content">
         <div className="cluster justify-between gap-inline">
-          <h2 className="font-serif text-heading-3">{c.recentLoans}</h2>
+          <h2 className="font-heading text-heading-3">{c.recentLoans}</h2>
           <Link
             href="/gestion/circulation"
             className="cluster min-h-11 items-center rounded-control bg-primary px-4 text-caption font-medium text-primary-foreground outline-offset-2 hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-ring"

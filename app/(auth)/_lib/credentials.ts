@@ -1,16 +1,16 @@
 import { prisma } from "@/lib/prisma";
 import { burnVerificationTime, verifyPassword } from "./password";
-import type { PortalSlug } from "./portals";
 
 /**
  * The only place authentication touches the database.
  *
- * Gestion authenticates on `staff_users.username`, OPAC on `patrons.barcode`
- * (the card number) — the one legacy behavior worth preserving exactly.
+ * Staff authenticate with `staff_users.username` and a password. Readers sign
+ * in with their school Google account only (CDI decision, 2026-11-18), found
+ * by `patrons.email`; legacy's card-number + password sign-in is gone.
  *
- * Every rejection returns a bare `invalid` with no reason, and every path that
- * fails to find an account still burns comparable time, so neither the
- * response body nor its timing reveals whether an identifier exists.
+ * Every staff rejection returns a bare `invalid` with no reason, and every
+ * path that fails to find an account still burns comparable time, so neither
+ * the response body nor its timing reveals whether a username exists.
  */
 
 export type Principal = {
@@ -27,15 +27,12 @@ export type CredentialResult =
 
 const INVALID = { status: "invalid" } as const;
 
-export async function verifyCredentials(
-  portal: PortalSlug,
-  identifier: string,
+export async function verifyStaffCredentials(
+  username: string,
   password: string,
 ): Promise<CredentialResult> {
   try {
-    return portal === "gestion"
-      ? await verifyStaff(identifier, password)
-      : await verifyPatron(identifier, password);
+    return await verifyStaff(username, password);
   } catch (error) {
     // Database unreachable or misconfigured — distinct from bad credentials,
     // so the form can say so instead of blaming the user's password.
@@ -74,34 +71,29 @@ async function verifyStaff(
   };
 }
 
-async function verifyPatron(
-  barcode: string,
-  password: string,
-): Promise<CredentialResult> {
-  const patron = await prisma.patron.findUnique({
-    where: { barcode },
-    include: { status: true },
-  });
+type PatronWithStatus = NonNullable<
+  Awaited<ReturnType<typeof findPatron>>
+>;
 
+function findPatron(email: string) {
+  return prisma.patron.findUnique({ where: { email }, include: { status: true } });
+}
+
+/** Who may use the OPAC at all. */
+function mayUseOpac(patron: PatronWithStatus) {
   // Compared as dates, not timestamps: expiresOn/blockedUntil are DATE columns.
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const ineligible =
-    !patron ||
-    !patron.passwordHash ||
-    patron.anonymizedAt !== null ||
-    patron.status?.allowsOpacLogin === false ||
-    (patron.expiresOn !== null && patron.expiresOn < today) ||
-    (patron.blockedUntil !== null && patron.blockedUntil >= today);
+  return (
+    patron.anonymizedAt === null &&
+    patron.status?.allowsOpacLogin !== false &&
+    (patron.expiresOn === null || patron.expiresOn >= today) &&
+    (patron.blockedUntil === null || patron.blockedUntil < today)
+  );
+}
 
-  if (ineligible) {
-    await burnVerificationTime(password);
-    return INVALID;
-  }
-
-  if (!(await verifyPassword(password, patron.passwordHash!))) return INVALID;
-
+async function signInPatron(patron: PatronWithStatus): Promise<CredentialResult> {
   const isFirstLogin = patron.lastLoginAt === null;
   await prisma.patron.update({
     where: { id: patron.id },
@@ -118,4 +110,22 @@ async function verifyPatron(
       isFirstLogin,
     },
   };
+}
+
+/**
+ * Google sign-in: the address has already been proven by Google and checked
+ * against the school domain (see google.ts), so the reader is found by the
+ * email their account was created from. No password, so no timing to equalise
+ * — and the address is the reader's own, so saying it has no account reveals
+ * nothing they could not already know.
+ */
+export async function verifyPatronByEmail(email: string): Promise<CredentialResult> {
+  try {
+    const patron = await findPatron(email);
+    if (!patron || !mayUseOpac(patron)) return INVALID;
+    return await signInPatron(patron);
+  } catch (error) {
+    console.error("Credential verification failed:", error);
+    return { status: "unavailable" };
+  }
 }

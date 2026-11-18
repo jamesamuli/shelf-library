@@ -30,7 +30,7 @@ export default async function ReadersPage() {
   return (
     <div className="stack gap-section">
       <header className="stack gap-inline">
-        <h1 className="font-serif text-heading-1">{r.title}</h1>
+        <h1 className="font-heading text-heading-1">{r.title}</h1>
         <p className="text-body text-foreground-muted">{r.intro}</p>
       </header>
 
@@ -39,7 +39,7 @@ export default async function ReadersPage() {
       <div className="grid gap-content xl:grid-cols-2 xl:items-start">
         <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
           <div className="stack gap-1">
-            <h2 className="font-serif text-heading-3">{r.formTitle}</h2>
+            <h2 className="font-heading text-heading-3">{r.formTitle}</h2>
             <p className="text-caption text-foreground-muted">{r.formIntro}</p>
           </div>
           <ReaderForm
@@ -58,7 +58,7 @@ export default async function ReadersPage() {
 
         <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
           <div className="stack gap-1">
-            <h2 className="font-serif text-heading-3">{r.importTitle}</h2>
+            <h2 className="font-heading text-heading-3">{r.importTitle}</h2>
             <p className="text-caption text-foreground-muted">{r.importIntro}</p>
           </div>
           <ImportPanel messages={messages} />

@@ -1,6 +1,7 @@
+import { Globe } from "lucide-react";
 import { setLocale, setTheme } from "@/lib/preferences-actions";
 import type { Messages } from "@/lib/i18n";
-import { LOCALES, type Locale, type Theme } from "@/lib/preferences";
+import { LOCALES, type Locale, type Theme, type ThemeSetting } from "@/lib/preferences";
 
 /**
  * Theme and language switches. Plain forms posting to Server Actions, so both
@@ -49,35 +50,75 @@ function MoonIcon() {
 const CONTROL =
   "cluster min-h-11 justify-center gap-1.5 rounded-control border border-border px-3 text-caption text-foreground-muted outline-offset-2 hover:bg-surface-muted hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring";
 
+/** Switches to `target`. Icon only on phones, where the header is one row. */
+function ThemeButton({
+  target,
+  messages,
+  className = "",
+}: {
+  target: Theme;
+  messages: Messages;
+  className?: string;
+}) {
+  return (
+    <form action={setTheme} className={className}>
+      <input type="hidden" name="theme" value={target} />
+      <button
+        type="submit"
+        className={CONTROL}
+        aria-label={target === "dark" ? messages.toDark : messages.toLight}
+      >
+        {target === "dark" ? <MoonIcon /> : <SunIcon />}
+        <span className="max-sm:hidden">
+          {target === "dark" ? messages.themeDark : messages.themeLight}
+        </span>
+      </button>
+    </form>
+  );
+}
+
 export function PreferencesBar({
   theme,
   locale,
   messages,
 }: {
-  theme: Theme;
+  theme: ThemeSetting;
   locale: Locale;
   messages: Messages;
 }) {
-  const nextTheme: Theme = theme === "dark" ? "light" : "dark";
-
   return (
     <div className="cluster justify-end gap-2">
-      <form action={setTheme}>
-        <input type="hidden" name="theme" value={nextTheme} />
-        <button
-          type="submit"
-          className={CONTROL}
-          aria-label={nextTheme === "dark" ? messages.toDark : messages.toLight}
-        >
-          {nextTheme === "dark" ? <MoonIcon /> : <SunIcon />}
-          <span>{nextTheme === "dark" ? "Dark" : "Light"}</span>
-        </button>
-      </form>
+      {/* Following the device's mode, which only the browser knows, both
+          buttons are sent and the media query shows the one that switches
+          away from what is on screen. */}
+      {theme === "system" ? (
+        <>
+          <ThemeButton
+            target="dark"
+            messages={messages}
+            className="[@media(prefers-color-scheme:dark)]:hidden"
+          />
+          <ThemeButton
+            target="light"
+            messages={messages}
+            className="hidden [@media(prefers-color-scheme:dark)]:block"
+          />
+        </>
+      ) : (
+        <ThemeButton target={theme === "dark" ? "light" : "dark"} messages={messages} />
+      )}
 
+      {/* The globe says "language" at a glance — on phones, where only the
+          other language's code shows, a bare "EN" did not read as a switch. */}
       <form action={setLocale} className="cluster gap-1">
         <span className="sr-only" id="language-label">
           {messages.languageLabel}
         </span>
+        <Globe
+          aria-hidden="true"
+          className="size-4 text-foreground-muted max-sm:hidden"
+          strokeWidth={2}
+        />
         {LOCALES.map((code) => (
           <button
             key={code}
@@ -86,12 +127,17 @@ export function PreferencesBar({
             value={code}
             aria-describedby="language-label"
             aria-current={code === locale ? "true" : undefined}
-            className={`min-h-11 min-w-11 rounded-control border px-3 text-caption uppercase outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring ${
+            // On phones only the other language shows — a one-tap switch that
+            // keeps the header to one row.
+            className={`flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-control border px-3 text-caption uppercase outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring ${
               code === locale
-                ? "border-border-strong bg-surface-muted text-foreground"
+                ? "border-border-strong bg-surface-muted text-foreground max-sm:hidden"
                 : "border-border text-foreground-muted hover:bg-surface-muted hover:text-foreground"
             }`}
           >
+            {code === locale ? null : (
+              <Globe aria-hidden="true" className="size-4 sm:hidden" strokeWidth={2} />
+            )}
             {code}
           </button>
         ))}

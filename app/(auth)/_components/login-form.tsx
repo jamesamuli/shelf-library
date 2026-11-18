@@ -2,78 +2,30 @@
 
 import Link from "next/link";
 import { useActionState, useId, useState } from "react";
-import type { Messages, PortalCopy } from "@/lib/i18n";
+import { Eye, EyeOff } from "lucide-react";
+import type { Messages } from "@/lib/i18n";
 import { login, type LoginState } from "../_actions/login";
-import type { Portal } from "../_lib/portals";
 
 const initialState: LoginState = {};
 
 const FIELD =
-  "w-full rounded-control border border-border bg-surface py-2.5 pl-10 text-body text-foreground placeholder:text-foreground-subtle outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring";
+  "w-full rounded-control border border-border-strong bg-surface px-3 py-2.5 text-body text-foreground placeholder:text-foreground-subtle outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring aria-invalid:border-danger";
 
-function UserIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      className="size-5"
-      aria-hidden="true"
-    >
-      <path d="M20 21a8 8 0 1 0-16 0" strokeLinecap="round" />
-      <circle cx="12" cy="7.5" r="4.5" />
-    </svg>
-  );
-}
-
-function LockIcon({ className = "size-5" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      className={className}
-      aria-hidden="true"
-    >
-      <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
-      <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function EyeIcon({ off }: { off: boolean }) {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      className="size-5"
-      aria-hidden="true"
-    >
-      <path
-        d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"
-        strokeLinecap="round"
-      />
-      <circle cx="12" cy="12" r="3" />
-      {off ? <path d="m4 20 16-16" strokeLinecap="round" /> : null}
-    </svg>
-  );
-}
-
+/**
+ * Staff sign-in. Readers sign in with Google and have no password form.
+ * `autoFocus` only when the staff page was asked for: the readers' page shows
+ * this card too, and focus jumping into it would skip past their button.
+ */
 export function LoginForm({
-  portal,
-  copy,
   messages,
   next,
+  autoFocus,
 }: {
-  portal: Portal;
-  copy: PortalCopy;
   messages: Messages;
   next?: string;
+  autoFocus: boolean;
 }) {
+  const copy = messages.portals.gestion;
   const [state, formAction, pending] = useActionState(login, initialState);
   const [revealed, setRevealed] = useState(false);
 
@@ -87,7 +39,6 @@ export function LoginForm({
 
   return (
     <form action={formAction} className="stack gap-content" noValidate>
-      <input type="hidden" name="portal" value={portal.slug} />
       {next ? <input type="hidden" name="next" value={next} /> : null}
 
       <div aria-live="polite">
@@ -102,23 +53,17 @@ export function LoginForm({
         <label htmlFor={identifierId} className="text-body-sm font-medium">
           {copy.identifierLabel}
         </label>
-        <div className="relative">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-foreground-subtle">
-            <UserIcon />
-          </span>
-          <input
-            id={identifierId}
-            name="identifier"
-            type="text"
-            inputMode={portal.identifierInputMode}
-            autoComplete={portal.identifierAutoComplete}
-            placeholder={copy.identifierPlaceholder}
-            autoFocus
-            aria-invalid={identifierError ? true : undefined}
-            aria-describedby={identifierError ? identifierErrorId : undefined}
-            className={`${FIELD} pr-3`}
-          />
-        </div>
+        <input
+          id={identifierId}
+          name="identifier"
+          type="text"
+          autoComplete="username"
+          placeholder={copy.identifierPlaceholder}
+          autoFocus={autoFocus}
+          aria-invalid={identifierError ? true : undefined}
+          aria-describedby={identifierError ? identifierErrorId : undefined}
+          className={FIELD}
+        />
         {identifierError ? (
           <p id={identifierErrorId} className="text-caption text-danger">
             {identifierError}
@@ -131,9 +76,6 @@ export function LoginForm({
           {messages.password}
         </label>
         <div className="relative">
-          <span className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-foreground-subtle">
-            <LockIcon />
-          </span>
           <input
             id={passwordId}
             name="password"
@@ -142,18 +84,20 @@ export function LoginForm({
             placeholder={messages.passwordPlaceholder}
             aria-invalid={passwordError ? true : undefined}
             aria-describedby={passwordError ? passwordErrorId : undefined}
-            className={`${FIELD} pr-11`}
+            className={`${FIELD} pr-12`}
           />
           <button
             type="button"
             onClick={() => setRevealed((value) => !value)}
             aria-pressed={revealed}
-            aria-label={
-              revealed ? messages.hidePassword : messages.showPassword
-            }
-            className="absolute inset-y-0 right-0 flex items-center rounded-control px-3 text-foreground-subtle outline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+            aria-label={revealed ? messages.hidePassword : messages.showPassword}
+            className="absolute inset-y-0 right-0 flex items-center rounded-control px-3 text-foreground-muted outline-offset-2 hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
           >
-            <EyeIcon off={revealed} />
+            {revealed ? (
+              <EyeOff aria-hidden="true" className="size-5" />
+            ) : (
+              <Eye aria-hidden="true" className="size-5" />
+            )}
           </button>
         </div>
         {passwordError ? (
@@ -163,23 +107,21 @@ export function LoginForm({
         ) : null}
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <button
+          type="submit"
+          disabled={pending}
+          className="min-h-12 rounded-control bg-primary px-8 max-sm:min-h-14 max-sm:w-full font-heading text-body font-semibold text-primary-foreground outline-offset-2 hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60"
+        >
+          {pending ? messages.signingIn : messages.signIn}
+        </button>
         <Link
-          href={`/login/${portal.slug}/mot-de-passe-oublie`}
-          className="text-caption text-accent underline-offset-2 outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+          href="/login/gestion/mot-de-passe-oublie"
+          className="inline-flex min-h-11 items-center text-body-sm font-medium text-primary underline underline-offset-2 outline-offset-2 hover:no-underline focus-visible:outline-2 focus-visible:outline-ring"
         >
           {messages.forgotPassword}
         </Link>
       </div>
-
-      <button
-        type="submit"
-        disabled={pending}
-        className="cluster justify-center gap-inline rounded-control bg-primary px-4 py-3 text-body-sm font-medium text-primary-foreground outline-offset-2 hover:bg-primary-hover focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-60"
-      >
-        <LockIcon className="size-4" />
-        {pending ? messages.signingIn : messages.signIn}
-      </button>
     </form>
   );
 }

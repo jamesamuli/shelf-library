@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { Prisma } from "../generated/prisma/client";
 import { prisma } from "./prisma";
+import type { Locale } from "./preferences";
 
 /**
  * Public catalogue queries. See docs/10-catalogue.md for the legacy behaviour
@@ -57,8 +58,44 @@ export type RecordDetail = {
   authors: string[];
   publishers: string[];
   subjects: string[];
+  genres: { slug: string; labelFr: string; labelEn: string | null }[];
   holdings: Holding[];
 };
+
+export type Genre = {
+  slug: string;
+  label: string;
+  icon: string;
+  colour: string;
+};
+
+export type NewArrival = {
+  id: number;
+  title: string;
+  authors: string[];
+  documentType: string | null;
+  coverUrl: string | null;
+  totalItems: number;
+  availableItems: number;
+};
+
+/**
+ * Legacy's rule: the record's own thumbnail, else a URL built from the
+ * ISBN/EAN with dashes and dots stripped (`opac_book_pics_url`). The template
+ * is Open Library's — free, keyless, and it answers a missing cover with a
+ * blank image rather than an error, so the placeholder beneath shows through.
+ */
+export function coverUrl(
+  thumbnailUrl: string | null,
+  standardNumber: string | null,
+): string | null {
+  if (thumbnailUrl?.trim()) return thumbnailUrl.trim();
+  const isbn = standardNumber?.replace(/[^0-9Xx]/g, "") ?? "";
+  if (isbn.length !== 10 && isbn.length !== 13) return null;
+  // L (~500 px wide) rather than M (~180): a phone shows one cover across
+  // the screen, and the image optimiser cuts it down for smaller slots.
+  return `https://covers.openlibrary.org/b/isbn/${isbn}-L.jpg`;
+}
 
 /**
  * Splits free user input into safe prefix-matched tsquery terms.
@@ -114,10 +151,107 @@ type HitRow = {
   available: number | null;
 };
 
+/**
+ * Shared holdings counts for result rows and new-arrival cards. A reference
+ * copy is on the shelf but cannot be borrowed, so it must not be counted as
+ * available.
+ */
+const holdingCounts = (isSubscriber: boolean) => Prisma.sql`
+  LEFT JOIN LATERAL (
+    SELECT
+      count(*)::int AS total,
+      count(*) FILTER (
+        WHERE l.id IS NULL AND COALESCE(ist.allows_loan, true)
+      )::int AS available
+    FROM items i
+    LEFT JOIN sections sec ON sec.id = i.section_id
+    LEFT JOIN item_statuses ist ON ist.id = i.status_id
+    LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
+    WHERE i.record_id = r.id AND ${visibleHoldings(isSubscriber)}
+  ) holdings ON true
+`;
+
+const authorNames = Prisma.sql`
+  ARRAY(
+    SELECT btrim(coalesce(a.forename, '') || ' ' || a.name)
+    FROM contributions c
+    JOIN authors a ON a.id = c.author_id
+    WHERE c.record_id = r.id
+    ORDER BY c.level, c.rank
+  )
+`;
+
+// Cached per request: the OPAC layout (the phone's bottom bar) and the home
+// page both need the genres, and should share one query.
+export const listGenres = cache(async (locale: Locale): Promise<Genre[]> => {
+  const rows = await prisma.genre.findMany({ orderBy: [{ rank: "asc" }, { id: "asc" }] });
+  return rows.map((row) => ({
+    slug: row.slug,
+    label: locale === "en" ? (row.labelEn ?? row.labelFr) : row.labelFr,
+    icon: row.icon,
+    colour: row.colour,
+  }));
+});
+
+type ArrivalRow = {
+  id: number;
+  title: string;
+  authors: string[] | null;
+  document_type: string | null;
+  thumbnail_url: string | null;
+  standard_number: string | null;
+  total: number | null;
+  available: number | null;
+};
+
+/**
+ * Legacy's "dernières notices": most recently catalogued first, id as the
+ * tie-break for records created in the same instant (bulk imports).
+ */
+export async function getNewArrivals(limit: number, isSubscriber = false): Promise<NewArrival[]> {
+  // The newest ids are picked first, so the per-record holdings and author
+  // subqueries run for `limit` rows rather than for the whole catalogue —
+  // Postgres evaluates a LATERAL join for every row before the LIMIT.
+  const rows = await prisma.$queryRaw<ArrivalRow[]>`
+    SELECT
+      r.id,
+      r.title,
+      ${authorNames} AS authors,
+      dt.label AS document_type,
+      r.thumbnail_url,
+      r.standard_number,
+      holdings.total,
+      holdings.available
+    FROM (
+      SELECT r.id
+      FROM bibliographic_records r
+      ${visibleRecords(isSubscriber)}
+      ORDER BY r.created_at DESC, r.id DESC
+      LIMIT ${limit}
+    ) newest
+    JOIN bibliographic_records r ON r.id = newest.id
+    ${visibleRecords(isSubscriber)}
+    LEFT JOIN document_types dt ON dt.id = r.document_type_id
+    ${holdingCounts(isSubscriber)}
+    ORDER BY r.created_at DESC, r.id DESC
+  `;
+
+  return rows.map((row) => ({
+    id: row.id,
+    title: row.title,
+    authors: row.authors ?? [],
+    documentType: row.document_type,
+    coverUrl: coverUrl(row.thumbnail_url, row.standard_number),
+    totalItems: row.total ?? 0,
+    availableItems: row.available ?? 0,
+  }));
+}
+
 export async function searchCatalogue(
   rawQuery: string,
   page: number,
   isSubscriber = false,
+  genreSlug: string | null = null,
 ): Promise<SearchResults> {
   const terms = parseTerms(rawQuery);
   const currentPage = Math.max(1, page);
@@ -151,6 +285,14 @@ export async function searchCatalogue(
     ? Prisma.sql`AND ${Prisma.join(terms.map(termMatch), " AND ")}`
     : Prisma.empty;
 
+  const inGenre = genreSlug
+    ? Prisma.sql`AND EXISTS (
+        SELECT 1 FROM record_genres rg
+        JOIN genres g ON g.id = rg.genre_id
+        WHERE rg.record_id = r.id AND g.slug = ${genreSlug}
+      )`
+    : Prisma.empty;
+
   // Relevance first, then title — legacy's `ORDER BY pert DESC, index_sew`.
   // Ranking uses the OR-form so a record matching more terms in its own text
   // outranks one that only matched via a linked heading.
@@ -167,33 +309,14 @@ export async function searchCatalogue(
         r.subtitle,
         r.publication_year,
         dt.label AS document_type,
-        ARRAY(
-          SELECT btrim(coalesce(a.forename, '') || ' ' || a.name)
-          FROM contributions c
-          JOIN authors a ON a.id = c.author_id
-          WHERE c.record_id = r.id
-          ORDER BY c.level, c.rank
-        ) AS authors,
+        ${authorNames} AS authors,
         holdings.total,
         holdings.available
       FROM bibliographic_records r
       ${visibleRecords(isSubscriber)}
       LEFT JOIN document_types dt ON dt.id = r.document_type_id
-      LEFT JOIN LATERAL (
-        SELECT
-          count(*)::int AS total,
-          -- A reference copy is on the shelf but cannot be borrowed, so it
-          -- must not be counted as available.
-          count(*) FILTER (
-            WHERE l.id IS NULL AND COALESCE(ist.allows_loan, true)
-          )::int AS available
-        FROM items i
-        LEFT JOIN sections sec ON sec.id = i.section_id
-        LEFT JOIN item_statuses ist ON ist.id = i.status_id
-        LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
-        WHERE i.record_id = r.id AND ${visibleHoldings(isSubscriber)}
-      ) holdings ON true
-      WHERE true ${match}
+      ${holdingCounts(isSubscriber)}
+      WHERE true ${match} ${inGenre}
       ${order}
       LIMIT ${PER_PAGE} OFFSET ${offset}
     `,
@@ -201,7 +324,7 @@ export async function searchCatalogue(
       SELECT count(*)::bigint AS count
       FROM bibliographic_records r
       ${visibleRecords(isSubscriber)}
-      WHERE true ${match}
+      WHERE true ${match} ${inGenre}
     `,
   ]);
 
@@ -238,6 +361,7 @@ type DetailRow = {
   authors: string[] | null;
   publishers: string[] | null;
   subjects: string[] | null;
+  genres: RecordDetail["genres"] | null;
   holdings: Holding[] | null;
 };
 
@@ -288,6 +412,14 @@ export const getRecord = cache(async function getRecord(
         WHERE rs.record_id = r.id
         ORDER BY rs.rank
       ) AS subjects,
+      (
+        SELECT json_agg(json_build_object(
+          'slug', g.slug, 'labelFr', g.label_fr, 'labelEn', g.label_en
+        ) ORDER BY g.rank)
+        FROM record_genres rg
+        JOIN genres g ON g.id = rg.genre_id
+        WHERE rg.record_id = r.id
+      ) AS genres,
       COALESCE((
         SELECT json_agg(h ORDER BY h.barcode)
         FROM (
@@ -336,6 +468,7 @@ export const getRecord = cache(async function getRecord(
     authors: row.authors ?? [],
     publishers: row.publishers ?? [],
     subjects: row.subjects ?? [],
+    genres: row.genres ?? [],
     holdings: row.holdings ?? [],
   };
 });

@@ -10,8 +10,9 @@
  * borders, subtle text and the danger/info roles are DERIVED from them and
  * marked below. Anything unmarked is a guideline value used verbatim.
  *
- * Themes switch on <html data-theme>, not prefers-color-scheme: the app
- * defaults to light and the user toggles explicitly (see lib/preferences.ts).
+ * Themes switch on <html data-theme>. On desktop the app defaults to light
+ * and the user toggles explicitly; a phone with no choice yet gets no
+ * data-theme and follows prefers-color-scheme (see lib/preferences.ts).
  *
  * Components reference semantic names only (bg-surface, text-foreground-muted),
  * never a raw brand value, so a palette change stays confined to this file.
@@ -44,17 +45,42 @@
   --color-info: var(--info);
 }
 
+/*
+ * Genre tile hues (OPAC home "Découvrir"). All derived: the brand has six
+ * colours and the tiles need eight that tell apart at a glance. Saturated
+ * and warm, at the CDI's request — the first, muted set read as washed out
+ * — while each still carries a white icon at >= 4.5:1 (lowest: teal, 4.86).
+ * They do not switch with the theme. Named by hue, not by genre, because
+ * which genre wears which colour is data (genres.colour).
+ */
+@theme {
+  --color-genre-indigo: #2457d6; /* derived, 6.2:1 with white */
+  --color-genre-teal: #00806f; /* derived: Teal Green saturated, 4.9:1 */
+  --color-genre-forest: #2a7d2e; /* derived, 5.2:1 */
+  --color-genre-terracotta: #c2410c; /* derived, 5.2:1 */
+  --color-genre-raspberry: #c8174f; /* derived, 5.7:1 */
+  --color-genre-violet: #7139c4; /* derived, 6.8:1 */
+  --color-genre-ochre: #a85d00; /* derived: gold deepened, 5.0:1 */
+  --color-genre-plum: #9c2a83; /* derived, 6.8:1 */
+}
+
 /* Light is the default: applies with no data-theme attribute present. */
+/*
+ * Light runs on white rather than the guideline's Warm Ivory ground, at the
+ * CDI's request for easier reading; ivory survives as the muted surface.
+ * Secondary text is darkened for the same reason: slate on white was 4.8:1
+ * and the lightened slate under it only ~3:1.
+ */
 :root,
 :root[data-theme="light"] {
-  --background: #ede7dc; /* Warm Ivory */
+  --background: #ffffff; /* derived: replaces Warm Ivory as the page ground */
   --foreground: #111827; /* Charcoal */
 
   --surface: #ffffff;
-  --surface-muted: #f5f1e8; /* derived: ivory tinted toward white */
+  --surface-muted: #f6f3ec; /* derived: Warm Ivory tinted toward white */
 
-  --foreground-muted: #6b7280; /* Slate Gray */
-  --foreground-subtle: #8b93a1; /* derived: slate lightened */
+  --foreground-muted: #4b5563; /* derived: slate darkened, 7.6:1 on white */
+  --foreground-subtle: #6b7280; /* Slate Gray, 4.8:1 on white */
 
   --primary: #0f1b2e; /* Deep Navy */
   --primary-hover: #1b2e4a; /* derived */
@@ -64,7 +90,7 @@
   --secondary-hover: #b08f52; /* derived */
   --accent: #2e7d71; /* Teal Green */
 
-  --border: #ded7c8; /* derived: warm border for the ivory ground */
+  --border: #e2ddd2; /* derived: warm border, visible on white */
   --border-strong: #c9c1b0; /* derived */
 
   --success: #2e7d71; /* Teal Green */
@@ -72,10 +98,27 @@
   --danger: #b3453f; /* derived: no red in the brand palette */
   --info: #2f4f75; /* derived: navy lightened toward blue */
 
-  --focus-ring: #c8a56a; /* Gold */
+  /* derived: Deep Navy, not Gold — gold on white is 2.3:1, under the 3:1
+     WCAG asks of a focus indicator; navy is 17:1. */
+  --focus-ring: #0f1b2e;
 }
 
+/*
+ * The dark palette, defined once and applied twice: when dark is chosen, and
+ * when nothing is chosen yet (no data-theme — a phone on its first visit) and
+ * the device is in dark mode. See lib/preferences.ts.
+ */
 :root[data-theme="dark"] {
+  @apply theme-dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    @apply theme-dark;
+  }
+}
+
+@utility theme-dark {
   --background: #111827; /* Charcoal */
   --foreground: #ede7dc; /* Warm Ivory */
 

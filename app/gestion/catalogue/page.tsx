@@ -29,7 +29,7 @@ export default async function CataloguingList({
     <div className="stack gap-section">
       <header className="cluster justify-between gap-content">
         <div className="stack gap-inline">
-          <h1 className="font-serif text-heading-1">{c.listTitle}</h1>
+          <h1 className="font-heading text-heading-1">{c.listTitle}</h1>
           <p className="text-body text-foreground-muted">{c.listIntro}</p>
         </div>
         <Link

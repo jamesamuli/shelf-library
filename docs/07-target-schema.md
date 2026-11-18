@@ -111,6 +111,7 @@ uniqueness via a unique index on `lower(...)`, UTF-8 throughout
 | `collections` + `sub_collections` | `collections` (self-referential — legacy already had `collection_parent`) |
 | `noeuds` + `categories` | `subjects` + `subject_labels` (split preserved) |
 | `notices_categories` | `record_subjects` |
+| *(none — new)* | `genres` + `record_genres`: the OPAC home's tiles, see [16-opac-home.md](16-opac-home.md) |
 | `indexint` | `classification_indexes` |
 | `empr` | `patrons` |
 | `pret` + `pret_archive` | `loans` (single table) |

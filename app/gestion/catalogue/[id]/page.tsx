@@ -22,7 +22,7 @@ export default async function EditRecordPage({
 
   const [record, options] = await Promise.all([
     getRecordForEdit(numericId),
-    getCataloguingOptions(),
+    getCataloguingOptions(locale),
   ]);
   if (!record) notFound();
 
@@ -41,7 +41,7 @@ export default async function EditRecordPage({
           ← {c.backToList}
         </Link>
         <div className="cluster justify-between gap-content">
-          <h1 className="font-serif text-heading-1">{record.values.title}</h1>
+          <h1 className="font-heading text-heading-1">{record.values.title}</h1>
           <Link
             href={`/catalogue/${record.id}`}
             className="min-h-11 cluster items-center rounded-control border border-border px-4 text-caption outline-offset-2 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
@@ -52,12 +52,13 @@ export default async function EditRecordPage({
       </div>
 
       <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
-        <h2 className="font-serif text-heading-3">{c.editRecordTitle}</h2>
+        <h2 className="font-heading text-heading-3">{c.editRecordTitle}</h2>
         <RecordForm
           id={record.id}
           values={record.values}
           documentTypes={options.documentTypes}
           recordStatuses={options.recordStatuses}
+          genres={options.genres}
           canDelete={granted.has("catalog.delete")}
           copyCount={record.items.length}
           messages={messages}
@@ -65,7 +66,7 @@ export default async function EditRecordPage({
       </section>
 
       <section className="stack gap-content rounded-card border border-border bg-surface p-4 sm:p-6">
-        <h2 className="font-serif text-heading-3">{c.copiesTitle}</h2>
+        <h2 className="font-heading text-heading-3">{c.copiesTitle}</h2>
         <CopiesEditor
           canDelete={granted.has("catalog.delete")}
           recordId={record.id}
