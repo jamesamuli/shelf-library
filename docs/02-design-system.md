@@ -36,9 +36,12 @@ longer loaded at all, since the logo became the monogram (see Logo). All
 load via `next/font/google` in [app/layout.tsx](../app/layout.tsx); Geist
 Mono is not preloaded, being used only on record pages and in Gestion.
 
-**The interface is scaled 115 % from 48rem (768 px) up** — `html {
-font-size: 115% }` in `app/globals.css` (CDI request for legibility,
-2026-11-18; first tried at 130 %, which crowded laptop screens).
+**The interface is scaled 103.5 % from 48rem (768 px) up** — `html {
+font-size: 103.5% }` in `app/globals.css` (CDI request for legibility).
+First tried at 130 %, which crowded laptop screens, then 115 %
+(2026-11-18) — which had only looked right in development because the
+browser was zoomed to 90 % on localhost. 103.5 % is that same rendering
+(115 × 0.9) without the browser zoom (2026-11-19).
 Everything rem-based grows together; breakpoints do not move, because
 media queries measure rem against the browser default. Phones stay at
 100 %, the size their layout is built for. Borders, shadows and other px
