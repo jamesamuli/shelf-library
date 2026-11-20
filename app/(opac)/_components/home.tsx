@@ -6,6 +6,7 @@ import type { Locale } from "@/lib/preferences";
 import { getNewArrivals, listGenres, type NewArrival } from "@/lib/catalogue";
 import { Carousel } from "./carousel";
 import { CoverImage } from "./cover-image";
+import { FallingBooks } from "./falling-books";
 import { GenreList } from "./genre-tile";
 import { PracticalInfo } from "./practical-info";
 import { SearchBar } from "./search-bar";
@@ -124,21 +125,28 @@ export async function CatalogueHome({
 
   return (
     <div className="stack gap-section">
+      {/* Out of the flow: it fills the catalogue layout, behind everything.
+          The heading and the search bar are what the books bounce off, the
+          new-arrivals panel what they land on (the data-book-* marks). */}
+      <FallingBooks quotes={messages.quotes} />
+
       {/* Not shown on phones (CDI request), but kept for screen readers: a
           page still needs its main heading. */}
       <h1 className="stack text-balance text-center font-heading text-heading-2 max-sm:sr-only sm:text-display">
         {/* The hidden dash keeps the two lines apart in the heading's spoken
             name — "Bienvenue au CDI — École Française de Bujumbura". */}
-        <span>{c.welcomeTitle}</span>
+        <span data-book-bump="text">{c.welcomeTitle}</span>
         <span className="sr-only"> — </span>
         {/* Capitals by CSS, not in the string: screen readers then say the
             name rather than risk spelling it out letter by letter. */}
-        <span className="uppercase text-accent">{c.welcomeSchool}</span>
+        <span data-book-bump="text" className="uppercase text-accent">
+          {c.welcomeSchool}
+        </span>
       </h1>
 
       {/* Search right under the welcome on desktop (CDI request); phones
           search from the bottom bar. */}
-      <div className="mx-auto w-full max-w-3xl max-sm:hidden">
+      <div data-book-bump className="mx-auto w-full max-w-3xl max-sm:hidden">
         <SearchBar messages={messages} id="catalogue-q" />
       </div>
 
@@ -148,6 +156,7 @@ export async function CatalogueHome({
         // bar 4rem, a little air), so one book holds the whole view (CDI
         // request). Never shorter than 28rem.
         <section
+          data-book-floor
           aria-labelledby="new-arrivals"
           className="flex h-[max(28rem,calc(100svh-12.25rem))] flex-col sm:block sm:h-auto sm:rounded-panel sm:border sm:border-border sm:bg-surface-muted sm:p-6"
         >
@@ -197,9 +206,11 @@ export async function CatalogueHome({
 
       {/* Découvrir beside the practical information, which took the search
           panel's place once search moved under the welcome (CDI request).
-          Phones reach Découvrir from the bottom bar, so only the practical
-          information follows the carousel there. */}
-      <div className="grid items-start gap-content md:grid-cols-2">
+          The two are stretched to one height (CDI request). Phones reach
+          Découvrir from the bottom bar, so only the practical information
+          follows the carousel there. Without new arrivals, the books land
+          here instead. */}
+      <div data-book-floor className="grid gap-content md:grid-cols-2">
         {genres.length === 0 ? null : (
           <section
             aria-labelledby="discover"

@@ -377,6 +377,45 @@ Infos pratiques; phone — search and Découvrir off the page,
 practical information below the carousel, the card 40 px clear of the
 bar, no horizontal scroll. axe clean on both.
 
+### Falling books, icon search, matched panels (2026-11-19)
+
+- **Books fall behind the welcome** (`falling-books.tsx`; CDI request,
+  after the sign-in page's backdrop). Small books in the genre colours
+  drop from under the header, sway as they fall, and **bounce off the
+  heading's letters and the search bar** — off the top with a hop towards
+  the nearer end, so none settles on the text; off a side, back the other
+  way. They **land on the new-arrivals panel**, lying flat or on end,
+  stacking on a book that landed first, rest 3–6 s and fade out; a book
+  whose support fades sinks onto what is left. The pointer pushes falling
+  books aside and knocks resting ones off. At most twelve at once.
+  - A small physics loop, not keyframes: where a book goes depends on what
+    it hits. The page marks what counts — `data-book-bump` on the search
+    bar and on each heading line (`"text"`: measured line by line, inset to
+    the letters, not the line box), `data-book-floor` on the panel — and
+    the loop re-reads those rectangles each frame, so reflows never strand
+    a book inside the text.
+  - The layer fills the catalogue layout, made `relative isolate` for it,
+    so books cross the full width and pass behind the header.
+  - It runs only while the heading is on screen; never on phones, where the
+    carousel fills the screen; not at all with reduced motion.
+- **Drifting books that quote** beside the heading on large screens (≥ lg;
+  quotes from 80rem, mouse and pen), the same `QuoteBooks` as the sign-in
+  page, moved to `app/_components/quote-books.tsx` so the two share it.
+- **The search button is an icon** (a magnifier) joined to the field's
+  right end, the field's height (CDI request), named "Rechercher" for
+  screen readers and on hover. The field's own magnifier went, one being
+  enough. The same form serves the results page and the phone sheet.
+- **Infos pratiques is as tall as Découvrir** (the grid stretches both),
+  its entries centred in the space under its heading (CDI request); the
+  headings stay level across the two panels.
+
+Verified at 1440 px, light and dark: books bounce on the heading and
+spill off its ends, land and stack on the panel, fade; ~56 fps; a drifting
+book quotes on hover; button 53 × 53 px beside a 53 px field; both panels
+374 px. Phone: the layer is not rendered, no horizontal scroll. Reduced
+motion: no falling books, drifting ones still. Sign-in page: falling books
+and quotes as before. axe clean on the home (both themes) and sign-in.
+
 ## 7. Verified
 
 In Edge (headless, via Playwright) against the live database:

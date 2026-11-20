@@ -120,8 +120,10 @@ export function PracticalInfo({
       </h2>
       {/* A <dl> group may hold only its <dt> and <dd>, so the icon rides in
           the term and the description is indented to line up under its text
-          (2.5rem icon + 0.75rem gap). */}
-      <dl className="grid gap-4">
+          (2.5rem icon + 0.75rem gap). The panel is stretched to Découvrir's
+          height beside it, and the entries sit in the middle of the space
+          left under the heading (CDI request). */}
+      <dl className="grid flex-1 content-center gap-4">
         {entries.map(({ Icon, title, body }) => (
           <div key={title} className="stack gap-0.5">
             <dt className="flex items-center gap-3 font-heading text-body font-semibold">

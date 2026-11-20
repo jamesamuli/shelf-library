@@ -67,7 +67,8 @@ Files:
 | `app/(auth)/_components/google-button.tsx` | "Se connecter avec Google" |
 | `app/(auth)/_components/brand-mark.tsx` | Theme-specific logo tile + wordmark |
 | `app/(auth)/_components/login-switch.tsx` | Two-tab switch: one sign-in card at a time, animated |
-| `app/(auth)/_components/floating-books.tsx` | Decorative books drifting behind the page |
+| `app/(auth)/_components/floating-books.tsx` | Decorative books falling behind the page |
+| `app/_components/quote-books.tsx` | Drifting books that quote on hover — shared with the catalogue home |
 | `app/(auth)/_components/preferences-bar.tsx` | Theme and language switches |
 | `lib/preferences.ts`, `lib/i18n.ts` | Cookie-backed theme/locale, translations |
 

@@ -25,7 +25,9 @@ export default async function CatalogueLayout({ children }: LayoutProps<"/">) {
     : { href: "/login/opac", label: messages.signIn, signedIn: false };
 
   return (
-    <div className="flex flex-1 flex-col">
+    // Positioned and isolated for the home's falling books, which fill this
+    // box behind the header and the content.
+    <div className="relative isolate flex flex-1 flex-col">
       {/* Hidden until focused: the first Tab stop on every OPAC page, so
           keyboard readers can jump past the header controls. */}
       <a
