@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { aiConfigured, dailyLimit, usageToday } from "@/lib/ai";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { messagesFor } from "@/lib/i18n";
@@ -60,6 +61,7 @@ export default async function EditRecordPage({
           recordStatuses={options.recordStatuses}
           genres={options.genres}
           canDelete={granted.has("catalog.delete")}
+          assistant={{ enabled: aiConfigured(), used: await usageToday(), limit: dailyLimit() }}
           copyCount={record.items.length}
           messages={messages}
         />

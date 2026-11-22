@@ -118,8 +118,12 @@ function Sheet({
       ref={ref}
       aria-labelledby={`${id}-title`}
       // The dialog itself is only hit on its backdrop: the content fills it.
+      // A link inside (a genre) navigates in place, and the layout holding
+      // the sheet stays mounted, so the sheet has to close itself (CDI
+      // request); otherwise the reader lands behind it.
       onClick={(event) => {
-        if (event.target === event.currentTarget) event.currentTarget.close();
+        const target = event.target as Element;
+        if (target === event.currentTarget || target.closest("a")) event.currentTarget.close();
       }}
       // Pinned to the bottom edge, full width; it rises from below on open
       // and sinks on close (allow-discrete lets display/overlay animate).

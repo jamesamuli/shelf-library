@@ -49,3 +49,26 @@ export type ItemFormState =
 
 export const RECORD_IDLE: RecordFormState = { kind: "idle" };
 export const ITEM_IDLE: ItemFormState = { kind: "idle" };
+
+import type { AuthorCheck, BiographyDraft } from "@/lib/cataloguing-assistant";
+
+/** Paid AI requests today against the cap, for the assistant to show. */
+export type AssistantUsage = { used: number; limit: number; enabled: boolean };
+
+export type AuthorCheckState = {
+  checks: AuthorCheck[];
+  /** Authors of the ISBN, offered when the field was empty. */
+  suggestions: string[];
+  usage: AssistantUsage;
+};
+
+type AiRefusal = "NOT_CONFIGURED" | "DAILY_LIMIT" | "FAILED";
+
+export type BiographyDraftState =
+  | { kind: "draft"; draft: BiographyDraft; cached: boolean; usage: AssistantUsage }
+  | { kind: "error"; reason: AiRefusal; usage: AssistantUsage };
+
+export type AbstractDraftState =
+  | { kind: "draft"; abstract: string; cached: boolean; usage: AssistantUsage }
+  | { kind: "unknown"; usage: AssistantUsage }
+  | { kind: "error"; reason: AiRefusal; usage: AssistantUsage };

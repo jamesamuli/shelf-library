@@ -416,6 +416,38 @@ book quotes on hover; button 53 × 53 px beside a 53 px field; both panels
 motion: no falling books, drifting ones still. Sign-in page: falling books
 and quotes as before. axe clean on the home (both themes) and sign-in.
 
+### Fifteen new arrivals and a "see more" tile (2026-11-20)
+
+- **The row holds 15 books** (was 12), then a **"Voir plus" tile** that
+  opens the whole catalogue (`/catalogue?q=`; CDI request). The tile is
+  the size of a book card, with a dashed Shelf-teal border, an arrow and
+  "Tout le catalogue" beneath. It takes the same hover zoom as the books,
+  and on phones it is one more full-screen card with its own dot.
+- **It only appears when there is more to see**: the home asks for 16
+  arrivals and shows 15. A catalogue of 15 titles or fewer would make the
+  tile lead to the same books.
+- It opens the catalogue newest first (`/catalogue?q=&tri=recent`), so the
+  list carries on where the row stops. (Sorted by title until the results
+  page gained its sort, 2026-11-21; see docs/10-catalogue.md §6.)
+- **The phone’s search sheet shows results in place** since 2026-11-22
+  (docs/10-catalogue.md §10).
+- **The phone’s Découvrir sheet closes once a genre is chosen** (CDI
+  request, 2026-11-21). The sheet lives in the layout, which stays mounted
+  through a client-side navigation, so it used to stay open over the new
+  list. It now closes on any link tap inside it; the search sheet's form
+  does a full page load and was never affected.
+
+Verified with the demo data (docs/17-demo-data.md), 106 records:
+- 15 cards and the tile, all 365 px tall, in light/FR and dark/EN.
+- The tile reads "Voir plus / Tout le catalogue" ("See more / Whole
+  catalogue") and lands on 106 results.
+- Every Découvrir genre lists titles: BD 14, romans 18, albums 12,
+  fictions 17, théâtre 10, contes et poésie 10, documentaires 19,
+  revues 6.
+- On a phone (390 px), the tile is the same 342 × 572 card as a book, with
+  16 dots and no horizontal scroll.
+- axe is clean in both themes.
+
 ## 7. Verified
 
 In Edge (headless, via Playwright) against the live database:

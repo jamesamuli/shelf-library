@@ -131,6 +131,9 @@ sign out, nothing more.
 (`bibliothecaire`) and one patron (card `E-2026-0001`). Passwords are
 never hardcoded — set `SEED_STAFF_PASSWORD` / `SEED_PATRON_PASSWORD`, or
 a random one is generated and printed once. Re-seeding resets them.
+`prisma/seed-demo.ts` adds one account per kind: `administrateur` in
+Gestion, plus a teacher and a pupil in the OPAC, whose Google addresses
+come from env (see [17-demo-data.md](17-demo-data.md)).
 
 Verified end to end in the browser: wrong password rejected with the
 generic message; correct password redirects to the portal landing with the

@@ -62,6 +62,87 @@
       rotate: calc(var(--tilt, 0deg) + 320deg);
     }
   }
+
+  /*
+   * `animate-heartbeat`: two soft beats and a long rest, like a calm pulse —
+   * the catalogue's sign-in dialog, where a heart or a bookmark asks the
+   * reader in (CDI request; toned down from a livelier first version). Uses
+   * `scale`, leaving `transform` to the element.
+   */
+  --animate-heartbeat: heartbeat 2.4s ease-in-out infinite;
+
+  /*
+   * `animate-nudge`: a quick zoom-and-tilt that settles back where it began —
+   * played once as the pointer reaches a row of the catalogue's list view
+   * (CDI request). The tilt is kept small: a row spans the page, and at the
+   * 15° first asked for its ends would sweep over the rows around it.
+   */
+  --animate-nudge: nudge 0.5s ease-out;
+
+  @keyframes nudge {
+    0%,
+    100% {
+      scale: 1;
+      rotate: 0deg;
+    }
+    40% {
+      scale: 1.02;
+      rotate: 1.5deg;
+    }
+  }
+
+  @keyframes heartbeat {
+    0%,
+    36%,
+    100% {
+      scale: 1;
+    }
+    10% {
+      scale: 1.06;
+    }
+    20% {
+      scale: 1.01;
+    }
+    28% {
+      scale: 1.05;
+    }
+  }
+}
+
+/*
+ * `details-smooth`: a disclosure that slides open and shut instead of
+ * jumping (CDI request, first for the Genre filter). The browser animates
+ * the <details> content box from 0 to `auto`; where `::details-content` or
+ * `interpolate-size` is not supported yet, it simply opens at once, as
+ * before. Clipped vertically only, so the tiles' hover shadows and focus
+ * rings still show at the sides.
+ */
+@layer components {
+  .details-smooth {
+    interpolate-size: allow-keywords;
+  }
+
+  .details-smooth::details-content {
+    block-size: 0;
+    /* In a flex <details> (\`stack\`) the content would otherwise keep its
+       automatic minimum height — its full size — and jump open. */
+    min-block-size: 0;
+    overflow-x: visible;
+    overflow-y: clip;
+    transition:
+      block-size 0.35s ease-out,
+      content-visibility 0.35s allow-discrete;
+  }
+
+  .details-smooth[open]::details-content {
+    block-size: auto;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .details-smooth::details-content {
+      transition: none;
+    }
+  }
 }
 
 /*

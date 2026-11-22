@@ -26,6 +26,25 @@ export type RecordInput = {
   /** One subject per line. */
   subjects: string;
   genreIds: string[];
+  /**
+   * The cataloguing assistant's decisions, keyed by the author line they
+   * were made for (docs/18-author-enrichment.md). A line without one is
+   * resolved the old way, by its exact written form.
+   */
+  authorChoices: Record<string, AuthorChoice>;
+};
+
+export type AuthorChoice = {
+  /** "C'est lui": link this authority, however it is spelt. */
+  id?: number;
+  /** "Nouvel auteur": create one even if a homonym exists. */
+  isNew?: boolean;
+  /** Kept by the librarian from the assistant's draft. */
+  biography?: string;
+  dates?: string;
+  openLibraryKey?: string;
+  wikidataId?: string;
+  isni?: string;
 };
 
 export type FieldError = "TITLE_REQUIRED" | "YEAR_INVALID";
@@ -71,16 +90,44 @@ function optionalId(value: string): number | null {
 }
 
 /**
- * Authorities are found or created, never silently duplicated. Matching is
- * exact on the written form — normalising further would merge two people who
- * genuinely share a name.
+ * Authorities are found or created, never silently duplicated. Without the
+ * assistant, matching is exact on the written form — normalising further
+ * would merge two people who genuinely share a name. With it, the librarian
+ * has said which authority a line is, or that it is a new one.
+ *
+ * What the assistant found is filed on the authority, but never over what
+ * is already there: a biography or date written earlier wins, and an
+ * identifier another authority holds is left off (it is unique).
  */
-async function resolveAuthors(entries: string[]): Promise<number[]> {
+async function resolveAuthors(
+  entries: string[],
+  choices: Record<string, AuthorChoice>,
+): Promise<number[]> {
   const ids: number[] = [];
   for (const entry of entries) {
     const { name, forename } = splitName(entry);
-    const existing = await prisma.author.findFirst({ where: { name, forename } });
+    const choice = choices[entry];
+    const chosen = choice?.id ? await prisma.author.findUnique({ where: { id: choice.id } }) : null;
+    const existing =
+      chosen ?? (choice?.isNew ? null : await prisma.author.findFirst({ where: { name, forename } }));
     const author = existing ?? (await prisma.author.create({ data: { name, forename } }));
+
+    if (choice) {
+      const taken = async (field: "openLibraryKey" | "wikidataId", value: string | undefined) =>
+        !value || (await prisma.author.count({ where: { [field]: value, id: { not: author.id } } })) > 0;
+      const data = {
+        ...(choice.biography?.trim() && !author.comment?.trim() ? { comment: choice.biography.trim() } : {}),
+        ...(choice.dates?.trim() && !author.dates ? { dates: choice.dates.trim() } : {}),
+        ...(choice.isni && !author.isni ? { isni: choice.isni } : {}),
+        ...(!author.openLibraryKey && !(await taken("openLibraryKey", choice.openLibraryKey))
+          ? { openLibraryKey: choice.openLibraryKey }
+          : {}),
+        ...(!author.wikidataId && !(await taken("wikidataId", choice.wikidataId))
+          ? { wikidataId: choice.wikidataId }
+          : {}),
+      };
+      if (Object.keys(data).length > 0) await prisma.author.update({ where: { id: author.id }, data });
+    }
     ids.push(author.id);
   }
   return ids;
@@ -132,7 +179,7 @@ export async function saveRecord(
   if (Object.keys(errors).length > 0) return { ok: false, errors };
 
   const [authorIds, publisherIds, subjectIds, genres] = await Promise.all([
-    resolveAuthors(lines(input.authors)),
+    resolveAuthors(lines(input.authors), input.authorChoices),
     resolvePublishers(lines(input.publishers)),
     resolveSubjects(lines(input.subjects)),
     // Checkbox values come from the browser: keep only genres that exist,
@@ -389,6 +436,7 @@ export async function getRecordForEdit(id: number) {
         .filter(Boolean)
         .join("\n"),
       genreIds: record.recordGenres.map((g) => String(g.genreId)),
+      authorChoices: {},
     } satisfies RecordInput,
     items: record.items.map((item) => ({
       id: item.id,
@@ -445,4 +493,5 @@ export const EMPTY_RECORD: RecordInput = {
   publishers: "",
   subjects: "",
   genreIds: [],
+  authorChoices: {},
 };

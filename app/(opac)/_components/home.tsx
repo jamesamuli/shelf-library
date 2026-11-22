@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { BookOpen, Check, Clock, Minus } from "lucide-react";
+import { ArrowRight, Check, Clock, Minus } from "lucide-react";
 import { ShelfMark } from "@/app/_components/shelf-mark";
 import { fill, type Messages } from "@/lib/i18n";
 import type { Locale } from "@/lib/preferences";
 import { getNewArrivals, listGenres, type NewArrival } from "@/lib/catalogue";
+import { Ribbon } from "../catalogue/_components/result-card";
 import { Carousel } from "./carousel";
 import { CoverImage } from "./cover-image";
 import { FallingBooks } from "./falling-books";
@@ -11,7 +12,8 @@ import { GenreList } from "./genre-tile";
 import { PracticalInfo } from "./practical-info";
 import { SearchBar } from "./search-bar";
 
-const NEW_ARRIVALS = 12;
+/** Books in the row; a "see more" tile follows when the catalogue has more. */
+const NEW_ARRIVALS = 15;
 
 /**
  * The cover sits on top of a Shelf-branded stand-in. While the cover is
@@ -22,10 +24,12 @@ function Cover({
   arrival,
   availability,
   eager,
+  locale,
 }: {
   arrival: NewArrival;
   availability: string;
   eager: boolean;
+  locale: Locale;
 }) {
   return (
     // On phones the card fills the screen and the cover takes whatever height
@@ -63,26 +67,16 @@ function Cover({
         </span>
       </div>
       {arrival.coverUrl ? <CoverImage src={arrival.coverUrl} eager={eager} /> : null}
-      {arrival.documentType ? <TypeRibbon label={arrival.documentType} /> : null}
+      {/* The genre's ribbon, in its colour (CDI request) — the same mark as
+          in the catalogue: large on a phone's full-screen card, small on
+          the row's narrow ones. `contents` keeps the wrappers out of layout. */}
+      <div className="contents sm:hidden">
+        <Ribbon documentType={arrival.documentType} genre={arrival.genre} locale={locale} variant="large" />
+      </div>
+      <div className="contents max-sm:hidden">
+        <Ribbon documentType={arrival.documentType} genre={arrival.genre} locale={locale} variant="small" />
+      </div>
     </div>
-  );
-}
-
-/**
- * Document type as a ribbon off the cover's left edge, in the Shelf teal.
- * Books get the book icon alone — the type is named for screen readers and
- * on hover; any other type still spells out its label until it has an icon.
- */
-function TypeRibbon({ label }: { label: string }) {
-  const isBook = /livre|book/i.test(label);
-  return (
-    <span
-      title={label}
-      className="absolute left-0 top-3 z-10 flex items-center gap-1.5 rounded-r-control bg-accent px-2.5 py-1.5 text-caption text-primary-foreground shadow-card"
-    >
-      <BookOpen aria-hidden="true" className="size-4" strokeWidth={2.25} />
-      {isBook ? <span className="sr-only">{label}</span> : label}
-    </span>
   );
 }
 
@@ -117,10 +111,13 @@ export async function CatalogueHome({
   locale: Locale;
   isSubscriber: boolean;
 }) {
-  const [arrivals, genres] = await Promise.all([
-    getNewArrivals(NEW_ARRIVALS, isSubscriber),
+  // One extra row tells whether the catalogue goes on past the row.
+  const [newest, genres] = await Promise.all([
+    getNewArrivals(NEW_ARRIVALS + 1, isSubscriber),
     listGenres(locale),
   ]);
+  const arrivals = newest.slice(0, NEW_ARRIVALS);
+  const hasMore = newest.length > NEW_ARRIVALS;
   const c = messages.catalogue;
 
   return (
@@ -182,7 +179,7 @@ export async function CatalogueHome({
                     href={`/catalogue/${arrival.id}`}
                     className="group relative stack h-full overflow-hidden rounded-card border-3 border-transparent bg-surface shadow-card outline-offset-4 transition-[scale,border-color,box-shadow] duration-300 ease-out hover:z-10 hover:scale-[1.08] hover:border-accent hover:shadow-modal focus-visible:z-10 focus-visible:scale-[1.08] focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:focus-visible:scale-100"
                   >
-                    <Cover arrival={arrival} availability={label} eager={index === 0} />
+                    <Cover arrival={arrival} availability={label} eager={index === 0} locale={locale} />
                     <span className="flex flex-1 items-center gap-2 px-3 py-2.5 max-sm:flex-none">
                       <span className="min-w-0 flex-1 truncate text-body-sm text-foreground-muted">
                         {arrival.authors.join(", ")}
@@ -200,6 +197,25 @@ export async function CatalogueHome({
                 </li>
               );
             })}
+            {/* The row's last tile, the size of a book, opens the whole
+                catalogue (CDI request), newest first: the row, carried on. */}
+            {hasMore ? (
+              <li className="w-full shrink-0 snap-center snap-always max-sm:h-full sm:w-52 sm:snap-start sm:snap-normal">
+                <Link
+                  href="/catalogue?q=&tri=recent"
+                  className="group stack h-full items-center justify-center gap-3 rounded-card border-3 border-dashed border-accent bg-surface p-4 text-center shadow-card outline-offset-4 transition-[scale,box-shadow] duration-300 ease-out hover:z-10 hover:scale-[1.08] hover:shadow-modal focus-visible:z-10 focus-visible:scale-[1.08] focus-visible:outline-2 focus-visible:outline-ring motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:focus-visible:scale-100"
+                >
+                  <span
+                    aria-hidden="true"
+                    className="grid size-14 place-items-center rounded-full bg-accent text-primary-foreground transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
+                  >
+                    <ArrowRight className="size-7" strokeWidth={2.5} />
+                  </span>
+                  <span className="font-heading text-heading-3 text-accent">{c.seeMore}</span>
+                  <span className="text-body-sm text-foreground-muted">{c.browsingAll}</span>
+                </Link>
+              </li>
+            ) : null}
           </Carousel>
         </section>
       )}

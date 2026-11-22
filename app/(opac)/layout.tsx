@@ -8,7 +8,7 @@ import { getLocale, getTheme } from "@/lib/preferences";
 import { getSession } from "@/app/(auth)/_lib/session";
 import { GenreList } from "./_components/genre-tile";
 import { MobileDock } from "./_components/mobile-dock";
-import { SearchPanel } from "./_components/search-bar";
+import { SearchSheet } from "./_components/search-sheet";
 
 /**
  * The catalogue is public: it renders signed in or out, matching legacy, where
@@ -87,7 +87,7 @@ export default async function CatalogueLayout({ children }: LayoutProps<"/">) {
         search={{
           title: c.searchPanelTitle,
           button: c.searchAction,
-          content: <SearchPanel messages={messages} id="catalogue-q-sheet" />,
+          content: <SearchSheet messages={messages} id="catalogue-q-sheet" />,
         }}
         account={account}
       />

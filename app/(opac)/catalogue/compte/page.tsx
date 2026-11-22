@@ -3,7 +3,10 @@ import type { Metadata } from "next";
 import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
 import { formatDate } from "@/lib/dates";
+import { Heart } from "lucide-react";
 import { getPatronAccount, type LoanRow } from "@/lib/circulation";
+import { listOwnHolds } from "@/lib/holds";
+import { listLikedRecords } from "@/lib/likes";
 import { logout } from "@/app/(auth)/_actions/logout";
 import { requireSession } from "@/app/(auth)/_lib/session";
 import { RenewButton } from "./_components/renew-button";
@@ -17,7 +20,13 @@ export default async function AccountPage() {
   ]);
   const messages = messagesFor(locale);
   const c = messages.circulation;
-  const account = await getPatronAccount(Number(session.sub));
+  const cat = messages.catalogue;
+  const patronId = Number(session.sub);
+  const [account, holds, favorites] = await Promise.all([
+    getPatronAccount(patronId),
+    listOwnHolds(patronId),
+    listLikedRecords(patronId),
+  ]);
 
   const title = (loan: LoanRow) =>
     loan.recordId ? (
@@ -94,6 +103,70 @@ export default async function AccountPage() {
               </p>
             ) : null}
           </>
+        )}
+      </section>
+
+      <section className="stack gap-content">
+        <h2 className="font-heading text-heading-3">{cat.holdsTitle}</h2>
+        {holds.length === 0 ? (
+          <p className="text-body-sm text-foreground-muted">{cat.noHolds}</p>
+        ) : (
+          <div className="overflow-x-auto rounded-card border border-border">
+            <table className="w-full min-w-[32rem] text-body-sm">
+              <thead className="bg-surface-muted text-caption text-foreground-muted">
+                <tr>
+                  <th scope="col" className="p-3 text-left">{c.colDocument}</th>
+                  <th scope="col" className="p-3 text-left">{cat.colPlacedOn}</th>
+                  <th scope="col" className="p-3 text-left">{c.colStatus}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {holds.map((hold) => (
+                  <tr key={hold.id} className="border-t border-border">
+                    <td className="p-3">
+                      {hold.recordId ? (
+                        <Link href={`/catalogue/${hold.recordId}`} className="text-accent underline-offset-2 hover:underline">
+                          {hold.title}
+                        </Link>
+                      ) : (
+                        hold.title
+                      )}
+                    </td>
+                    <td className="p-3">{formatDate(hold.placedAt, locale)}</td>
+                    <td className={`p-3 ${hold.readyUntil ? "font-medium text-success" : "text-foreground-muted"}`}>
+                      {hold.readyUntil
+                        ? fill(cat.holdReady, { date: formatDate(hold.readyUntil, locale) })
+                        : cat.holdWaiting}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="stack gap-content">
+        <h2 className="font-heading text-heading-3">{cat.favoritesTitle}</h2>
+        {favorites.length === 0 ? (
+          <p className="text-body-sm text-foreground-muted">{cat.noFavorites}</p>
+        ) : (
+          <ul className="grid gap-2 sm:grid-cols-2">
+            {favorites.map((record) => (
+              <li key={record.id}>
+                <Link
+                  href={`/catalogue/${record.id}`}
+                  className="flex items-center gap-3 rounded-card border border-border bg-surface p-3 outline-offset-2 hover:border-border-strong focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  <Heart aria-hidden="true" className="size-5 shrink-0 fill-genre-raspberry text-genre-raspberry" />
+                  <span className="stack min-w-0">
+                    <span className="truncate font-semibold">{record.title}</span>
+                    <span className="truncate text-caption text-foreground-muted">{record.authors.join(", ")}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
         )}
       </section>
 

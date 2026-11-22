@@ -10,7 +10,8 @@ import type { Locale } from "./preferences";
  * SERVER ONLY.
  */
 
-export const PER_PAGE = 10;
+/** Twelve, as in the CDI's reference design (legacy: `opac_search_results_per_page`). */
+export const PER_PAGE = 12;
 
 export type SearchHit = {
   id: number;
@@ -18,10 +19,51 @@ export type SearchHit = {
   subtitle: string | null;
   publicationYear: number | null;
   documentType: string | null;
-  authors: string[];
+  authors: AuthorLink[];
+  abstract: string | null;
   totalItems: number;
   availableItems: number;
+  coverUrl: string | null;
+  standardNumber: string | null;
+  /** ISO 639-2/B codes, e.g. "fre". */
+  languages: string[];
+  /** The record's first genre, for its ribbon. */
+  genre: { labelFr: string; labelEn: string | null; icon: string; colour: string } | null;
+  /** A copy to go and find: an available one when there is one. */
+  callNumber: string | null;
+  /** For the "Localiser" dialog, so it opens without a round trip. */
+  holdings: Holding[];
+  /** First publisher, and the collation (legacy notices.npages): the list view. */
+  publisher: string | null;
+  pageCount: string | null;
+  likeCount: number;
+  /** Whether the signed-in reader likes it; false when nobody is signed in. */
+  liked: boolean;
 };
+
+export type AuthorLink = { id: number; name: string };
+export type PublisherLink = { id: number; name: string };
+
+export type PublisherDetail = {
+  id: number;
+  name: string;
+  /** "Paris" or "Dakar, Sénégal". */
+  place: string | null;
+  /** The note the CDI writes (`publishers.comment`), shown as a description. */
+  description: string | null;
+  website: string | null;
+};
+
+export type AuthorDetail = {
+  id: number;
+  name: string;
+  dates: string | null;
+  /** Legacy `author_comment`: the note the CDI writes, shown as a biography. */
+  biography: string | null;
+  website: string | null;
+};
+
+export type DocumentTypeOption = { id: number; label: string };
 
 export type SearchResults = {
   hits: SearchHit[];
@@ -42,6 +84,8 @@ export type Holding = {
   isOnLoan: boolean;
   /** ISO date string, or null when not on loan. */
   dueOn: string | null;
+  /** ISO date string. */
+  acquiredOn: string | null;
 };
 
 export type RecordDetail = {
@@ -55,11 +99,24 @@ export type RecordDetail = {
   collection: string | null;
   series: string | null;
   classification: string | null;
-  authors: string[];
-  publishers: string[];
+  /** The Dewey class's shelf label, e.g. "Théâtre français". */
+  classificationLabel: string | null;
+  authors: AuthorLink[];
+  publishers: PublisherLink[];
   subjects: string[];
-  genres: { slug: string; labelFr: string; labelEn: string | null }[];
+  genres: { slug: string; labelFr: string; labelEn: string | null; icon: string; colour: string }[];
   holdings: Holding[];
+  coverUrl: string | null;
+  /** Legacy notices.npages, e.g. "56 p." — the collation. */
+  pageCount: string | null;
+  physicalDetails: string | null;
+  dimensions: string | null;
+  edition: string | null;
+  volume: string | null;
+  /** ISO 639-2/B codes. */
+  languages: string[];
+  likeCount: number;
+  liked: boolean;
 };
 
 export type Genre = {
@@ -74,6 +131,8 @@ export type NewArrival = {
   title: string;
   authors: string[];
   documentType: string | null;
+  /** The record's first genre, for its ribbon on the card. */
+  genre: SearchHit["genre"];
   coverUrl: string | null;
   totalItems: number;
   availableItems: number;
@@ -145,10 +204,21 @@ type HitRow = {
   title: string;
   subtitle: string | null;
   publication_year: number | null;
+  standard_number: string | null;
+  thumbnail_url: string | null;
+  abstract: string | null;
   document_type: string | null;
-  authors: string[] | null;
+  authors: AuthorLink[];
+  languages: string[] | null;
+  genre: SearchHit["genre"];
   total: number | null;
   available: number | null;
+  call_number: string | null;
+  holdings: Holding[];
+  like_count: number;
+  liked: boolean;
+  publisher: string | null;
+  page_count: string | null;
 };
 
 /**
@@ -162,13 +232,54 @@ const holdingCounts = (isSubscriber: boolean) => Prisma.sql`
       count(*)::int AS total,
       count(*) FILTER (
         WHERE l.id IS NULL AND COALESCE(ist.allows_loan, true)
-      )::int AS available
+      )::int AS available,
+      (array_agg(i.call_number ORDER BY (l.id IS NULL) DESC, i.barcode)
+        FILTER (WHERE i.call_number IS NOT NULL))[1] AS call_number
     FROM items i
     LEFT JOIN sections sec ON sec.id = i.section_id
     LEFT JOIN item_statuses ist ON ist.id = i.status_id
     LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
     WHERE i.record_id = r.id AND ${visibleHoldings(isSubscriber)}
   ) holdings ON true
+`;
+
+/**
+ * The record's visible copies as JSON, one per line of the record page's
+ * holdings table and of the results' "Localiser" dialog.
+ */
+const holdingList = (isSubscriber: boolean) => Prisma.sql`COALESCE((
+  SELECT json_agg(h ORDER BY h.barcode)
+  FROM (
+    SELECT
+      i.id,
+      i.barcode,
+      i.call_number   AS "callNumber",
+      loc.label       AS location,
+      sec.label       AS section,
+      COALESCE(ist.opac_label, ist.label) AS status,
+      COALESCE(ist.allows_loan, true) AS "isLoanable",
+      (l.id IS NOT NULL) AS "isOnLoan",
+      l.due_on        AS "dueOn",
+      i.acquired_on   AS "acquiredOn"
+    FROM items i
+    LEFT JOIN locations loc ON loc.id = i.location_id
+    LEFT JOIN sections sec ON sec.id = i.section_id
+    LEFT JOIN item_statuses ist ON ist.id = i.status_id
+    LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
+    WHERE i.record_id = r.id AND ${visibleHoldings(isSubscriber)}
+  ) h
+), '[]'::json)`;
+
+/** Authors with their ids, for links to the author page. */
+const authorLinks = Prisma.sql`
+  COALESCE((
+    SELECT json_agg(json_build_object(
+      'id', a.id, 'name', btrim(coalesce(a.forename, '') || ' ' || a.name)
+    ) ORDER BY c.level, c.rank)
+    FROM contributions c
+    JOIN authors a ON a.id = c.author_id
+    WHERE c.record_id = r.id
+  ), '[]'::json)
 `;
 
 const authorNames = Prisma.sql`
@@ -198,6 +309,7 @@ type ArrivalRow = {
   title: string;
   authors: string[] | null;
   document_type: string | null;
+  genre: SearchHit["genre"];
   thumbnail_url: string | null;
   standard_number: string | null;
   total: number | null;
@@ -218,6 +330,16 @@ export async function getNewArrivals(limit: number, isSubscriber = false): Promi
       r.title,
       ${authorNames} AS authors,
       dt.label AS document_type,
+      (
+        SELECT json_build_object(
+          'labelFr', g.label_fr, 'labelEn', g.label_en, 'icon', g.icon, 'colour', g.colour
+        )
+        FROM record_genres rg
+        JOIN genres g ON g.id = rg.genre_id
+        WHERE rg.record_id = r.id
+        ORDER BY g.rank
+        LIMIT 1
+      ) AS genre,
       r.thumbnail_url,
       r.standard_number,
       holdings.total,
@@ -241,18 +363,78 @@ export async function getNewArrivals(limit: number, isSubscriber = false): Promi
     title: row.title,
     authors: row.authors ?? [],
     documentType: row.document_type,
+    genre: row.genre,
     coverUrl: coverUrl(row.thumbnail_url, row.standard_number),
     totalItems: row.total ?? 0,
     availableItems: row.available ?? 0,
   }));
 }
 
-export async function searchCatalogue(
-  rawQuery: string,
-  page: number,
+/**
+ * Legacy let the OPAC sort a result set (`sort_by`) by relevance, title,
+ * author or date. "Recent" is the order of the home's new arrivals, so its
+ * "see more" tile can carry on where the row stops.
+ */
+export const SORTS = ["pertinence", "titre", "auteur", "recent", "annee"] as const;
+export type Sort = (typeof SORTS)[number];
+
+export function isSort(value: unknown): value is Sort {
+  return SORTS.includes(value as Sort);
+}
+
+/**
+ * The languages a reader can filter on (CDI decision: French, English and
+ * Spanish, the ones the CDI collects). ISO 639-2/B, as `record_languages`.
+ */
+export const LANGUAGES = ["fre", "eng", "spa"] as const;
+export type Language = (typeof LANGUAGES)[number];
+
+export function isLanguage(value: unknown): value is Language {
+  return LANGUAGES.includes(value as Language);
+}
+
+/**
+ * The document types a reader can filter on: visible in the OPAC, and
+ * holding at least one record, so no filter leads to an empty list by
+ * construction. Cached per request, like the genres.
+ */
+export const listDocumentTypes = cache(async (): Promise<DocumentTypeOption[]> => {
+  return prisma.$queryRaw<DocumentTypeOption[]>`
+    SELECT dt.id, dt.label
+    FROM document_types dt
+    WHERE dt.is_visible_in_opac
+      AND EXISTS (SELECT 1 FROM bibliographic_records r WHERE r.document_type_id = dt.id)
+    ORDER BY dt.id
+  `;
+});
+
+export async function searchCatalogue({
+  query: rawQuery,
+  page,
   isSubscriber = false,
-  genreSlug: string | null = null,
-): Promise<SearchResults> {
+  genre: genreSlug = null,
+  documentTypeId = null,
+  language = null,
+  authorId = null,
+  publisherId = null,
+  patronId = null,
+  sort,
+}: {
+  query: string;
+  page: number;
+  isSubscriber?: boolean;
+  genre?: string | null;
+  documentTypeId?: number | null;
+  /** One of LANGUAGES: records written in it. */
+  language?: Language | null;
+  /** The author page's list: records this author contributed to. */
+  authorId?: number | null;
+  /** The publisher dialog's list: records this publisher published. */
+  publisherId?: number | null;
+  /** The signed-in reader, whose likes are marked on the hits. */
+  patronId?: number | null;
+  sort: Sort;
+}): Promise<SearchResults> {
   const terms = parseTerms(rawQuery);
   const currentPage = Math.max(1, page);
   const offset = (currentPage - 1) * PER_PAGE;
@@ -293,14 +475,59 @@ export async function searchCatalogue(
       )`
     : Prisma.empty;
 
+  const inLanguage = language
+    ? Prisma.sql`AND EXISTS (
+        SELECT 1 FROM record_languages rl WHERE rl.record_id = r.id AND rl.language_code = ${language}
+      )`
+    : Prisma.empty;
+
+  const ofType = documentTypeId
+    ? Prisma.sql`AND r.document_type_id = ${documentTypeId}`
+    : Prisma.empty;
+
+  // Accents folded and case ignored, so "Éthiopiques" files under E and
+  // "L’Étranger" beside "Le…", not after Z. The title is every sort's
+  // tie-break, as legacy's `index_sew` was.
+  const byTitle = Prisma.sql`unaccent(lower(r.title)) ASC, r.id ASC`;
+  const firstAuthor = Prisma.sql`(
+    SELECT unaccent(lower(a.name))
+    FROM contributions c
+    JOIN authors a ON a.id = c.author_id
+    WHERE c.record_id = r.id
+    ORDER BY c.level, c.rank
+    LIMIT 1
+  )`;
   // Relevance first, then title — legacy's `ORDER BY pert DESC, index_sew`.
   // Ranking uses the OR-form so a record matching more terms in its own text
-  // outranks one that only matched via a linked heading.
+  // outranks one that only matched via a linked heading. Without terms there
+  // is nothing to rank, so relevance falls back to title.
   const rankQuery = terms.join(" | ");
-  const order = terms.length
-    ? Prisma.sql`ORDER BY ts_rank_cd(r.search_vector, to_tsquery('french_unaccent', ${rankQuery})) DESC, r.title ASC`
-    : Prisma.sql`ORDER BY r.title ASC`;
+  const order = {
+    pertinence: terms.length
+      ? Prisma.sql`ts_rank_cd(r.search_vector, to_tsquery('french_unaccent', ${rankQuery})) DESC, ${byTitle}`
+      : byTitle,
+    titre: byTitle,
+    auteur: Prisma.sql`${firstAuthor} ASC NULLS LAST, ${byTitle}`,
+    recent: Prisma.sql`r.created_at DESC, r.id DESC`,
+    annee: Prisma.sql`r.publication_year DESC NULLS LAST, ${byTitle}`,
+  }[sort];
 
+  const byAuthor = authorId
+    ? Prisma.sql`AND EXISTS (
+        SELECT 1 FROM contributions c WHERE c.record_id = r.id AND c.author_id = ${authorId}
+      )`
+    : Prisma.empty;
+
+  const byPublisher = publisherId
+    ? Prisma.sql`AND EXISTS (
+        SELECT 1 FROM record_publishers rp WHERE rp.record_id = r.id AND rp.publisher_id = ${publisherId}
+      )`
+    : Prisma.empty;
+
+  const filters = Prisma.sql`WHERE true ${match} ${inGenre} ${ofType} ${inLanguage} ${byAuthor} ${byPublisher}`;
+
+  // The page's ids are picked first, so the per-record lookups below run for
+  // one page rather than for every match — as for the new arrivals.
   const [rows, countRows] = await Promise.all([
     prisma.$queryRaw<HitRow[]>`
       SELECT
@@ -308,23 +535,62 @@ export async function searchCatalogue(
         r.title,
         r.subtitle,
         r.publication_year,
+        r.standard_number,
+        r.thumbnail_url,
+        r.abstract,
+        r.page_count,
         dt.label AS document_type,
-        ${authorNames} AS authors,
+        ${authorLinks} AS authors,
+        (
+          SELECT p.name FROM record_publishers rp
+          JOIN publishers p ON p.id = rp.publisher_id
+          WHERE rp.record_id = r.id
+          ORDER BY rp.rank
+          LIMIT 1
+        ) AS publisher,
+        ARRAY(
+          SELECT rl.language_code
+          FROM record_languages rl
+          WHERE rl.record_id = r.id
+          ORDER BY rl.rank
+        ) AS languages,
+        (
+          SELECT json_build_object(
+            'labelFr', g.label_fr, 'labelEn', g.label_en, 'icon', g.icon, 'colour', g.colour
+          )
+          FROM record_genres rg
+          JOIN genres g ON g.id = rg.genre_id
+          WHERE rg.record_id = r.id
+          ORDER BY g.rank
+          LIMIT 1
+        ) AS genre,
         holdings.total,
-        holdings.available
-      FROM bibliographic_records r
+        holdings.available,
+        holdings.call_number,
+        ${holdingList(isSubscriber)} AS holdings,
+        (SELECT count(*)::int FROM record_likes lk WHERE lk.record_id = r.id) AS like_count,
+        EXISTS (
+          SELECT 1 FROM record_likes lk WHERE lk.record_id = r.id AND lk.patron_id = ${patronId ?? 0}
+        ) AS liked
+      FROM (
+        SELECT r.id, row_number() OVER (ORDER BY ${order}) AS position
+        FROM bibliographic_records r
+        ${visibleRecords(isSubscriber)}
+        ${filters}
+        ORDER BY position
+        LIMIT ${PER_PAGE} OFFSET ${offset}
+      ) page
+      JOIN bibliographic_records r ON r.id = page.id
       ${visibleRecords(isSubscriber)}
       LEFT JOIN document_types dt ON dt.id = r.document_type_id
       ${holdingCounts(isSubscriber)}
-      WHERE true ${match} ${inGenre}
-      ${order}
-      LIMIT ${PER_PAGE} OFFSET ${offset}
+      ORDER BY page.position
     `,
     prisma.$queryRaw<{ count: bigint }[]>`
       SELECT count(*)::bigint AS count
       FROM bibliographic_records r
       ${visibleRecords(isSubscriber)}
-      WHERE true ${match} ${inGenre}
+      ${filters}
     `,
   ]);
 
@@ -337,9 +603,20 @@ export async function searchCatalogue(
       subtitle: row.subtitle,
       publicationYear: row.publication_year,
       documentType: row.document_type,
-      authors: row.authors ?? [],
+      authors: row.authors,
+      abstract: row.abstract,
       totalItems: row.total ?? 0,
       availableItems: row.available ?? 0,
+      coverUrl: coverUrl(row.thumbnail_url, row.standard_number),
+      standardNumber: row.standard_number,
+      languages: row.languages ?? [],
+      genre: row.genre,
+      callNumber: row.call_number,
+      holdings: row.holdings,
+      likeCount: row.like_count,
+      liked: row.liked,
+      publisher: row.publisher,
+      pageCount: row.page_count,
     })),
     total,
     page: currentPage,
@@ -358,11 +635,21 @@ type DetailRow = {
   collection: string | null;
   series: string | null;
   classification: string | null;
-  authors: string[] | null;
-  publishers: string[] | null;
+  classification_label: string | null;
+  authors: AuthorLink[];
+  publishers: PublisherLink[] | null;
   subjects: string[] | null;
   genres: RecordDetail["genres"] | null;
   holdings: Holding[] | null;
+  thumbnail_url: string | null;
+  page_count: string | null;
+  physical_details: string | null;
+  dimensions: string | null;
+  edition_statement: string | null;
+  volume_number: string | null;
+  languages: string[] | null;
+  like_count: number;
+  liked: boolean;
 };
 
 /**
@@ -378,6 +665,8 @@ type DetailRow = {
 export const getRecord = cache(async function getRecord(
   id: number,
   isSubscriber = false,
+  /** The signed-in reader, whose like is marked. */
+  patronId: number | null = null,
 ): Promise<RecordDetail | null> {
   const rows = await prisma.$queryRaw<DetailRow[]>`
     SELECT
@@ -391,19 +680,26 @@ export const getRecord = cache(async function getRecord(
       col.name AS collection,
       ser.name AS series,
       ci.code AS classification,
+      ci.comment AS classification_label,
+      r.thumbnail_url,
+      r.page_count,
+      r.physical_details,
+      r.dimensions,
+      r.edition_statement,
+      r.volume_number,
       ARRAY(
-        SELECT btrim(coalesce(a.forename, '') || ' ' || a.name)
-        FROM contributions c
-        JOIN authors a ON a.id = c.author_id
-        WHERE c.record_id = r.id
-        ORDER BY c.level, c.rank
-      ) AS authors,
-      ARRAY(
-        SELECT p.name
+        SELECT rl.language_code FROM record_languages rl WHERE rl.record_id = r.id ORDER BY rl.rank
+      ) AS languages,
+      (SELECT count(*)::int FROM record_likes lk WHERE lk.record_id = r.id) AS like_count,
+      EXISTS (
+        SELECT 1 FROM record_likes lk WHERE lk.record_id = r.id AND lk.patron_id = ${patronId ?? 0}
+      ) AS liked,
+      ${authorLinks} AS authors,
+      (
+        SELECT json_agg(json_build_object('id', p.id, 'name', p.name) ORDER BY rp.rank)
         FROM record_publishers rp
         JOIN publishers p ON p.id = rp.publisher_id
         WHERE rp.record_id = r.id
-        ORDER BY rp.rank
       ) AS publishers,
       ARRAY(
         SELECT sl.label
@@ -414,33 +710,14 @@ export const getRecord = cache(async function getRecord(
       ) AS subjects,
       (
         SELECT json_agg(json_build_object(
-          'slug', g.slug, 'labelFr', g.label_fr, 'labelEn', g.label_en
+          'slug', g.slug, 'labelFr', g.label_fr, 'labelEn', g.label_en,
+          'icon', g.icon, 'colour', g.colour
         ) ORDER BY g.rank)
         FROM record_genres rg
         JOIN genres g ON g.id = rg.genre_id
         WHERE rg.record_id = r.id
       ) AS genres,
-      COALESCE((
-        SELECT json_agg(h ORDER BY h.barcode)
-        FROM (
-          SELECT
-            i.id,
-            i.barcode,
-            i.call_number   AS "callNumber",
-            loc.label       AS location,
-            sec.label       AS section,
-            COALESCE(ist.opac_label, ist.label) AS status,
-            COALESCE(ist.allows_loan, true) AS "isLoanable",
-            (l.id IS NOT NULL) AS "isOnLoan",
-            l.due_on        AS "dueOn"
-          FROM items i
-          LEFT JOIN locations loc ON loc.id = i.location_id
-          LEFT JOIN sections sec ON sec.id = i.section_id
-          LEFT JOIN item_statuses ist ON ist.id = i.status_id
-          LEFT JOIN loans l ON l.item_id = i.id AND l.returned_at IS NULL
-          WHERE i.record_id = r.id AND ${visibleHoldings(isSubscriber)}
-        ) h
-      ), '[]'::json) AS holdings
+      ${holdingList(isSubscriber)} AS holdings
     FROM bibliographic_records r
     ${visibleRecords(isSubscriber)}
     LEFT JOIN document_types dt ON dt.id = r.document_type_id
@@ -465,10 +742,46 @@ export const getRecord = cache(async function getRecord(
     collection: row.collection,
     series: row.series,
     classification: row.classification,
+    classificationLabel: row.classification_label,
     authors: row.authors ?? [],
     publishers: row.publishers ?? [],
     subjects: row.subjects ?? [],
     genres: row.genres ?? [],
     holdings: row.holdings ?? [],
+    coverUrl: coverUrl(row.thumbnail_url, row.standard_number),
+    pageCount: row.page_count,
+    physicalDetails: row.physical_details,
+    dimensions: row.dimensions,
+    edition: row.edition_statement,
+    volume: row.volume_number,
+    languages: row.languages ?? [],
+    likeCount: row.like_count,
+    liked: row.liked,
+  };
+});
+
+/** The author page's header. Null for an unknown id. */
+export const getAuthor = cache(async (id: number): Promise<AuthorDetail | null> => {
+  const author = await prisma.author.findUnique({ where: { id } });
+  if (!author) return null;
+  return {
+    id: author.id,
+    name: [author.forename, author.name].filter(Boolean).join(" "),
+    dates: author.dates,
+    biography: author.comment,
+    website: author.website,
+  };
+});
+
+/** The publisher dialog's header. Null for an unknown id. */
+export const getPublisher = cache(async (id: number): Promise<PublisherDetail | null> => {
+  const publisher = await prisma.publisher.findUnique({ where: { id } });
+  if (!publisher) return null;
+  return {
+    id: publisher.id,
+    name: publisher.name,
+    place: [publisher.city, publisher.country].filter(Boolean).join(", ") || null,
+    description: publisher.comment,
+    website: publisher.website,
   };
 });

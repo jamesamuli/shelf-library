@@ -1,3 +1,5 @@
+import type { Sort } from "./catalogue";
+import type { ReserveRefusal } from "./holds";
 import type { Locale } from "./preferences";
 
 /**
@@ -85,11 +87,15 @@ type CatalogueCopy = {
   welcomeTitle: string;
   welcomeSchool: string;
   newArrivals: string;
+  seeMore: string;
   scrollBack: string;
   scrollForward: string;
   searchPanelTitle: string;
   searchTipsTitle: string;
   searchTips: string[];
+  searching: string;
+  /** Contains a {count} placeholder. */
+  seeAllResults: string;
   discover: string;
   /** Names the phone's bottom bar. */
   dockLabel: string;
@@ -108,10 +114,89 @@ type CatalogueCopy = {
   phoneTitle: string;
   closePanel: string;
   genres: string;
-  /** Contains a {genre} placeholder. */
-  genreFilter: string;
-  /** Contains a {genre} placeholder. */
-  clearGenre: string;
+  resultsTitle: string;
+  /** Contains {from}, {to} and {total} placeholders. */
+  resultsRange: string;
+  filterTitle: string;
+  filterFormat: string;
+  filterGenre: string;
+  filterLanguage: string;
+  /** Contains a {count} placeholder: the active filters. */
+  filtersButton: string;
+  clearFilters: string;
+  /** Contains a {label} placeholder. */
+  removeFilter: string;
+  viewLabel: string;
+  viewList: string;
+  viewDetailed: string;
+  sortLabel: string;
+  sortApply: string;
+  sorts: Record<Sort, string>;
+  locate: string;
+  language: string;
+  paginationLabel: string;
+  paginationEndLabel: string;
+  /** Contains a {page} placeholder. */
+  pageLink: string;
+  locateBook: string;
+  reserveBook: string;
+  /** Contains a {title} placeholder. */
+  copiesTitle: string;
+  /** Contains a {count} placeholder. */
+  copiesFound: string;
+  copiesHint: string;
+  colCopy: string;
+  colPlace: string;
+  colAvailability: string;
+  colAcquired: string;
+  copyAvailable: string;
+  /** Contains a {title} placeholder. */
+  reserveTitle: string;
+  /** Contains a {days} placeholder. */
+  reserveIntro: string;
+  reserveConfirm: string;
+  cancel: string;
+  /** Contains a {title} placeholder. */
+  reserveOk: string;
+  reserveErrors: Record<ReserveRefusal, string>;
+  like: string;
+  unlike: string;
+  /** Contains a {count} placeholder. */
+  likeCount: string;
+  recommend: string;
+  linkCopied: string;
+  /** Contains a {title} placeholder. */
+  shareText: string;
+  /** Contains a {name} placeholder. */
+  authorBooks: string;
+  noBiography: string;
+  noPublisherDescription: string;
+  authorWebsite: string;
+  favoritesTitle: string;
+  noFavorites: string;
+  holdsTitle: string;
+  noHolds: string;
+  colPlacedOn: string;
+  holdWaiting: string;
+  /** Contains a {date} placeholder. */
+  holdReady: string;
+  collation: string;
+  ean: string;
+  publishedIn: string;
+  edition: string;
+  dimensions: string;
+  breadcrumbLabel: string;
+  home: string;
+  catalogueCrumb: string;
+  details: string;
+  signInReserveTitle: string;
+  signInLikeTitle: string;
+  signInSchoolHint: string;
+  moreInfo: string;
+  authorLoading: string;
+  authorBooksShort: string;
+  /** Contains a {count} placeholder. */
+  authorAllBooks: string;
 };
 
 type CirculationCopy = {
@@ -260,6 +345,43 @@ type CataloguingCopy = {
   errBarcodeTaken: string;
   /** Contains a {detail} placeholder. */
   errOnLoan: string;
+  assistantTitle: string;
+  checkAuthors: string;
+  checkAuthorsHint: string;
+  checking: string;
+  suggestedAuthors: string;
+  useSuggested: string;
+  nothingToCheck: string;
+  matchIdentifier: string;
+  matchName: string;
+  matchSurname: string;
+  titlesInCdi: string;
+  hasBiography: string;
+  noBiography: string;
+  thisIsThem: string;
+  newAuthor: string;
+  noCandidate: string;
+  proposeBiography: string;
+  proposeAbstract: string;
+  aiWorking: string;
+  aiUsage: string;
+  aiCached: string;
+  aiLimit: string;
+  aiFailed: string;
+  aiNotConfigured: string;
+  samePersonYes: string;
+  samePersonNo: string;
+  samePersonUnsure: string;
+  biographyDraft: string;
+  datesLabel: string;
+  sources: string;
+  keepBiography: string;
+  discard: string;
+  biographyKept: string;
+  abstractUnknown: string;
+  abstractReplace: string;
+  abstractFilled: string;
+  reviewNote: string;
 };
 
 type ReadersCopy = {
@@ -502,10 +624,13 @@ const fr: Messages = {
     welcomeTitle: "Bienvenue au CDI",
     welcomeSchool: "École Française de Bujumbura",
     newArrivals: "Nouveautés",
+    seeMore: "Voir plus",
     scrollBack: "Nouveautés précédentes",
     scrollForward: "Nouveautés suivantes",
     searchPanelTitle: "Rechercher un document",
     searchTipsTitle: "Astuces",
+    searching: "Recherche…",
+    seeAllResults: "Voir les {count} résultats",
     searchTips: [
       "Mélangez titre et auteur : « camus peste » fonctionne.",
       "Les accents sont facultatifs : « etranger » trouve « L’Étranger ».",
@@ -526,8 +651,87 @@ const fr: Messages = {
     phoneTitle: "Téléphone",
     closePanel: "Fermer",
     genres: "Genre(s)",
-    genreFilter: "Genre : {genre}",
-    clearGenre: "Retirer le filtre « {genre} »",
+    resultsTitle: "Résultats de recherche",
+    resultsRange: "Résultats : {from} à {to} sur un total de {total}",
+    filterTitle: "Filtrer la recherche",
+    filterFormat: "Support",
+    filterGenre: "Genre",
+    filterLanguage: "Langue",
+    filtersButton: "Filtres ({count})",
+    clearFilters: "Effacer les filtres",
+    removeFilter: "Retirer le filtre « {label} »",
+    viewLabel: "Affichage",
+    viewList: "Liste",
+    viewDetailed: "Étendu",
+    sortLabel: "Trier par",
+    sortApply: "Trier",
+    sorts: {
+      pertinence: "Pertinence",
+      titre: "Titre (A → Z)",
+      auteur: "Auteur (A → Z)",
+      recent: "Plus récents",
+      annee: "Année de parution",
+    },
+    locate: "Localiser le document",
+    language: "Langue",
+    paginationLabel: "Pages de résultats",
+    paginationEndLabel: "Pages de résultats, fin de liste",
+    pageLink: "Page {page}",
+    locateBook: "Localiser le livre",
+    reserveBook: "Réserver le livre",
+    copiesTitle: "Liste des exemplaires de « {title} »",
+    copiesFound: "{count} exemplaire(s) trouvé(s).",
+    copiesHint: "Notez la cote : elle indique le rayon où le livre est rangé. L’équipe du CDI peut vous aider à le trouver.",
+    colCopy: "N° d’exemplaire",
+    colPlace: "Emplacement",
+    colAvailability: "Disponibilité",
+    colAcquired: "Date d’acquisition",
+    copyAvailable: "Disponible",
+    reserveTitle: "Réserver « {title} »",
+    reserveIntro: "Le CDI mettra un exemplaire de côté pour vous dès qu’il sera libre. Vous aurez ensuite {days} jours pour venir le chercher.",
+    reserveConfirm: "Confirmer la réservation",
+    cancel: "Annuler",
+    reserveOk: "C’est noté : « {title} » est réservé pour vous. Vous retrouverez vos réservations dans Mon compte.",
+    reserveErrors: {
+      PATRON_NOT_ALLOWED: "Votre compte ne permet pas de réserver. Adressez-vous à l’équipe du CDI.",
+      RECORD_NOT_FOUND: "Ce livre n’est plus au catalogue.",
+      NO_LOANABLE_COPY: "Ce document ne s’emprunte pas : il se consulte sur place.",
+      ALREADY_HELD: "Vous avez déjà réservé ce livre.",
+      ALREADY_ON_LOAN: "Vous avez déjà ce livre en prêt.",
+    },
+    like: "J’aime",
+    unlike: "Je n’aime plus",
+    likeCount: "{count} j’aime",
+    recommend: "Recommander",
+    linkCopied: "Lien copié",
+    shareText: "Je te recommande « {title} », au CDI de l’École Française de Bujumbura.",
+    authorBooks: "Les livres de {name} au CDI",
+    noBiography: "Le CDI n’a pas encore rédigé de biographie pour cet auteur.",
+    noPublisherDescription: "Le CDI n’a pas encore rédigé de description pour cet éditeur.",
+    authorWebsite: "Site web",
+    favoritesTitle: "Mes favoris",
+    noFavorites: "Aucun favori pour l’instant. Touchez le cœur sous un livre pour le retrouver ici.",
+    holdsTitle: "Mes réservations",
+    noHolds: "Aucune réservation en cours.",
+    colPlacedOn: "Réservé le",
+    holdWaiting: "En attente d’un exemplaire",
+    holdReady: "À retirer au CDI avant le {date}",
+    collation: "Collation",
+    ean: "EAN",
+    publishedIn: "Publié en {year}",
+    edition: "Édition",
+    dimensions: "Format",
+    breadcrumbLabel: "Vous êtes ici",
+    home: "Accueil",
+    catalogueCrumb: "Catalogue",
+    details: "Détails",
+    signInReserveTitle: "Connectez-vous pour réserver ce livre",
+    signInLikeTitle: "Connectez-vous pour aimer ce livre",
+    signInSchoolHint: "Utilisez votre compte Google de l’école (adresse en @efbujumbura.com).",
+    moreInfo: "En savoir plus",
+    authorLoading: "Chargement…",
+    authorBooksShort: "Ses livres au CDI",
+    authorAllBooks: "Voir tous ses livres ({count})",
   },
   circulation: {
     navDashboard: "Tableau de bord",
@@ -663,6 +867,43 @@ const fr: Messages = {
     errBarcodeRequired: "Le code-barres est obligatoire.",
     errBarcodeTaken: "Ce code-barres est déjà utilisé.",
     errOnLoan: "Exemplaire emprunté par {detail} : enregistrez le retour d’abord.",
+    assistantTitle: "Assistant de catalogage",
+    checkAuthors: "Vérifier les auteurs",
+    checkAuthorsHint: "Gratuit : cherche l’ISBN dans Open Library et les auteurs déjà au catalogue.",
+    checking: "Vérification…",
+    suggestedAuthors: "Auteurs trouvés pour cet ISBN :",
+    useSuggested: "Utiliser ces auteurs",
+    nothingToCheck: "Saisissez un auteur ou un ISBN, puis vérifiez.",
+    matchIdentifier: "Même auteur (identifiant Open Library)",
+    matchName: "Même nom",
+    matchSurname: "Même nom de famille",
+    titlesInCdi: "{count} livre(s) au CDI",
+    hasBiography: "biographie ✓",
+    noBiography: "sans biographie",
+    thisIsThem: "C’est lui",
+    newAuthor: "Nouvel auteur",
+    noCandidate: "Pas encore au catalogue : un nouvel auteur sera créé.",
+    proposeBiography: "Proposer une biographie (IA)",
+    proposeAbstract: "Proposer un résumé (IA)",
+    aiWorking: "Gemini rédige…",
+    aiUsage: "IA : {used} / {limit} requêtes aujourd’hui",
+    aiCached: "Réponse déjà connue : aucun coût.",
+    aiLimit: "Limite du jour atteinte ({limit} requêtes). Réessayez demain.",
+    aiFailed: "Gemini n’a pas pu répondre. Réessayez plus tard.",
+    aiNotConfigured: "L’assistant IA n’est pas configuré.",
+    samePersonYes: "Gemini confirme que c’est bien cet auteur.",
+    samePersonNo: "Gemini pense que ce n’est PAS cet auteur : n’utilisez pas ce texte.",
+    samePersonUnsure: "Gemini n’est pas sûr de l’identité : vérifiez avant d’utiliser.",
+    biographyDraft: "Biographie proposée (modifiable)",
+    datesLabel: "Dates",
+    sources: "Sources",
+    keepBiography: "Garder cette biographie",
+    discard: "Ignorer",
+    biographyKept: "Gardée : elle sera enregistrée avec la notice.",
+    abstractUnknown: "Gemini ne connaît pas ce livre : rédigez le résumé vous-même.",
+    abstractReplace: "Remplacer le résumé déjà saisi ?",
+    abstractFilled: "Résumé proposé : relisez-le avant d’enregistrer.",
+    reviewNote: "Relisez toujours : rien n’est publié avant votre enregistrement.",
   },
   readers: {
     navReaders: "Lecteurs",
@@ -935,10 +1176,13 @@ const en: Messages = {
     welcomeTitle: "Welcome to the library",
     welcomeSchool: "École Française de Bujumbura",
     newArrivals: "New arrivals",
+    seeMore: "See more",
     scrollBack: "Previous new arrivals",
     scrollForward: "More new arrivals",
     searchPanelTitle: "Find a document",
     searchTipsTitle: "Tips",
+    searching: "Searching…",
+    seeAllResults: "See all {count} results",
     searchTips: [
       "Mix title and author: “camus peste” works.",
       "Accents are optional: “etranger” finds “L’Étranger”.",
@@ -959,8 +1203,87 @@ const en: Messages = {
     phoneTitle: "Phone",
     closePanel: "Close",
     genres: "Genre(s)",
-    genreFilter: "Genre: {genre}",
-    clearGenre: "Remove the “{genre}” filter",
+    resultsTitle: "Search results",
+    resultsRange: "Results {from} to {to} of {total}",
+    filterTitle: "Refine your search",
+    filterFormat: "Format",
+    filterGenre: "Genre",
+    filterLanguage: "Language",
+    filtersButton: "Filters ({count})",
+    clearFilters: "Clear filters",
+    removeFilter: "Remove the “{label}” filter",
+    viewLabel: "View",
+    viewList: "List",
+    viewDetailed: "Detailed",
+    sortLabel: "Sort by",
+    sortApply: "Sort",
+    sorts: {
+      pertinence: "Relevance",
+      titre: "Title (A → Z)",
+      auteur: "Author (A → Z)",
+      recent: "Newest",
+      annee: "Publication year",
+    },
+    locate: "Find it on the shelf",
+    language: "Language",
+    paginationLabel: "Result pages",
+    paginationEndLabel: "Result pages, end of list",
+    pageLink: "Page {page}",
+    locateBook: "Locate the book",
+    reserveBook: "Reserve this book",
+    copiesTitle: "Copies of “{title}”",
+    copiesFound: "{count} cop(ies) found.",
+    copiesHint: "Note the call number: it tells you which shelf the book is on. The library team can help you find it.",
+    colCopy: "Copy number",
+    colPlace: "Location",
+    colAvailability: "Availability",
+    colAcquired: "Acquired",
+    copyAvailable: "Available",
+    reserveTitle: "Reserve “{title}”",
+    reserveIntro: "The library will set a copy aside for you as soon as one is free. You will then have {days} days to collect it.",
+    reserveConfirm: "Confirm the reservation",
+    cancel: "Cancel",
+    reserveOk: "Done: “{title}” is reserved for you. Your reservations are in My account.",
+    reserveErrors: {
+      PATRON_NOT_ALLOWED: "Your account cannot place reservations. Please ask the library team.",
+      RECORD_NOT_FOUND: "This book is no longer in the catalogue.",
+      NO_LOANABLE_COPY: "This item cannot be borrowed: it is for reading in the library.",
+      ALREADY_HELD: "You have already reserved this book.",
+      ALREADY_ON_LOAN: "You already have this book on loan.",
+    },
+    like: "Like",
+    unlike: "Unlike",
+    likeCount: "{count} like(s)",
+    recommend: "Recommend",
+    linkCopied: "Link copied",
+    shareText: "I recommend “{title}”, at the École Française de Bujumbura library.",
+    authorBooks: "{name}’s books in the library",
+    noBiography: "The library has not written a biography for this author yet.",
+    noPublisherDescription: "The library has not written a description for this publisher yet.",
+    authorWebsite: "Website",
+    favoritesTitle: "My favourites",
+    noFavorites: "No favourites yet. Tap the heart under a book to keep it here.",
+    holdsTitle: "My reservations",
+    noHolds: "No reservations at the moment.",
+    colPlacedOn: "Reserved on",
+    holdWaiting: "Waiting for a copy",
+    holdReady: "Collect from the library by {date}",
+    collation: "Collation",
+    ean: "EAN",
+    publishedIn: "Published in {year}",
+    edition: "Edition",
+    dimensions: "Size",
+    breadcrumbLabel: "You are here",
+    home: "Home",
+    catalogueCrumb: "Catalogue",
+    details: "Details",
+    signInReserveTitle: "Sign in to reserve this book",
+    signInLikeTitle: "Sign in to like this book",
+    signInSchoolHint: "Use your school Google account (an @efbujumbura.com address).",
+    moreInfo: "More about this book",
+    authorLoading: "Loading…",
+    authorBooksShort: "Their books in the library",
+    authorAllBooks: "See all their books ({count})",
   },
   circulation: {
     navDashboard: "Dashboard",
@@ -1095,6 +1418,43 @@ const en: Messages = {
     errBarcodeRequired: "A barcode is required.",
     errBarcodeTaken: "That barcode is already in use.",
     errOnLoan: "On loan to {detail}: check it in first.",
+    assistantTitle: "Cataloguing assistant",
+    checkAuthors: "Check the authors",
+    checkAuthorsHint: "Free: looks the ISBN up in Open Library and the authors up in the catalogue.",
+    checking: "Checking…",
+    suggestedAuthors: "Authors found for this ISBN:",
+    useSuggested: "Use these authors",
+    nothingToCheck: "Type an author or an ISBN, then check.",
+    matchIdentifier: "Same author (Open Library identifier)",
+    matchName: "Same name",
+    matchSurname: "Same surname",
+    titlesInCdi: "{count} book(s) in the library",
+    hasBiography: "biography ✓",
+    noBiography: "no biography",
+    thisIsThem: "That’s them",
+    newAuthor: "New author",
+    noCandidate: "Not in the catalogue yet: a new author will be created.",
+    proposeBiography: "Suggest a biography (AI)",
+    proposeAbstract: "Suggest a summary (AI)",
+    aiWorking: "Gemini is writing…",
+    aiUsage: "AI: {used} / {limit} requests today",
+    aiCached: "Answer already known: no cost.",
+    aiLimit: "Today’s limit reached ({limit} requests). Try again tomorrow.",
+    aiFailed: "Gemini could not answer. Try again later.",
+    aiNotConfigured: "The AI assistant is not configured.",
+    samePersonYes: "Gemini confirms it is this author.",
+    samePersonNo: "Gemini thinks this is NOT this author: do not use this text.",
+    samePersonUnsure: "Gemini is not sure who this is: check before using it.",
+    biographyDraft: "Suggested biography (editable)",
+    datesLabel: "Dates",
+    sources: "Sources",
+    keepBiography: "Keep this biography",
+    discard: "Discard",
+    biographyKept: "Kept: it will be saved with the record.",
+    abstractUnknown: "Gemini does not know this book: please write the summary yourself.",
+    abstractReplace: "Replace the summary already typed?",
+    abstractFilled: "Summary suggested: read it through before saving.",
+    reviewNote: "Always read it through: nothing is published until you save.",
   },
   readers: {
     navReaders: "Readers",

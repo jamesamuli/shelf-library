@@ -40,9 +40,13 @@ const COLOURS: Record<string, { fill: string; edge: string }> = {
   plum: { fill: "bg-genre-plum", edge: "border-genre-plum" },
 };
 
+/** A genre's icon and colour classes, falling back for unknown keys. */
+export function genreStyle(icon: string, colour: string) {
+  return { Icon: ICONS[icon] ?? BookOpen, ...(COLOURS[colour] ?? COLOURS.indigo) };
+}
+
 export function GenreTile({ genre }: { genre: Genre }) {
-  const Icon = ICONS[genre.icon] ?? BookOpen;
-  const colour = COLOURS[genre.colour] ?? COLOURS.indigo;
+  const { Icon, ...colour } = genreStyle(genre.icon, genre.colour);
 
   // Colour lives in the icon block and border only; the label stays on the
   // plain surface (CDI request), so hover lifts the tile instead of tinting it.

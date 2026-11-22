@@ -103,7 +103,8 @@ browser rather than only at the function boundary.
 
 ## 5. Open questions
 
-- **Who places reservations in practice?** There is a desk form, because the
+- **Who places reservations in practice?** *(Answered 2026-11-22: readers do,
+  from the OPAC results — see docs/10-catalogue.md §7.)* There is a desk form, because the
   screen would otherwise be unreachable, but in legacy readers place their own
   from the OPAC. That belongs to the OPAC module and does not exist yet.
 - **Should a returned copy trap itself for the next reader?** Today check-in

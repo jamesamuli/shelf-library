@@ -5,23 +5,32 @@ import type { Messages } from "@/lib/i18n";
  * A plain GET form, so a search is a real URL: shareable, bookmarkable,
  * back-button friendly, and working without JavaScript. Legacy posted the
  * search and kept state in the PHP session, which made results unlinkable.
+ *
+ * The phone's search sheet passes `onSubmit` to show the results in place;
+ * without JavaScript the form still goes to the results page.
  */
 export function SearchBar({
   messages,
   defaultValue,
-  genre,
+  keep = {},
   id = "catalogue-q",
+  onSubmit,
+  onChange,
 }: {
   messages: Messages;
   defaultValue?: string;
   /** Unique per page: the home renders the form twice (page and phone sheet). */
   id?: string;
-  /** Keeps a genre filter on while the reader refines with keywords. */
-  genre?: string;
+  /** Filters, sort and view kept on while the reader refines with keywords. */
+  keep?: Record<string, string>;
+  onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }) {
   return (
-    <form action="/catalogue" method="get" role="search" className="w-full">
-      {genre ? <input type="hidden" name="genre" value={genre} /> : null}
+    <form action="/catalogue" method="get" role="search" onSubmit={onSubmit} className="w-full">
+      {Object.entries(keep).map(([name, value]) => (
+        <input key={name} type="hidden" name={name} value={value} />
+      ))}
       <label htmlFor={id} className="sr-only">
         {messages.catalogue.searchLabel}
       </label>
@@ -35,6 +44,7 @@ export function SearchBar({
           type="search"
           name="q"
           defaultValue={defaultValue}
+          onChange={onChange}
           placeholder={messages.catalogue.searchPlaceholder}
           enterKeyHint="search"
           className="min-w-0 flex-1 rounded-l-control border border-r-0 border-border bg-surface px-4 py-3 text-body text-foreground placeholder:text-foreground-subtle outline-offset-2 focus-visible:relative focus-visible:outline-2 focus-visible:outline-ring"
@@ -49,26 +59,5 @@ export function SearchBar({
         </button>
       </div>
     </form>
-  );
-}
-
-/**
- * The search form with its tips: the home's search panel and the phone sheet.
- * Rendered twice on one page there, so each copy gets its own field id.
- */
-export function SearchPanel({ messages, id }: { messages: Messages; id: string }) {
-  const c = messages.catalogue;
-  return (
-    <>
-      <SearchBar messages={messages} id={id} />
-      <div className="stack gap-2 rounded-control bg-primary p-4 text-primary-foreground">
-        <h3 className="text-body-sm font-semibold">{c.searchTipsTitle}</h3>
-        <ul className="stack gap-1.5 text-body-sm">
-          {c.searchTips.map((tip) => (
-            <li key={tip}>{tip}</li>
-          ))}
-        </ul>
-      </div>
-    </>
   );
 }

@@ -254,6 +254,83 @@ export async function placeHold(
   return { ok: true, detail: item.record?.title };
 }
 
+/** The reader's own open reservations, for their account; oldest first. */
+export async function listOwnHolds(patronId: number) {
+  const holds = await prisma.hold.findMany({
+    where: { patronId, status: { in: ["PENDING", "AVAILABLE"] } },
+    orderBy: { placedAt: "asc" },
+    include: { record: { select: { id: true, title: true } } },
+  });
+  return holds.map((hold) => ({
+    id: hold.id,
+    recordId: hold.record?.id ?? null,
+    title: hold.record?.title ?? "—",
+    placedAt: hold.placedAt.toISOString(),
+    /** Set once a copy waits for the reader: the end of the pickup window. */
+    readyUntil: hold.status === "AVAILABLE" && hold.expiresOn ? hold.expiresOn.toISOString() : null,
+  }));
+}
+
+export type ReserveRefusal =
+  | "PATRON_NOT_ALLOWED"
+  | "RECORD_NOT_FOUND"
+  | "NO_LOANABLE_COPY"
+  | "ALREADY_HELD"
+  | "ALREADY_ON_LOAN";
+
+/**
+ * A reader reserving a title from the OPAC — legacy `opac_css/do_resa.php`
+ * through `resa::can_reserve()`. Its checks, in its order, less the ones
+ * whose machinery we do not have (quotas, the post-loan waiting period,
+ * per-location rules):
+ *
+ * - the reader may reserve (`empr_statut.allow_book`);
+ * - the record exists and the OPAC shows it, with at least one copy that can
+ *   be lent (a magazine kept for consultation cannot be reserved);
+ * - the reader has not already reserved it (`resa_exists`);
+ * - the reader does not already have it on loan (`allready_loaned`).
+ *
+ * The reader comes from the session, never from the form.
+ */
+export async function reserveTitle(
+  patronId: number,
+  recordId: number,
+): Promise<{ ok: true; title: string } | { ok: false; reason: ReserveRefusal }> {
+  const patron = await prisma.patron.findUnique({
+    where: { id: patronId },
+    include: { status: true },
+  });
+  if (!patron || patron.anonymizedAt || patron.status?.allowsHold === false) {
+    return { ok: false, reason: "PATRON_NOT_ALLOWED" };
+  }
+
+  const record = await prisma.bibliographicRecord.findFirst({
+    where: { id: recordId, status: { isRecordVisibleInOpac: true } },
+    select: {
+      title: true,
+      items: { select: { status: { select: { allowsLoan: true } } } },
+    },
+  });
+  if (!record) return { ok: false, reason: "RECORD_NOT_FOUND" };
+  if (!record.items.some((item) => item.status?.allowsLoan !== false)) {
+    return { ok: false, reason: "NO_LOANABLE_COPY" };
+  }
+
+  const [held, onLoan] = await Promise.all([
+    prisma.hold.findFirst({
+      where: { patronId, recordId, status: { in: ["PENDING", "AVAILABLE"] } },
+    }),
+    prisma.loan.findFirst({
+      where: { patronId, returnedAt: null, item: { recordId } },
+    }),
+  ]);
+  if (held) return { ok: false, reason: "ALREADY_HELD" };
+  if (onLoan) return { ok: false, reason: "ALREADY_ON_LOAN" };
+
+  await prisma.hold.create({ data: { patronId, recordId } });
+  return { ok: true, title: record.title };
+}
+
 /**
  * Set a copy aside for a waiting reader and start the pickup window. Legacy
  * wrote resa_cb + resa_date_debut/fin and flipped resa_confirmee.

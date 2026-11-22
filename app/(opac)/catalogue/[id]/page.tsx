@@ -1,206 +1,262 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import { MapPin } from "lucide-react";
+import { ShelfMark } from "@/app/_components/shelf-mark";
 import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
-import { formatDate } from "@/lib/dates";
 import { getRecord } from "@/lib/catalogue";
+import { PICKUP_DAYS } from "@/lib/holds";
 import { getSession } from "@/app/(auth)/_lib/session";
+import { googleConfig } from "@/app/(auth)/_lib/google";
+import { CoverImage } from "../../_components/cover-image";
+import { eanOf } from "../_lib/identifiers";
+import { languageName } from "../_lib/language";
+import { AuthorLinks, EntityName } from "../_components/author-links";
+import { Breadcrumb } from "../_components/breadcrumb";
+import { LikeButton } from "../_components/like-button";
+import { CopiesTable } from "../_components/locate-dialog";
+import { ReserveButton } from "../_components/reserve-button";
+import { Ribbon } from "../_components/result-card";
+import { ShareButton } from "../_components/share-button";
 
-export async function generateMetadata({
-  params,
-}: PageProps<"/catalogue/[id]">): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<"/catalogue/[id]">): Promise<Metadata> {
   const { id } = await params;
   const record = await getRecord(Number(id), (await getSession("opac")) !== null);
   return { title: record?.title ?? "Catalogue" };
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="stack gap-0.5 border-t border-border py-3 sm:grid sm:grid-cols-3 sm:gap-4">
-      <dt className="text-caption font-medium text-foreground-muted">{label}</dt>
-      <dd className="text-body-sm sm:col-span-2">{children}</dd>
-    </div>
-  );
-}
+/** A record id carried back from the sign-in (`reserver`, `aimer`). */
+const pendingId = (value: string | string[] | undefined) =>
+  typeof value === "string" && /^\d+$/.test(value) ? Number(value) : null;
 
-export default async function RecordPage({
-  params,
-}: PageProps<"/catalogue/[id]">) {
+/**
+ * A book, after the CDI's reference screen: the title, then a card with the
+ * cover and "Localiser" on the left, and on the right the authors (each
+ * opening their dialog), publication, collation, the summary, every
+ * identifier and classification the record has, and the reader's actions.
+ * The full list of copies follows. The breadcrumb's "Catalogue" goes back
+ * to the list the reader came from, as it was.
+ */
+export default async function RecordPage({ params, searchParams }: PageProps<"/catalogue/[id]">) {
   const { id } = await params;
   const numericId = Number(id);
   if (!Number.isInteger(numericId)) notFound();
 
+  const query = await searchParams;
   const [locale, session] = await Promise.all([getLocale(), getSession("opac")]);
   const messages = messagesFor(locale);
-  const record = await getRecord(numericId, session !== null);
   const c = messages.catalogue;
+  const record = await getRecord(numericId, session !== null, session ? Number(session.sub) : null);
+  const crumbs = [
+    { label: c.home, href: "/" },
+    { label: c.catalogueCrumb, href: "/catalogue?q=", back: true },
+  ];
 
   // Not found and "hidden from the OPAC" are deliberately indistinguishable.
   if (!record) {
     return (
-      <div className="mx-auto max-w-md stack gap-content rounded-card border border-border bg-surface p-6 text-center">
-        <h1 className="font-heading text-heading-3">{c.notFound}</h1>
-        <p className="text-body-sm text-foreground-muted">{c.notFoundHint}</p>
-        <Link
-          href="/"
-          className="min-h-11 cluster items-center justify-center rounded-control border border-border px-4 text-body-sm outline-offset-2 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
-        >
-          {c.backToResults}
-        </Link>
+      <div className="stack gap-content">
+        <Breadcrumb label={c.breadcrumbLabel} crumbs={crumbs} current={c.notFound} />
+        <div className="mx-auto max-w-md stack gap-content rounded-card border border-border bg-surface p-6 text-center">
+          <h1 className="font-heading text-heading-3">{c.notFound}</h1>
+          <p className="text-body-sm text-foreground-muted">{c.notFoundHint}</p>
+        </div>
       </div>
     );
   }
 
-  const { authors, publishers, subjects, genres } = record;
+  const colon = locale === "fr" ? " :" : ":";
+  const genre = record.genres[0] ?? null;
+  const ean = eanOf(record.standardNumber);
+  const callNumber =
+    record.holdings.find((copy) => !copy.isOnLoan && copy.isLoanable)?.callNumber ??
+    record.holdings.find((copy) => copy.callNumber)?.callNumber ??
+    null;
+  const available = record.holdings.filter((copy) => !copy.isOnLoan && copy.isLoanable).length;
+  const collation = [record.pageCount, record.physicalDetails, record.dimensions].filter(Boolean).join(" ; ");
+  const returnTo = `/catalogue/${record.id}`;
+  const signedIn = session !== null;
+  const googleReady = googleConfig() !== null;
+
+  const facts: [string, React.ReactNode][] = [];
+  if (record.languages.length) {
+    facts.push([c.language, record.languages.map((code) => languageName(code, locale)).join(", ")]);
+  }
+  if (record.standardNumber) facts.push([c.isbn, <span key="isbn" className="tabular-nums">{record.standardNumber}</span>]);
+  if (ean) facts.push([c.ean, <span key="ean" className="tabular-nums">{ean}</span>]);
+  if (callNumber) facts.push([c.callNumber, <span key="call" className="font-mono font-semibold">{callNumber}</span>]);
+  // Under the call number, each publisher opening its dialog (CDI request).
+  if (record.publishers.length) {
+    facts.push([
+      c.publisher,
+      <span key="publishers">
+        {record.publishers.map((publisher, index) => (
+          <span key={publisher.id}>
+            {index > 0 ? ", " : null}
+            <EntityName kind="publisher" entity={publisher} messages={messages} />
+          </span>
+        ))}
+      </span>,
+    ]);
+  }
+  if (record.classification) {
+    facts.push([
+      c.classification,
+      <span key="dewey">
+        <span className="font-mono">{record.classification}</span>
+        {record.classificationLabel ? ` — ${record.classificationLabel}` : ""}
+      </span>,
+    ]);
+  }
+  if (record.series) facts.push([c.series, record.volume ? `${record.series}, ${record.volume}` : record.series]);
+  if (record.collection) facts.push([c.collection, record.collection]);
+  if (record.edition) facts.push([c.edition, record.edition]);
 
   return (
-    <article className="stack gap-content">
-      <Link
-        href="/"
-        className="text-caption text-accent underline-offset-2 hover:underline"
-      >
-        ← {c.backToResults}
-      </Link>
+    <div className="stack gap-content">
+      <Breadcrumb label={c.breadcrumbLabel} crumbs={crumbs} current={record.title} />
 
-      <header className="stack gap-inline">
-        <h1 className="font-heading text-heading-1">{record.title}</h1>
-        {record.subtitle ? (
-          <p className="text-body text-foreground-muted">{record.subtitle}</p>
-        ) : null}
-        {authors.length > 0 ? (
-          <p className="text-body text-foreground-muted">
-            {authors.join(", ")}
-          </p>
-        ) : null}
+      {/* Above the card from `sm`; a phone reads it under the cover instead
+          (CDI request), so here it is kept for screen readers only. */}
+      <header className="stack gap-1 max-sm:sr-only">
+        <h1 className="font-heading text-heading-1 leading-tight text-balance">{record.title}</h1>
+        {record.subtitle ? <p className="text-body text-foreground-muted">{record.subtitle}</p> : null}
       </header>
 
-      {record.abstract ? (
-        <section className="rounded-card border border-border bg-surface p-4">
-          <h2 className="text-caption font-medium text-foreground-muted">
-            {c.abstract}
-          </h2>
-          <p className="mt-1 text-body-sm">{record.abstract}</p>
-        </section>
-      ) : null}
+      <article className="relative grid overflow-hidden rounded-card border border-border bg-surface shadow-card sm:grid-cols-[13rem_1fr] sm:gap-6 sm:p-6 lg:grid-cols-[17rem_1fr]">
+        {/* With its words from `sm`; on a phone, compact, clear of the centred
+            cover. `contents`: the wrappers take no cell of the card's grid. */}
+        <div className="contents max-sm:hidden">
+          <Ribbon documentType={record.documentType} genre={genre} locale={locale} />
+        </div>
+        <div className="contents sm:hidden">
+          <Ribbon documentType={record.documentType} genre={genre} locale={locale} variant="large" />
+        </div>
 
-      <section>
-        <dl className="border-b border-border">
-          {authors.length > 0 ? (
-            <Field label={c.authors}>{authors.join(", ")}</Field>
-          ) : null}
-          {publishers.length > 0 ? (
-            <Field label={c.publisher}>{publishers.join(", ")}</Field>
-          ) : null}
-          {record.publicationYear ? (
-            <Field label={c.year}>{record.publicationYear}</Field>
-          ) : null}
-          {record.standardNumber ? (
-            <Field label={c.isbn}>
-              <span className="font-mono">{record.standardNumber}</span>
-            </Field>
-          ) : null}
-          {record.documentType ? (
-            <Field label={c.documentType}>{record.documentType}</Field>
-          ) : null}
-          {genres.length > 0 ? (
-            <Field label={c.genres}>
-              <span className="cluster gap-1.5">
-                {genres.map((genre) => (
-                  <Link
-                    key={genre.slug}
-                    href={`/catalogue?genre=${encodeURIComponent(genre.slug)}`}
-                    className="rounded-control bg-surface-muted px-2 py-0.5 text-caption text-accent outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
-                  >
-                    {locale === "en" ? (genre.labelEn ?? genre.labelFr) : genre.labelFr}
-                  </Link>
-                ))}
+        {/* The cover fills the card's width on a phone (CDI request); "Localiser"
+            is gone, the copies being listed below the card. */}
+        <div>
+          <div className="relative aspect-[4/5] w-full overflow-hidden bg-surface-muted sm:aspect-[2/3] sm:rounded-control sm:shadow-card">
+            <div aria-hidden="true" className="absolute inset-0 stack items-center justify-center gap-2 p-4 text-center">
+              <ShelfMark className="w-1/2" />
+              <span className="line-clamp-3 font-heading text-caption font-semibold text-foreground-muted">
+                {record.title}
               </span>
-            </Field>
-          ) : null}
-          {record.collection ? (
-            <Field label={c.collection}>{record.collection}</Field>
-          ) : null}
-          {record.series ? (
-            <Field label={c.series}>{record.series}</Field>
-          ) : null}
-          {record.classification ? (
-            <Field label={c.classification}>
-              <span className="font-mono">
-                {record.classification}
-              </span>
-            </Field>
-          ) : null}
-          {subjects.length > 0 ? (
-            <Field label={c.subjects}>
-              <span className="cluster gap-1.5">
-                {subjects.map((subject) => (
-                  <span
-                    key={subject}
-                    className="rounded-control bg-surface-muted px-2 py-0.5 text-caption"
-                  >
-                    {subject}
-                  </span>
-                ))}
-              </span>
-            </Field>
-          ) : null}
-        </dl>
-      </section>
+            </div>
+            {record.coverUrl ? <CoverImage src={record.coverUrl} eager sizes="(max-width: 639px) 100vw, 17rem" /> : null}
+          </div>
+        </div>
 
-      <section className="stack gap-inline">
-        <h2 className="font-heading text-heading-3">
-          {c.holdings}{" "}
-          <span className="text-body-sm font-normal text-foreground-muted">
-            ({fill(c.copies, { count: String(record.holdings.length) })})
-          </span>
+        <div className="stack min-w-0 gap-4 max-sm:p-5">
+          {/* The phone's title, under the cover; the h1 above serves screen readers. */}
+          <div aria-hidden="true" className="stack gap-1 sm:hidden">
+            <p className="font-heading text-heading-2 leading-tight">{record.title}</p>
+            {record.subtitle ? <p className="text-body text-foreground-muted">{record.subtitle}</p> : null}
+          </div>
+          {/* Clear of the ribbon in the card's top right corner. */}
+          <div className="stack gap-1.5 sm:pr-44">
+            <AuthorLinks authors={record.authors} className="text-heading-3 font-semibold text-accent" messages={messages} />
+            {record.publicationYear || record.publishers.length ? (
+              <p className="text-body">
+                {record.publicationYear ? fill(c.publishedIn, { year: String(record.publicationYear) }) : null}
+                {record.publicationYear && record.publishers.length ? " · " : null}
+                {record.publishers.map((publisher) => publisher.name).join(", ")}
+              </p>
+            ) : null}
+            {collation ? <p className="text-body-sm text-foreground-muted">{collation}</p> : null}
+          </div>
+
+          {record.abstract ? <p className="max-w-prose text-body leading-relaxed">{record.abstract}</p> : null}
+
+          {facts.length > 0 ? (
+            <dl className="grid gap-x-8 gap-y-2 text-body-sm sm:grid-cols-2">
+              {facts.map(([label, value]) => (
+                <div key={label} className="flex flex-wrap gap-x-1">
+                  <dt className="font-semibold text-accent">
+                    {label}
+                    {colon}
+                  </dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : null}
+
+          {record.genres.length > 0 || record.subjects.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {record.genres.map((item) => (
+                <Link
+                  key={item.slug}
+                  href={`/catalogue?q=&genre=${encodeURIComponent(item.slug)}`}
+                  className="flex min-h-8 items-center rounded-full bg-accent px-3 text-caption font-semibold text-primary-foreground outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  {locale === "en" ? (item.labelEn ?? item.labelFr) : item.labelFr}
+                </Link>
+              ))}
+              {record.subjects.map((subject) => (
+                <Link
+                  key={subject}
+                  href={`/catalogue?${new URLSearchParams({ q: subject })}`}
+                  className="flex min-h-8 items-center rounded-full bg-surface-muted px-3 text-caption outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+                >
+                  {subject}
+                </Link>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="mt-auto flex flex-wrap items-center gap-3 border-t border-border pt-4">
+            {record.holdings.some((copy) => copy.isLoanable) ? (
+              <ReserveButton
+                recordId={record.id}
+                title={record.title}
+                intro={fill(c.reserveIntro, { days: String(PICKUP_DAYS) })}
+                signedIn={signedIn}
+                googleReady={googleReady}
+                returnTo={returnTo}
+                autoOpen={pendingId(query.reserver) === record.id}
+                messages={messages}
+              />
+            ) : null}
+            <span className="ml-auto flex items-center gap-1">
+              <LikeButton
+                key={`${record.liked}-${record.likeCount}`}
+                recordId={record.id}
+                liked={record.liked}
+                count={record.likeCount}
+                signedIn={signedIn}
+                googleReady={googleReady}
+                returnTo={returnTo}
+                autoLike={pendingId(query.aimer) === record.id}
+                large
+                messages={messages}
+              />
+              {/* "Recommend" on phones only (CDI request). */}
+              <span className="sm:hidden">
+                <ShareButton recordId={record.id} title={record.title} messages={messages} />
+              </span>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <section id="exemplaires" aria-labelledby="copies-title" className="stack scroll-mt-6 gap-inline">
+        <h2 id="copies-title" className="flex items-center gap-2 font-heading text-heading-3">
+          <MapPin aria-hidden="true" className="size-5 text-accent" />
+          {c.holdings}
+          {record.holdings.length > 0 ? (
+            <span className="font-sans text-body-sm font-semibold text-accent">
+              · {fill(c.available, { count: String(available) })}
+            </span>
+          ) : null}
         </h2>
-
         {record.holdings.length === 0 ? (
           <p className="text-body-sm text-foreground-muted">{c.noHoldings}</p>
         ) : (
-          <div className="overflow-x-auto rounded-card border border-border">
-            <table className="w-full min-w-[36rem] text-body-sm">
-              <thead className="bg-surface-muted text-caption text-foreground-muted">
-                <tr>
-                  <th scope="col" className="p-3 text-left">{c.callNumber}</th>
-                  <th scope="col" className="p-3 text-left">{c.location}</th>
-                  <th scope="col" className="p-3 text-left">{c.section}</th>
-                  <th scope="col" className="p-3 text-left">{c.itemStatus}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {record.holdings.map((item) => (
-                  <tr key={item.id} className="border-t border-border">
-                    <td className="p-3 font-mono">{item.callNumber ?? "—"}</td>
-                    <td className="p-3">{item.location ?? "—"}</td>
-                    <td className="p-3">{item.section ?? "—"}</td>
-                    <td className="p-3">
-                      {item.isOnLoan ? (
-                        <span className="text-foreground-muted">
-                          {item.dueOn
-                            ? fill(c.onLoanUntil, {
-                                date: formatDate(item.dueOn, locale),
-                              })
-                            : c.allOnLoan}
-                        </span>
-                      ) : (
-                        <span
-                          className={
-                            item.isLoanable ? "text-success" : "text-foreground-muted"
-                          }
-                        >
-                          {item.status ?? c.onShelf}
-                        </span>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <CopiesTable holdings={record.holdings} messages={messages} locale={locale} />
         )}
       </section>
-    </article>
+    </div>
   );
 }

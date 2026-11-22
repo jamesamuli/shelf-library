@@ -2,14 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { aiConfigured, dailyLimit, usageToday } from "@/lib/ai";
 import {
   deleteItem,
   deleteRecord,
   saveItem,
   saveRecord,
+  type AuthorChoice,
   type RecordInput,
 } from "@/lib/cataloguing";
+import { checkAuthors, draftAbstract, draftBiography } from "@/lib/cataloguing-assistant";
 import type {
+  AssistantUsage,
+  AuthorCheckState,
+  BiographyDraftState,
+  AbstractDraftState,
   CataloguingMessageKey,
   ItemFormState,
   RecordFormState,
@@ -31,7 +38,98 @@ function readRecord(formData: FormData): RecordInput {
     publishers: text(formData, "publishers"),
     subjects: text(formData, "subjects"),
     genreIds: formData.getAll("genreIds").map(String),
+    authorChoices: readChoices(text(formData, "authorChoices")),
   };
+}
+
+const optionalText = (value: unknown, max: number) =>
+  typeof value === "string" && value.trim() ? value.trim().slice(0, max) : undefined;
+
+/**
+ * The assistant's decisions arrive as JSON in a hidden field: browser data,
+ * so each one is rebuilt field by field, and anything else is dropped.
+ */
+function readChoices(raw: string): Record<string, AuthorChoice> {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw || "{}");
+  } catch {
+    return {};
+  }
+  if (!parsed || typeof parsed !== "object") return {};
+  const choices: Record<string, AuthorChoice> = {};
+  for (const [line, value] of Object.entries(parsed as Record<string, unknown>).slice(0, 20)) {
+    if (!value || typeof value !== "object") continue;
+    const v = value as Record<string, unknown>;
+    choices[line] = {
+      id: Number.isInteger(v.id) ? (v.id as number) : undefined,
+      isNew: v.isNew === true,
+      biography: optionalText(v.biography, 1200),
+      dates: optionalText(v.dates, 20),
+      openLibraryKey: optionalText(v.openLibraryKey, 30),
+      wikidataId: optionalText(v.wikidataId, 30),
+      isni: optionalText(v.isni, 30),
+    };
+  }
+  return choices;
+}
+
+async function usage(): Promise<AssistantUsage> {
+  return { used: await usageToday(), limit: dailyLimit(), enabled: aiConfigured() };
+}
+
+/** Steps 1 and 2 of the assistant: free, no AI. */
+export async function checkAuthorsAction(authors: string, isbn: string): Promise<AuthorCheckState> {
+  await requirePermission("catalog.edit");
+  const lines = authors.split("\n").map((line) => line.trim()).filter(Boolean).slice(0, 10);
+  const { checks, suggestions } = await checkAuthors(lines, isbn.slice(0, 20));
+  return { checks, suggestions, usage: await usage() };
+}
+
+/** Step 3: one paid request, unless the same question was asked before. */
+export async function draftBiographyAction(input: {
+  author: string;
+  title: string;
+  year: string;
+  publisher: string;
+  otherTitles: string[];
+}): Promise<BiographyDraftState> {
+  const session = await requirePermission("catalog.edit");
+  const { answer, draft } = await draftBiography(
+    {
+      author: input.author.slice(0, 200),
+      book: { title: input.title.slice(0, 300), year: input.year.slice(0, 4), publisher: input.publisher.slice(0, 200) },
+      otherTitles: input.otherTitles.slice(0, 5).map((title) => title.slice(0, 200)),
+    },
+    Number(session.sub),
+  );
+  const used = { used: answer.used, limit: answer.limit, enabled: aiConfigured() };
+  if (!answer.ok) return { kind: "error", reason: answer.reason, usage: used };
+  if (!draft) return { kind: "error", reason: "FAILED", usage: used };
+  return { kind: "draft", draft, cached: answer.cached, usage: used };
+}
+
+/** The "Proposer un résumé" helper: one paid request, unless cached. */
+export async function draftAbstractAction(input: {
+  title: string;
+  authors: string;
+  isbn: string;
+  year: string;
+}): Promise<AbstractDraftState> {
+  const session = await requirePermission("catalog.edit");
+  const { answer, abstract } = await draftAbstract(
+    {
+      title: input.title.slice(0, 300),
+      authors: input.authors.split("\n").map((line) => line.trim()).filter(Boolean).slice(0, 5),
+      isbn: input.isbn.slice(0, 20),
+      year: input.year.slice(0, 4),
+    },
+    Number(session.sub),
+  );
+  const used = { used: answer.used, limit: answer.limit, enabled: aiConfigured() };
+  if (!answer.ok) return { kind: "error", reason: answer.reason, usage: used };
+  if (!abstract) return { kind: "unknown", usage: used };
+  return { kind: "draft", abstract, cached: answer.cached, usage: used };
 }
 
 const FIELD_ERRORS: Record<string, CataloguingMessageKey> = {

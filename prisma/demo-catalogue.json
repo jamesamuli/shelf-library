@@ -1,0 +1,2383 @@
+[
+  {
+    "title": "L’Enfant noir",
+    "authors": [
+      {
+        "name": "Laye",
+        "forename": "Camara",
+        "dates": "1928-1980"
+      }
+    ],
+    "publisher": "Plon",
+    "city": "Paris",
+    "year": 1953,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Guinée",
+      "Enfance",
+      "Autobiographie"
+    ],
+    "copies": 3,
+    "abstract": "Camara Laye raconte son enfance à Kouroussa, en Haute-Guinée : l’atelier de son père forgeron et le petit serpent noir qui le protège, les moissons chez sa grand-mère à Tindican, l’école coranique puis l’école française, les rites d’initiation qui font de lui un homme.\n\nÀ mesure que le jeune garçon poursuit ses études jusqu’à Conakry puis jusqu’à Paris, il s’éloigne du monde de ses parents. Le livre est à la fois un hommage tendre à sa mère et à une culture, et le récit d’un arrachement : grandir, c’est aussi partir.",
+    "isbn": "9782266178945",
+    "pages": "221 p."
+  },
+  {
+    "title": "Une si longue lettre",
+    "authors": [
+      {
+        "name": "Bâ",
+        "forename": "Mariama",
+        "dates": "1929-1981"
+      }
+    ],
+    "publisher": "Nouvelles éditions africaines",
+    "city": "Dakar",
+    "year": 1979,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Sénégal",
+      "Condition féminine",
+      "Polygamie"
+    ],
+    "copies": 2,
+    "abstract": "Au lendemain de la mort de son mari, Ramatoulaye écrit à son amie Aïssatou. Elle revient sur son mariage, sur la trahison de Modou qui a pris une seconde épouse, et sur le choix qu’elle a fait de rester quand Aïssatou, elle, est partie. Un roman épistolaire bref et puissant sur la place des femmes dans le Sénégal moderne.",
+    "isbn": "9782842612894",
+    "pages": "164 p."
+  },
+  {
+    "title": "Les Misérables",
+    "authors": [
+      {
+        "name": "Hugo",
+        "forename": "Victor",
+        "dates": "1802-1885"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1862,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "XIXe siècle",
+      "Justice",
+      "Pauvreté"
+    ],
+    "copies": 2,
+    "abstract": "Libéré du bagne après dix-neuf ans pour avoir volé un pain, Jean Valjean est transformé par la bonté de l’évêque Myriel. Devenu un homme respecté sous un autre nom, il recueille Cosette, une enfant exploitée par les Thénardier, tout en étant traqué sans relâche par l’inspecteur Javert.\n\nDe la bataille de Waterloo aux barricades de Paris en 1832, Victor Hugo mêle l’histoire de France à celle des plus pauvres, et pose une question qui traverse tout le roman : un homme peut-il changer, et la société le lui permet-elle ?",
+    "isbn": "9782013232814",
+    "pages": "347 p."
+  },
+  {
+    "title": "Le Comte de Monte-Cristo",
+    "authors": [
+      {
+        "name": "Dumas",
+        "forename": "Alexandre",
+        "dates": "1802-1870"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1844,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Vengeance",
+      "Aventure",
+      "XIXe siècle"
+    ],
+    "copies": 2,
+    "abstract": "Le jour de ses fiançailles, le jeune marin Edmond Dantès est arrêté sur une dénonciation et enfermé au château d’If. Quatorze ans plus tard, il s’évade, riche du trésor que lui a révélé l’abbé Faria, et revient sous le nom de comte de Monte-Cristo pour se venger, un par un, de ceux qui l’ont trahi.",
+    "isbn": "9782211239745"
+  },
+  {
+    "title": "Germinal",
+    "authors": [
+      {
+        "name": "Zola",
+        "forename": "Émile",
+        "dates": "1840-1902"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1885,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Mines",
+      "Grève",
+      "Monde ouvrier"
+    ],
+    "copies": 2,
+    "abstract": "Étienne Lantier, ouvrier sans travail, est embauché à la mine du Voreux, dans le nord de la France. Il découvre la misère des mineurs et prend la tête d’une grève qui tourne au drame.",
+    "isbn": "9782080710727",
+    "pages": "596 p."
+  },
+  {
+    "title": "Madame Bovary",
+    "authors": [
+      {
+        "name": "Flaubert",
+        "forename": "Gustave",
+        "dates": "1821-1880"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1857,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Province",
+      "Mariage",
+      "XIXe siècle"
+    ],
+    "copies": 1,
+    "abstract": "Emma, nourrie de romans sentimentaux, épouse Charles Bovary, un médecin de campagne sans éclat. L’ennui de la vie de province la pousse vers des amants et des dettes qui la mèneront à sa perte."
+  },
+  {
+    "title": "Petit Pays",
+    "authors": [
+      {
+        "name": "Faye",
+        "forename": "Gaël"
+      }
+    ],
+    "publisher": "Grasset",
+    "city": "Paris",
+    "year": 2016,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Burundi",
+      "Bujumbura",
+      "Enfance",
+      "Guerre civile"
+    ],
+    "copies": 3,
+    "abstract": "Gabriel a dix ans et vit à Bujumbura, dans le quartier de Kinanira, avec son père français, sa mère rwandaise et sa petite sœur Ana. Avec ses copains de l’impasse, il passe ses journées à voler des mangues, à fabriquer des bateaux et à refaire le monde dans un vieux combi Volkswagen.\n\nPuis, en 1993, tout bascule : la séparation des parents, l’assassinat du président, la guerre civile au Burundi et le génocide des Tutsi au Rwanda voisin. Gaël Faye raconte la fin d’une enfance et l’irruption de la violence dans un monde qui semblait paisible. Prix Goncourt des lycéens 2016.",
+    "isbn": "9782246857334",
+    "pages": "215 p."
+  },
+  {
+    "title": "L’Aventure ambiguë",
+    "authors": [
+      {
+        "name": "Kane",
+        "forename": "Cheikh Hamidou"
+      }
+    ],
+    "publisher": "Julliard",
+    "city": "Paris",
+    "year": 1961,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Sénégal",
+      "Islam",
+      "Colonisation",
+      "Identité"
+    ],
+    "copies": 1,
+    "abstract": "Samba Diallo, fils de l’aristocratie des Diallobé, reçoit d’abord l’enseignement rigoureux du maître coranique. Sa famille décide ensuite de l’envoyer à l’école des Blancs, puis à Paris pour étudier la philosophie.\n\nEntre deux cultures, deux façons de penser Dieu et le monde, le jeune homme perd peu à peu ses repères. Ce roman philosophique interroge ce que l’on gagne et ce que l’on perd à « apprendre à lier le bois au bois ».",
+    "isbn": "9782264036933",
+    "pages": "191 p."
+  },
+  {
+    "title": "Le Vieux qui lisait des romans d’amour",
+    "authors": [
+      {
+        "name": "Sepúlveda",
+        "forename": "Luis",
+        "dates": "1949-2020"
+      }
+    ],
+    "publisher": "Métailié",
+    "city": "Paris",
+    "year": 1992,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Amazonie",
+      "Équateur",
+      "Nature"
+    ],
+    "copies": 2,
+    "abstract": "À El Idilio, village perdu de l’Amazonie équatorienne, Antonio José Bolívar connaît la forêt mieux que personne. Quand une femelle jaguar se met à tuer des hommes, c’est lui que l’on charge de la traquer. Un court roman sur la nature, la vieillesse et le goût de lire."
+  },
+  {
+    "title": "Vendredi ou la Vie sauvage",
+    "authors": [
+      {
+        "name": "Tournier",
+        "forename": "Michel",
+        "dates": "1924-2016"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 1971,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Robinson Crusoé",
+      "Île",
+      "Amitié"
+    ],
+    "copies": 3,
+    "abstract": "Naufragé sur une île déserte, Robinson tente d’y recréer la société qu’il a quittée : il cultive, construit, légifère. L’arrivée de Vendredi bouleverse cet ordre et lui apprend une autre manière de vivre."
+  },
+  {
+    "title": "No et moi",
+    "authors": [
+      {
+        "name": "Vigan",
+        "forename": "Delphine de"
+      }
+    ],
+    "publisher": "JC Lattès",
+    "city": "Paris",
+    "year": 2007,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Adolescence",
+      "Sans-abri",
+      "Amitié"
+    ],
+    "copies": 2,
+    "abstract": "Lou, treize ans et deux ans d’avance, choisit pour son exposé de parler des sans-abri. À la gare d’Austerlitz, elle rencontre No, une jeune fille de dix-huit ans qui vit dans la rue, et décide de l’aider coûte que coûte.",
+    "isbn": "9782253124801",
+    "pages": "248 p."
+  },
+  {
+    "title": "Oscar et la dame rose",
+    "authors": [
+      {
+        "name": "Schmitt",
+        "forename": "Éric-Emmanuel"
+      }
+    ],
+    "publisher": "Albin Michel",
+    "city": "Paris",
+    "year": 2002,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Maladie",
+      "Enfance",
+      "Lettres"
+    ],
+    "copies": 2,
+    "abstract": "Oscar, dix ans, est hospitalisé et sait qu’il va mourir. Mamie-Rose, une visiteuse bénévole, lui propose de vivre chaque jour comme dix années et d’écrire à Dieu.",
+    "isbn": "9782226135025",
+    "pages": "99 p."
+  },
+  {
+    "title": "Le Grand Meaulnes",
+    "authors": [
+      {
+        "name": "Alain-Fournier",
+        "dates": "1886-1914"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1913,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Adolescence",
+      "Amour",
+      "Sologne"
+    ],
+    "copies": 1,
+    "abstract": "Augustin Meaulnes, nouveau pensionnaire de l’école de Sainte-Agathe, s’égare un soir et découvre un domaine mystérieux où se déroule une fête étrange. Il y aperçoit Yvonne de Galais et passera des années à chercher le chemin du retour. Le narrateur, François, raconte cette quête d’un paradis perdu.",
+    "isbn": "9782745314789",
+    "pages": "385 p."
+  },
+  {
+    "title": "Notre-Dame du Nil",
+    "authors": [
+      {
+        "name": "Mukasonga",
+        "forename": "Scholastique"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 2012,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Rwanda",
+      "Pensionnat",
+      "Racisme"
+    ],
+    "copies": 1,
+    "abstract": "Au Rwanda, au début des années 1970, le lycée Notre-Dame du Nil accueille sur les hauteurs les jeunes filles de l’élite. Derrière les cours et les prières, les tensions entre élèves hutu et tutsi annoncent la violence à venir. Prix Renaudot 2012."
+  },
+  {
+    "title": "Allah n’est pas obligé",
+    "authors": [
+      {
+        "name": "Kourouma",
+        "forename": "Ahmadou",
+        "dates": "1927-2003"
+      }
+    ],
+    "publisher": "Seuil",
+    "city": "Paris",
+    "year": 2000,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Enfants soldats",
+      "Liberia",
+      "Sierra Leone",
+      "Guerre civile"
+    ],
+    "copies": 1,
+    "abstract": "Birahima, une dizaine d’années, part à la recherche de sa tante au Liberia et devient enfant soldat. Il raconte la guerre avec une gouaille insolente, à l’aide de quatre dictionnaires pour expliquer ses mots. Prix Renaudot 2000.",
+    "isbn": "2020427877",
+    "pages": "232 p."
+  },
+  {
+    "title": "Bel-Ami",
+    "authors": [
+      {
+        "name": "Maupassant",
+        "forename": "Guy de",
+        "dates": "1850-1893"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1885,
+    "genre": "romans",
+    "type": "Livre",
+    "subjects": [
+      "Presse",
+      "Ambition",
+      "Paris"
+    ],
+    "copies": 1,
+    "abstract": "Georges Duroy, ancien sous-officier sans le sou, entre dans le journalisme presque par hasard. Séduisant et sans scrupules, il se sert des femmes pour gravir les échelons de la société parisienne.",
+    "isbn": "9791041410736",
+    "pages": "416 p."
+  },
+  {
+    "title": "Harry Potter à l’école des sorciers",
+    "authors": [
+      {
+        "name": "Rowling",
+        "forename": "J. K."
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 1998,
+    "genre": "fictions",
+    "type": "Livre",
+    "series": "Harry Potter",
+    "volume": "1",
+    "subjects": [
+      "Magie",
+      "École",
+      "Fantasy"
+    ],
+    "copies": 3,
+    "abstract": "Le jour de ses onze ans, Harry Potter, orphelin maltraité par son oncle et sa tante, apprend qu’il est un sorcier et qu’une place l’attend à Poudlard. Il y découvre le Quidditch, se fait deux amis, Ron et Hermione, et comprend peu à peu ce qui est arrivé à ses parents.\n\nDerrière la magie et l’humour, un roman sur l’amitié, le courage et le choix de qui l’on veut être.",
+    "isbn": "9782070643028",
+    "pages": "322 p."
+  },
+  {
+    "title": "Harry Potter et la Chambre des secrets",
+    "authors": [
+      {
+        "name": "Rowling",
+        "forename": "J. K."
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 1999,
+    "genre": "fictions",
+    "type": "Livre",
+    "series": "Harry Potter",
+    "volume": "2",
+    "subjects": [
+      "Magie",
+      "École",
+      "Fantasy"
+    ],
+    "copies": 2,
+    "abstract": "Pour sa deuxième année à Poudlard, Harry entend des voix dans les murs, et des élèves sont retrouvés pétrifiés. La légendaire Chambre des secrets aurait été rouverte.",
+    "isbn": "9782070643035"
+  },
+  {
+    "title": "Le Hobbit",
+    "authors": [
+      {
+        "name": "Tolkien",
+        "forename": "J. R. R.",
+        "dates": "1892-1973"
+      }
+    ],
+    "publisher": "Christian Bourgois",
+    "city": "Paris",
+    "year": 2012,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Fantasy",
+      "Dragons",
+      "Aventure"
+    ],
+    "copies": 2,
+    "abstract": "Bilbo Sacquet, un hobbit casanier, se laisse entraîner par le magicien Gandalf et treize nains dans une expédition vers la Montagne Solitaire, où le dragon Smaug garde un trésor volé. En chemin, il trouve un anneau qui rend invisible.",
+    "isbn": "9782253177104",
+    "pages": "384 p."
+  },
+  {
+    "title": "Le Lion, la Sorcière blanche et l’Armoire magique",
+    "authors": [
+      {
+        "name": "Lewis",
+        "forename": "C. S.",
+        "dates": "1898-1963"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 2002,
+    "genre": "fictions",
+    "type": "Livre",
+    "series": "Le Monde de Narnia",
+    "volume": "2",
+    "subjects": [
+      "Fantasy",
+      "Fratrie"
+    ],
+    "copies": 2,
+    "abstract": "Réfugiés à la campagne pendant la guerre, Peter, Susan, Edmund et Lucy découvrent au fond d’une armoire le royaume de Narnia, plongé dans un hiver sans fin par la Sorcière blanche."
+  },
+  {
+    "title": "Hunger Games",
+    "authors": [
+      {
+        "name": "Collins",
+        "forename": "Suzanne"
+      }
+    ],
+    "publisher": "Pocket Jeunesse",
+    "city": "Paris",
+    "year": 2009,
+    "genre": "fictions",
+    "type": "Livre",
+    "series": "Hunger Games",
+    "volume": "1",
+    "subjects": [
+      "Dystopie",
+      "Science-fiction",
+      "Survie"
+    ],
+    "copies": 3,
+    "abstract": "Chaque année, le Capitole oblige les douze districts de Panem à envoyer deux adolescents s’affronter à mort dans une arène télévisée. Pour sauver sa petite sœur, Katniss Everdeen se porte volontaire.\n\nDans l’arène, il faudra survivre, mais aussi jouer pour les caméras et pour les sponsors, sans perdre ce qui fait d’elle un être humain. Un roman d’action qui parle aussi de propagande, de spectacle et de révolte.",
+    "isbn": "9782298027259",
+    "pages": "399 p."
+  },
+  {
+    "title": "Les Fiancés de l’hiver",
+    "authors": [
+      {
+        "name": "Dabos",
+        "forename": "Christelle"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 2013,
+    "genre": "fictions",
+    "type": "Livre",
+    "series": "La Passe-miroir",
+    "volume": "1",
+    "subjects": [
+      "Fantasy",
+      "Miroirs"
+    ],
+    "copies": 2,
+    "abstract": "Ophélie, maladroite et discrète, peut lire le passé des objets et voyager à travers les miroirs. On la fiance à Thorn, un homme froid du clan des Dragons, et elle doit quitter son arche d’Anima pour la Citacielle, une cité suspendue pleine d’intrigues et d’illusions.",
+    "isbn": "9782072957871",
+    "pages": "608 p."
+  },
+  {
+    "title": "Fahrenheit 451",
+    "authors": [
+      {
+        "name": "Bradbury",
+        "forename": "Ray",
+        "dates": "1920-2012"
+      }
+    ],
+    "publisher": "Denoël",
+    "city": "Paris",
+    "year": 1955,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Dystopie",
+      "Censure",
+      "Livres"
+    ],
+    "copies": 2,
+    "abstract": "Montag est pompier : son métier n’est pas d’éteindre les incendies mais de brûler les livres, interdits par l’État. Une rencontre le pousse à en lire un, puis à tout remettre en question.",
+    "isbn": "9782070415731",
+    "pages": "224 p."
+  },
+  {
+    "title": "Vingt mille lieues sous les mers",
+    "authors": [
+      {
+        "name": "Verne",
+        "forename": "Jules",
+        "dates": "1828-1905"
+      }
+    ],
+    "publisher": "Le Livre de Poche Jeunesse",
+    "city": "Paris",
+    "year": 1870,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Océans",
+      "Sous-marin",
+      "Aventure"
+    ],
+    "copies": 2,
+    "abstract": "Partis traquer un monstre marin, le professeur Aronnax, son domestique Conseil et le harponneur Ned Land se retrouvent prisonniers du Nautilus, le sous-marin du mystérieux capitaine Nemo. Ils parcourent avec lui les fonds de toutes les mers du globe."
+  },
+  {
+    "title": "Le Tour du monde en quatre-vingts jours",
+    "authors": [
+      {
+        "name": "Verne",
+        "forename": "Jules",
+        "dates": "1828-1905"
+      }
+    ],
+    "publisher": "Le Livre de Poche Jeunesse",
+    "city": "Paris",
+    "year": 1872,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Voyage",
+      "Aventure",
+      "Pari"
+    ],
+    "copies": 2,
+    "abstract": "Phileas Fogg parie vingt mille livres qu’il fera le tour du monde en quatre-vingts jours. Avec son valet Passepartout, et poursuivi par l’inspecteur Fix, il se lance dans une course contre la montre.",
+    "isbn": "9782847066777",
+    "pages": "336 p."
+  },
+  {
+    "title": "Ils étaient dix",
+    "authors": [
+      {
+        "name": "Christie",
+        "forename": "Agatha",
+        "dates": "1890-1976"
+      }
+    ],
+    "publisher": "Le Masque",
+    "city": "Paris",
+    "year": 2020,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Roman policier",
+      "Huis clos"
+    ],
+    "copies": 2,
+    "abstract": "Dix inconnus sont invités sur une île au large du Devon par un hôte qui ne se montre pas. Le premier soir, une voix les accuse chacun d’un crime resté impuni. Puis, un à un, ils meurent, comme dans la comptine affichée dans leurs chambres."
+  },
+  {
+    "title": "Le Crime de l’Orient-Express",
+    "authors": [
+      {
+        "name": "Christie",
+        "forename": "Agatha",
+        "dates": "1890-1976"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1934,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Roman policier",
+      "Hercule Poirot",
+      "Train"
+    ],
+    "copies": 1,
+    "abstract": "Bloqué par la neige en pleine Yougoslavie, l’Orient-Express s’arrête. Au matin, un passager est retrouvé poignardé dans sa cabine. Hercule Poirot mène l’enquête parmi douze voyageurs qui ont tous un alibi.",
+    "isbn": "9782702436332"
+  },
+  {
+    "title": "Le Chien des Baskerville",
+    "authors": [
+      {
+        "name": "Conan Doyle",
+        "forename": "Arthur",
+        "dates": "1859-1930"
+      }
+    ],
+    "publisher": "Le Livre de Poche Jeunesse",
+    "city": "Paris",
+    "year": 1902,
+    "genre": "fictions",
+    "type": "Livre",
+    "series": "Sherlock Holmes",
+    "subjects": [
+      "Roman policier",
+      "Sherlock Holmes",
+      "Légende"
+    ],
+    "copies": 2,
+    "abstract": "Une légende familiale raconte qu’un chien monstrueux hante les landes du Devon et poursuit les héritiers des Baskerville. Après la mort suspecte de Sir Charles, Sherlock Holmes et le docteur Watson sont appelés à protéger son neveu."
+  },
+  {
+    "title": "L’Œil du loup",
+    "authors": [
+      {
+        "name": "Pennac",
+        "forename": "Daniel"
+      }
+    ],
+    "publisher": "Nathan",
+    "city": "Paris",
+    "year": 1984,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Afrique",
+      "Loups",
+      "Amitié"
+    ],
+    "copies": 3,
+    "abstract": "Dans un zoo, un garçon venu d’Afrique se plante chaque jour devant l’enclos d’un loup borgne. Peu à peu, l’œil de l’homme et l’œil du loup se racontent leur histoire : le Grand Nord, la chasse, l’Afrique jaune, grise et verte.",
+    "isbn": "9782266126304",
+    "pages": "92 p."
+  },
+  {
+    "title": "Eragon",
+    "authors": [
+      {
+        "name": "Paolini",
+        "forename": "Christopher"
+      }
+    ],
+    "publisher": "Bayard Jeunesse",
+    "city": "Paris",
+    "year": 2004,
+    "genre": "fictions",
+    "type": "Livre",
+    "series": "L’Héritage",
+    "volume": "1",
+    "subjects": [
+      "Fantasy",
+      "Dragons"
+    ],
+    "copies": 2,
+    "abstract": "Eragon, jeune fermier, trouve dans la montagne une pierre bleue qui se révèle être un œuf de dragon. Lorsque la dragonne Saphira éclot, il devient Dragonnier, et la cible du roi Galbatorix.",
+    "isbn": "2747033341",
+    "pages": "698 p."
+  },
+  {
+    "title": "Le Garçon en pyjama rayé",
+    "authors": [
+      {
+        "name": "Boyne",
+        "forename": "John"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 2006,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Seconde Guerre mondiale",
+      "Shoah",
+      "Amitié"
+    ],
+    "copies": 2,
+    "abstract": "Bruno, neuf ans, quitte Berlin pour suivre son père, nommé commandant d’un camp. De l’autre côté des barbelés, il se lie d’amitié avec Shmuel, un garçon qui porte toujours un pyjama rayé. Un récit raconté à hauteur d’enfant, qui ne comprend pas ce que le lecteur, lui, comprend.",
+    "isbn": "9782070623976",
+    "pages": "192 p."
+  },
+  {
+    "title": "Wonder",
+    "authors": [
+      {
+        "name": "Palacio",
+        "forename": "R. J."
+      }
+    ],
+    "publisher": "Pocket Jeunesse",
+    "city": "Paris",
+    "year": 2013,
+    "genre": "fictions",
+    "type": "Livre",
+    "subjects": [
+      "Différence",
+      "Collège",
+      "Harcèlement"
+    ],
+    "copies": 3,
+    "abstract": "Auggie est né avec une malformation du visage et a toujours été scolarisé à la maison. À dix ans, il entre au collège. Le roman donne tour à tour la parole à Auggie, à sa sœur et à ses camarades : une année de regards, de cruauté et d’amitiés inattendues.",
+    "isbn": "9782266232616",
+    "pages": "416 p."
+  },
+  {
+    "title": "Astérix le Gaulois",
+    "authors": [
+      {
+        "name": "Goscinny",
+        "forename": "René",
+        "dates": "1926-1977"
+      },
+      {
+        "name": "Uderzo",
+        "forename": "Albert",
+        "dates": "1927-2020"
+      }
+    ],
+    "publisher": "Hachette",
+    "city": "Paris",
+    "year": 1961,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Astérix",
+    "volume": "1",
+    "subjects": [
+      "Gaulois",
+      "Romains",
+      "Humour"
+    ],
+    "copies": 3,
+    "abstract": "Nous sommes en 50 avant Jésus-Christ. Toute la Gaule est occupée par les Romains… Toute ? Non ! Un village d’irréductibles Gaulois résiste encore, grâce à la potion magique du druide Panoramix. Le centurion Caius Bonus veut en percer le secret.",
+    "isbn": "9782012101654",
+    "pages": "48 p."
+  },
+  {
+    "title": "Astérix et Cléopâtre",
+    "authors": [
+      {
+        "name": "Goscinny",
+        "forename": "René",
+        "dates": "1926-1977"
+      },
+      {
+        "name": "Uderzo",
+        "forename": "Albert",
+        "dates": "1927-2020"
+      }
+    ],
+    "publisher": "Hachette",
+    "city": "Paris",
+    "year": 1965,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Astérix",
+    "volume": "6",
+    "subjects": [
+      "Égypte",
+      "Humour"
+    ],
+    "copies": 2,
+    "abstract": "Cléopâtre a parié avec César que les Égyptiens lui construiraient un palais en trois mois. L’architecte Numérobis appelle à l’aide Panoramix, qui part pour Alexandrie avec Astérix, Obélix et Idéfix.",
+    "isbn": "9782014001242",
+    "pages": "64 p."
+  },
+  {
+    "title": "Tintin au Tibet",
+    "authors": [
+      {
+        "name": "Hergé",
+        "dates": "1907-1983"
+      }
+    ],
+    "publisher": "Casterman",
+    "city": "Tournai",
+    "year": 1960,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Les Aventures de Tintin",
+    "volume": "20",
+    "subjects": [
+      "Tibet",
+      "Himalaya",
+      "Amitié"
+    ],
+    "copies": 2,
+    "abstract": "Tintin apprend que l’avion de son ami Tchang s’est écrasé dans l’Himalaya. Persuadé qu’il est vivant, il part à sa recherche avec le capitaine Haddock, malgré la montagne, le froid et les rumeurs sur le yéti.",
+    "isbn": "2203001194",
+    "pages": "62 p."
+  },
+  {
+    "title": "On a marché sur la Lune",
+    "authors": [
+      {
+        "name": "Hergé",
+        "dates": "1907-1983"
+      }
+    ],
+    "publisher": "Casterman",
+    "city": "Tournai",
+    "year": 1954,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Les Aventures de Tintin",
+    "volume": "17",
+    "subjects": [
+      "Lune",
+      "Espace",
+      "Fusée"
+    ],
+    "copies": 1,
+    "abstract": "La fusée du professeur Tournesol décolle enfin, avec à son bord Tintin, Milou, le capitaine Haddock… et deux passagers clandestins inattendus. Quinze ans avant Apollo 11, Hergé imagine le premier pas de l’homme sur la Lune.",
+    "isbn": "9782203001169",
+    "pages": "62 p."
+  },
+  {
+    "title": "Persepolis",
+    "subtitle": "Tome 1",
+    "authors": [
+      {
+        "name": "Satrapi",
+        "forename": "Marjane"
+      }
+    ],
+    "publisher": "L’Association",
+    "city": "Paris",
+    "year": 2000,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Persepolis",
+    "volume": "1",
+    "subjects": [
+      "Iran",
+      "Révolution islamique",
+      "Autobiographie"
+    ],
+    "copies": 2,
+    "abstract": "Marjane Satrapi raconte en noir et blanc son enfance à Téhéran, de la chute du chah à la révolution islamique puis à la guerre contre l’Irak. Une petite fille qui veut devenir prophète découvre la politique, la répression et le courage de sa famille.\n\nLe récit mêle l’Histoire et le quotidien : le voile obligatoire à l’école, les cassettes de musique interdites, les oncles emprisonnés. Une bande dessinée devenue un classique, étudiée au collège comme au lycée.",
+    "isbn": "9782844146762",
+    "pages": "216 p."
+  },
+  {
+    "title": "Aya de Yopougon",
+    "subtitle": "Tome 1",
+    "authors": [
+      {
+        "name": "Abouet",
+        "forename": "Marguerite"
+      },
+      {
+        "name": "Oubrerie",
+        "forename": "Clément"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 2005,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Aya de Yopougon",
+    "volume": "1",
+    "subjects": [
+      "Côte d’Ivoire",
+      "Abidjan",
+      "Années 1970"
+    ],
+    "copies": 2,
+    "abstract": "Abidjan, fin des années 1970. Aya, dix-neuf ans, veut devenir médecin, tandis que ses amies Adjoua et Bintou préfèrent les maquis et les garçons. Une chronique drôle et tendre du quartier populaire de Yopougon.",
+    "isbn": "2070573117",
+    "pages": "96 p."
+  },
+  {
+    "title": "L’Arabe du futur",
+    "subtitle": "Une jeunesse au Moyen-Orient (1978-1984)",
+    "authors": [
+      {
+        "name": "Sattouf",
+        "forename": "Riad"
+      }
+    ],
+    "publisher": "Allary",
+    "city": "Paris",
+    "year": 2014,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "L’Arabe du futur",
+    "volume": "1",
+    "subjects": [
+      "Libye",
+      "Syrie",
+      "Enfance",
+      "Autobiographie"
+    ],
+    "copies": 2,
+    "abstract": "Fils d’un père syrien et d’une mère bretonne, le petit Riad grandit dans la Libye de Kadhafi puis dans un village syrien. À hauteur d’enfant, il raconte les rêves panarabes de son père et la réalité qu’il découvre.",
+    "isbn": "9782370730145"
+  },
+  {
+    "title": "Les Cahiers d’Esther",
+    "subtitle": "Histoires de mes 10 ans",
+    "authors": [
+      {
+        "name": "Sattouf",
+        "forename": "Riad"
+      }
+    ],
+    "publisher": "Allary",
+    "city": "Paris",
+    "year": 2016,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Les Cahiers d’Esther",
+    "volume": "1",
+    "subjects": [
+      "Enfance",
+      "École",
+      "Humour"
+    ],
+    "copies": 2,
+    "abstract": "Esther a dix ans et raconte sa vie : l’école, les copines, son grand frère, les écrans, les garçons. Chaque page est tirée de ce qu’une vraie petite fille a confié à l’auteur.",
+    "isbn": "9782370730848",
+    "pages": "54 p."
+  },
+  {
+    "title": "Mortelle Adèle",
+    "subtitle": "Tout ça finira mal",
+    "authors": [
+      {
+        "name": "Mr Tan"
+      },
+      {
+        "name": "Miss Prickly"
+      }
+    ],
+    "publisher": "Tourbillon",
+    "city": "Paris",
+    "year": 2012,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Mortelle Adèle",
+    "volume": "1",
+    "subjects": [
+      "Humour",
+      "Enfance"
+    ],
+    "copies": 3,
+    "abstract": "Adèle n’aime ni ses parents, ni son chat Ajax, ni les autres enfants. Des gags d’une page, féroces et très drôles."
+  },
+  {
+    "title": "La Bar-Mitsva",
+    "authors": [
+      {
+        "name": "Sfar",
+        "forename": "Joann"
+      }
+    ],
+    "publisher": "Dargaud",
+    "city": "Paris",
+    "year": 2002,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Le Chat du rabbin",
+    "volume": "1",
+    "subjects": [
+      "Algérie",
+      "Judaïsme",
+      "Philosophie"
+    ],
+    "copies": 1,
+    "abstract": "À Alger, dans les années 1930, le chat d’un rabbin dévore le perroquet de la maison et se met à parler. Il veut faire sa bar-mitsva et discute de Dieu avec son maître, au grand désarroi de celui-ci."
+  },
+  {
+    "title": "Ceux qui restent",
+    "authors": [
+      {
+        "name": "Lupano",
+        "forename": "Wilfrid"
+      },
+      {
+        "name": "Cauuet",
+        "forename": "Paul"
+      }
+    ],
+    "publisher": "Dargaud",
+    "city": "Paris",
+    "year": 2014,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Les Vieux Fourneaux",
+    "volume": "1",
+    "subjects": [
+      "Vieillesse",
+      "Amitié",
+      "Humour"
+    ],
+    "copies": 1,
+    "abstract": "Pierrot, Mimile et Antoine, septuagénaires et amis d’enfance, se retrouvent à l’enterrement de la femme d’Antoine. Un secret découvert ce jour-là lance les trois vieux râleurs sur les routes."
+  },
+  {
+    "title": "À l’aube d’une grande aventure",
+    "authors": [
+      {
+        "name": "Oda",
+        "forename": "Eiichirō"
+      }
+    ],
+    "publisher": "Glénat",
+    "city": "Grenoble",
+    "year": 2000,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "One Piece",
+    "volume": "1",
+    "subjects": [
+      "Manga",
+      "Pirates",
+      "Aventure"
+    ],
+    "copies": 3,
+    "abstract": "Luffy a mangé un fruit du démon qui a rendu son corps élastique comme du caoutchouc. Il prend la mer pour réunir un équipage, trouver le trésor légendaire One Piece et devenir le roi des pirates."
+  },
+  {
+    "title": "Naruto",
+    "subtitle": "Tome 1",
+    "authors": [
+      {
+        "name": "Kishimoto",
+        "forename": "Masashi"
+      }
+    ],
+    "publisher": "Kana",
+    "city": "Bruxelles",
+    "year": 2002,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Naruto",
+    "volume": "1",
+    "subjects": [
+      "Manga",
+      "Ninjas"
+    ],
+    "copies": 2,
+    "abstract": "Naruto Uzumaki, apprenti ninja turbulent et rejeté par son village, rêve de devenir Hokage, le plus puissant des ninjas, pour qu’enfin on le reconnaisse.",
+    "isbn": "9782871294146",
+    "pages": "208 p."
+  },
+  {
+    "title": "La Diligence",
+    "authors": [
+      {
+        "name": "Morris",
+        "dates": "1923-2001"
+      },
+      {
+        "name": "Goscinny",
+        "forename": "René",
+        "dates": "1926-1977"
+      }
+    ],
+    "publisher": "Dargaud",
+    "city": "Paris",
+    "year": 1968,
+    "genre": "bandes-dessinees",
+    "type": "Bande dessinée",
+    "series": "Lucky Luke",
+    "subjects": [
+      "Western",
+      "Humour"
+    ],
+    "copies": 1,
+    "abstract": "Lucky Luke escorte une diligence de la Wells Fargo qui transporte de l’or à travers l’Ouest, avec à son bord une galerie de passagers aussi pittoresques que suspects.",
+    "isbn": "2205003062",
+    "pages": "47 p."
+  },
+  {
+    "title": "Max et les Maximonstres",
+    "authors": [
+      {
+        "name": "Sendak",
+        "forename": "Maurice",
+        "dates": "1928-2012"
+      }
+    ],
+    "publisher": "L’École des loisirs",
+    "city": "Paris",
+    "year": 1967,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Imaginaire",
+      "Colère",
+      "Monstres"
+    ],
+    "copies": 2,
+    "abstract": "Puni et envoyé au lit sans dîner, Max voit sa chambre se transformer en forêt. Il navigue jusqu’au pays des Maximonstres, qui le sacrent roi.",
+    "isbn": "9782211028936",
+    "pages": "27 p."
+  },
+  {
+    "title": "Gruffalo",
+    "authors": [
+      {
+        "name": "Donaldson",
+        "forename": "Julia"
+      },
+      {
+        "name": "Scheffler",
+        "forename": "Axel"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 1999,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Ruse",
+      "Forêt",
+      "Monstres"
+    ],
+    "copies": 2,
+    "abstract": "Une petite souris se promène dans la forêt. Pour éloigner le renard, le hibou et le serpent qui veulent la manger, elle invente un monstre terrible, le Gruffalo. Mais que faire quand le Gruffalo existe vraiment ?",
+    "isbn": "9782070653133",
+    "pages": "27 p."
+  },
+  {
+    "title": "Petit-Bleu et Petit-Jaune",
+    "authors": [
+      {
+        "name": "Lionni",
+        "forename": "Leo",
+        "dates": "1910-1999"
+      }
+    ],
+    "publisher": "L’École des loisirs",
+    "city": "Paris",
+    "year": 1970,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Couleurs",
+      "Amitié"
+    ],
+    "copies": 1,
+    "abstract": "Petit-Bleu et Petit-Jaune sont les meilleurs amis du monde. Un jour, ils s’embrassent si fort qu’ils deviennent tout verts, et leurs parents ne les reconnaissent plus."
+  },
+  {
+    "title": "La Chenille qui fait des trous",
+    "authors": [
+      {
+        "name": "Carle",
+        "forename": "Eric",
+        "dates": "1929-2021"
+      }
+    ],
+    "publisher": "Mijade",
+    "city": "Namur",
+    "year": 1995,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Alimentation",
+      "Papillon",
+      "Jours de la semaine"
+    ],
+    "copies": 2,
+    "abstract": "Une petite chenille affamée mange une pomme le lundi, deux poires le mardi… et grossit jusqu’à se transformer en papillon.",
+    "isbn": "9782871421740"
+  },
+  {
+    "title": "Le Loup qui voulait changer de couleur",
+    "authors": [
+      {
+        "name": "Lallemand",
+        "forename": "Orianne"
+      },
+      {
+        "name": "Thuillier",
+        "forename": "Éléonore"
+      }
+    ],
+    "publisher": "Auzou",
+    "city": "Paris",
+    "year": 2009,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Couleurs",
+      "Estime de soi"
+    ],
+    "copies": 2,
+    "abstract": "Loup trouve que le noir est triste. Chaque jour de la semaine, il essaie une nouvelle couleur, sans jamais être satisfait.",
+    "isbn": "9782733820278",
+    "pages": "1 vol. (8 p.)"
+  },
+  {
+    "title": "Kirikou et la sorcière",
+    "authors": [
+      {
+        "name": "Ocelot",
+        "forename": "Michel"
+      }
+    ],
+    "publisher": "Milan",
+    "city": "Toulouse",
+    "year": 1998,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Afrique de l’Ouest",
+      "Sorcellerie",
+      "Courage"
+    ],
+    "copies": 2,
+    "abstract": "Kirikou, minuscule mais vif, naît dans un village d’Afrique de l’Ouest que la sorcière Karaba a privé d’eau et d’hommes. Il est bien décidé à comprendre pourquoi elle est si méchante.",
+    "isbn": "9782745902603"
+  },
+  {
+    "title": "Les Trois Brigands",
+    "authors": [
+      {
+        "name": "Ungerer",
+        "forename": "Tomi",
+        "dates": "1931-2019"
+      }
+    ],
+    "publisher": "L’École des loisirs",
+    "city": "Paris",
+    "year": 1968,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Brigands",
+      "Orphelins"
+    ],
+    "copies": 1,
+    "abstract": "Trois brigands terrifiants, armés d’un tromblon, d’un soufflet à poivre et d’une grande hache rouge, attaquent les diligences. Une nuit, ils ne trouvent qu’une petite orpheline, Tiffany, qui leur demande ce qu’ils font de tout leur or.",
+    "isbn": "9782211058513",
+    "pages": "39 p."
+  },
+  {
+    "title": "Bébés chouettes",
+    "authors": [
+      {
+        "name": "Waddell",
+        "forename": "Martin"
+      },
+      {
+        "name": "Benson",
+        "forename": "Patrick"
+      }
+    ],
+    "publisher": "L’École des loisirs",
+    "city": "Paris",
+    "year": 1993,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Absence",
+      "Nuit",
+      "Chouettes"
+    ],
+    "copies": 1,
+    "abstract": "Une nuit, Sarah, Rémi et Lou se réveillent : leur maman chouette n’est plus là. Serrés sur leur branche, ils l’attendent.",
+    "isbn": "9782211017718"
+  },
+  {
+    "title": "C’est moi le plus fort",
+    "authors": [
+      {
+        "name": "Ramos",
+        "forename": "Mario",
+        "dates": "1958-2012"
+      }
+    ],
+    "publisher": "L’École des loisirs",
+    "city": "Paris",
+    "year": 2001,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Loup",
+      "Contes détournés",
+      "Humour"
+    ],
+    "copies": 2,
+    "abstract": "Le loup a bien mangé et se promène pour vérifier que tout le monde le trouve le plus fort : le Petit Chaperon rouge, les trois petits cochons, les sept nains… jusqu’à une rencontre qui va lui clouer le bec.",
+    "isbn": "9782211062084",
+    "pages": "32 p."
+  },
+  {
+    "title": "Devine combien je t’aime",
+    "authors": [
+      {
+        "name": "McBratney",
+        "forename": "Sam"
+      },
+      {
+        "name": "Jeram",
+        "forename": "Anita"
+      }
+    ],
+    "publisher": "L’École des loisirs",
+    "city": "Paris",
+    "year": 1994,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Tendresse",
+      "Lièvres"
+    ],
+    "copies": 1,
+    "abstract": "Avant de s’endormir, Petit Lièvre Brun veut montrer à Grand Lièvre Brun combien il l’aime : grand comme ses bras, haut comme ses sauts, loin comme la rivière. Mais Grand Lièvre Brun l’aime encore plus."
+  },
+  {
+    "title": "Elmer",
+    "authors": [
+      {
+        "name": "McKee",
+        "forename": "David",
+        "dates": "1935-2022"
+      }
+    ],
+    "publisher": "Kaléidoscope",
+    "city": "Paris",
+    "year": 1989,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Différence",
+      "Éléphants"
+    ],
+    "copies": 2,
+    "abstract": "Elmer est un éléphant à carreaux de toutes les couleurs. Fatigué d’être différent, il se roule dans des baies grises pour ressembler aux autres.",
+    "isbn": "9782877670098",
+    "pages": "28 p."
+  },
+  {
+    "title": "Bon appétit ! Monsieur Lapin",
+    "authors": [
+      {
+        "name": "Boujon",
+        "forename": "Claude",
+        "dates": "1930-1995"
+      }
+    ],
+    "publisher": "L’École des loisirs",
+    "city": "Paris",
+    "year": 1985,
+    "genre": "albums",
+    "type": "Album",
+    "subjects": [
+      "Alimentation",
+      "Animaux",
+      "Humour"
+    ],
+    "copies": 2,
+    "abstract": "Monsieur Lapin n’aime plus les carottes. Il va voir ce que mangent la grenouille, l’oiseau, le poisson, la baleine… jusqu’au renard, qui aime les lapins.",
+    "isbn": "9782211035347",
+    "pages": "32 p."
+  },
+  {
+    "title": "Le Malade imaginaire",
+    "authors": [
+      {
+        "name": "Molière",
+        "dates": "1622-1673"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1673,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Comédie",
+      "Médecine",
+      "XVIIe siècle"
+    ],
+    "dewey": "842",
+    "copies": 3,
+    "abstract": "Argan se croit malade et veut marier sa fille Angélique à un médecin, pour en avoir un à demeure. La servante Toinette et son frère Béralde vont tout faire pour lui ouvrir les yeux. La dernière comédie de Molière, qui mourut peu après l’une de ses représentations.",
+    "isbn": "9782072900129",
+    "pages": "242 p."
+  },
+  {
+    "title": "L’Avare",
+    "authors": [
+      {
+        "name": "Molière",
+        "dates": "1622-1673"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1668,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Comédie",
+      "Avarice",
+      "XVIIe siècle"
+    ],
+    "dewey": "842",
+    "copies": 3,
+    "abstract": "Harpagon ne pense qu’à sa cassette pleine d’or. Il veut épouser la jeune Mariane, que son fils Cléante aime aussi, et marier sa fille à un vieil homme riche qui la prendrait « sans dot ».",
+    "isbn": "9782091878232"
+  },
+  {
+    "title": "Les Fourberies de Scapin",
+    "authors": [
+      {
+        "name": "Molière",
+        "dates": "1622-1673"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1671,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Comédie",
+      "Valet",
+      "XVIIe siècle"
+    ],
+    "dewey": "842",
+    "copies": 2,
+    "abstract": "Pendant l’absence de leurs pères, Octave et Léandre se sont engagés auprès de jeunes filles sans fortune. Le valet Scapin, maître en ruses, va duper les deux vieillards pour tirer les amoureux d’affaire.",
+    "isbn": "9782290314142"
+  },
+  {
+    "title": "Le Cid",
+    "authors": [
+      {
+        "name": "Corneille",
+        "forename": "Pierre",
+        "dates": "1606-1684"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1637,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Tragi-comédie",
+      "Honneur",
+      "XVIIe siècle"
+    ],
+    "dewey": "842",
+    "copies": 2,
+    "abstract": "Rodrigue aime Chimène, et Chimène l’aime. Mais pour venger l’honneur de son père, Rodrigue doit tuer en duel le père de celle qu’il aime. Entre l’amour et le devoir, chacun doit choisir.",
+    "isbn": "9782070313754",
+    "pages": "194 p."
+  },
+  {
+    "title": "Antigone",
+    "authors": [
+      {
+        "name": "Anouilh",
+        "forename": "Jean",
+        "dates": "1910-1987"
+      }
+    ],
+    "publisher": "La Table ronde",
+    "city": "Paris",
+    "year": 1946,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Tragédie",
+      "Mythologie grecque",
+      "Résistance"
+    ],
+    "dewey": "842",
+    "copies": 3,
+    "abstract": "Malgré l’interdiction du roi Créon, Antigone veut donner une sépulture à son frère Polynice. Jean Anouilh reprend le mythe grec sous l’Occupation et en fait l’affrontement de deux logiques : celle qui dit non, et celle qui gouverne.\n\nLa pièce, créée à Paris en 1944, est l’une des plus étudiées en classe de troisième, pour sa langue directe et la question qu’elle laisse ouverte : qui a raison, Antigone ou Créon ?",
+    "isbn": "9782710330400",
+    "pages": "122 p."
+  },
+  {
+    "title": "Rhinocéros",
+    "authors": [
+      {
+        "name": "Ionesco",
+        "forename": "Eugène",
+        "dates": "1909-1994"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1959,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Absurde",
+      "Totalitarisme",
+      "Conformisme"
+    ],
+    "dewey": "842",
+    "copies": 2,
+    "abstract": "Dans une petite ville, les habitants se transforment un à un en rhinocéros. Bérenger, employé ordinaire et un peu ivrogne, est bientôt le seul à résister.",
+    "isbn": "9783125972650",
+    "pages": "246 p."
+  },
+  {
+    "title": "Cyrano de Bergerac",
+    "authors": [
+      {
+        "name": "Rostand",
+        "forename": "Edmond",
+        "dates": "1868-1918"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1897,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Comédie héroïque",
+      "Amour",
+      "Panache"
+    ],
+    "dewey": "842",
+    "copies": 2,
+    "abstract": "Cyrano, cadet de Gascogne, poète et bretteur, aime en secret sa cousine Roxane. Persuadé que son nez immense le rend indigne d’elle, il prête ses mots au beau Christian, qui la courtise.",
+    "isbn": "9782070653683",
+    "pages": "285 p."
+  },
+  {
+    "title": "Roméo et Juliette",
+    "authors": [
+      {
+        "name": "Shakespeare",
+        "forename": "William",
+        "dates": "1564-1616"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1597,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Tragédie",
+      "Amour",
+      "Vérone"
+    ],
+    "dewey": "822",
+    "copies": 2,
+    "abstract": "À Vérone, les Montaigu et les Capulet se haïssent. Roméo et Juliette, enfants de ces deux familles, tombent amoureux et se marient en secret."
+  },
+  {
+    "title": "La Tragédie du roi Christophe",
+    "authors": [
+      {
+        "name": "Césaire",
+        "forename": "Aimé",
+        "dates": "1913-2008"
+      }
+    ],
+    "publisher": "Présence africaine",
+    "city": "Paris",
+    "year": 1963,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Haïti",
+      "Décolonisation",
+      "Pouvoir"
+    ],
+    "dewey": "842",
+    "copies": 1,
+    "abstract": "Après l’indépendance d’Haïti, l’ancien esclave Henri Christophe se fait couronner roi. Pour faire de son peuple une nation, il impose un travail forcé et fait bâtir une immense citadelle. Aimé Césaire montre comment le rêve de libération peut se changer en tyrannie.",
+    "isbn": "2708701304",
+    "pages": "153 p."
+  },
+  {
+    "title": "Le Jeu de l’amour et du hasard",
+    "authors": [
+      {
+        "name": "Marivaux",
+        "dates": "1688-1763"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1730,
+    "genre": "theatre",
+    "type": "Livre",
+    "subjects": [
+      "Comédie",
+      "Déguisement",
+      "XVIIIe siècle"
+    ],
+    "dewey": "842",
+    "copies": 2,
+    "abstract": "Pour observer le prétendant qu’on lui destine, Silvia prend la place de sa servante. Elle ignore que Dorante a eu la même idée avec son valet.",
+    "isbn": "9782761330442",
+    "pages": "72 p."
+  },
+  {
+    "title": "Le Petit Prince",
+    "authors": [
+      {
+        "name": "Saint-Exupéry",
+        "forename": "Antoine de",
+        "dates": "1900-1944"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1943,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Conte philosophique",
+      "Amitié",
+      "Enfance"
+    ],
+    "copies": 3,
+    "abstract": "Un aviateur tombé en panne dans le désert du Sahara rencontre un petit garçon venu d’une autre planète. Le petit prince lui raconte son astéroïde, sa rose, et les adultes étranges qu’il a croisés en chemin : un roi, un vaniteux, un businessman, un géographe.\n\nAvec le renard, il apprend ce que signifie « apprivoiser ». Un conte poétique, illustré par l’auteur, qui se lit à tout âge et dit que « l’essentiel est invisible pour les yeux »."
+  },
+  {
+    "title": "Fables",
+    "subtitle": "Choix de fables",
+    "authors": [
+      {
+        "name": "La Fontaine",
+        "forename": "Jean de",
+        "dates": "1621-1695"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1668,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Fables",
+      "Morale",
+      "Poésie"
+    ],
+    "dewey": "841",
+    "copies": 3,
+    "abstract": "Le Corbeau et le Renard, La Cigale et la Fourmi, Le Loup et l’Agneau… Les fables les plus connues de La Fontaine, où les animaux parlent pour mieux faire voir les travers des hommes.",
+    "isbn": "9782240053015",
+    "pages": "81 p."
+  },
+  {
+    "title": "Contes",
+    "subtitle": "Histoires ou contes du temps passé",
+    "authors": [
+      {
+        "name": "Perrault",
+        "forename": "Charles",
+        "dates": "1628-1703"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 1697,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Contes merveilleux",
+      "Morale"
+    ],
+    "dewey": "398.2",
+    "copies": 2,
+    "abstract": "Le Petit Chaperon rouge, Cendrillon, La Barbe bleue, Le Chat botté, Le Petit Poucet, La Belle au bois dormant : les contes de Perrault, chacun suivi de sa morale en vers.",
+    "isbn": "9781412193610"
+  },
+  {
+    "title": "Les Contes d’Amadou Koumba",
+    "authors": [
+      {
+        "name": "Diop",
+        "forename": "Birago",
+        "dates": "1906-1989"
+      }
+    ],
+    "publisher": "Présence africaine",
+    "city": "Paris",
+    "year": 1947,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Sénégal",
+      "Tradition orale",
+      "Contes africains"
+    ],
+    "dewey": "398.2",
+    "copies": 2,
+    "abstract": "Birago Diop transcrit les contes que lui disait le griot Amadou Koumba : Leuk-le-Lièvre, Bouki-l’Hyène et bien d’autres y rusent, se trompent et apprennent. Une porte d’entrée dans la tradition orale d’Afrique de l’Ouest."
+  },
+  {
+    "title": "Les Fleurs du mal",
+    "authors": [
+      {
+        "name": "Baudelaire",
+        "forename": "Charles",
+        "dates": "1821-1867"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1857,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Poésie",
+      "Spleen",
+      "XIXe siècle"
+    ],
+    "dewey": "841",
+    "copies": 1,
+    "abstract": "Le recueil qui a fait scandale à sa parution : Baudelaire y oppose le Spleen et l’Idéal, chante Paris, l’amour, l’ennui et la mort, et cherche la beauté jusque dans le mal."
+  },
+  {
+    "title": "Paroles",
+    "authors": [
+      {
+        "name": "Prévert",
+        "forename": "Jacques",
+        "dates": "1900-1977"
+      }
+    ],
+    "publisher": "Gallimard",
+    "city": "Paris",
+    "year": 1946,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Poésie",
+      "Quotidien"
+    ],
+    "dewey": "841",
+    "copies": 2,
+    "abstract": "Des poèmes en langue de tous les jours : Barbara, Le Cancre, Pour faire le portrait d’un oiseau, Déjeuner du matin. Prévert y mêle tendresse, humour et révolte.",
+    "isbn": "2070394255",
+    "pages": "320 p."
+  },
+  {
+    "title": "Cahier d’un retour au pays natal",
+    "authors": [
+      {
+        "name": "Césaire",
+        "forename": "Aimé",
+        "dates": "1913-2008"
+      }
+    ],
+    "publisher": "Présence africaine",
+    "city": "Paris",
+    "year": 1956,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Négritude",
+      "Martinique",
+      "Poésie"
+    ],
+    "dewey": "841",
+    "copies": 1,
+    "abstract": "Un long poème en prose écrit au moment de quitter Paris pour la Martinique. Césaire y crie la misère de son île, l’héritage de l’esclavage, et revendique pour la première fois avec force la « négritude ».\n\nTexte fondateur de la poésie francophone du XXe siècle, salué par André Breton comme « le plus grand monument lyrique de ce temps ».",
+    "isbn": "2760124134",
+    "pages": "101 p."
+  },
+  {
+    "title": "Contes de Grimm",
+    "authors": [
+      {
+        "name": "Grimm",
+        "forename": "Jacob",
+        "dates": "1785-1863"
+      },
+      {
+        "name": "Grimm",
+        "forename": "Wilhelm",
+        "dates": "1786-1859"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 1812,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Contes merveilleux",
+      "Allemagne"
+    ],
+    "dewey": "398.2",
+    "copies": 2,
+    "abstract": "Hansel et Gretel, Blanche-Neige, Raiponce, Les Musiciens de Brême : un choix de contes recueillis par les frères Grimm.",
+    "isbn": "9782700010053",
+    "pages": "80 p."
+  },
+  {
+    "title": "Les Contes du chat perché",
+    "authors": [
+      {
+        "name": "Aymé",
+        "forename": "Marcel",
+        "dates": "1902-1967"
+      }
+    ],
+    "publisher": "Gallimard Jeunesse",
+    "city": "Paris",
+    "year": 1939,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Ferme",
+      "Animaux",
+      "Humour"
+    ],
+    "copies": 2,
+    "abstract": "Dans une ferme, Delphine et Marinette parlent avec les animaux, qui les aident à se tirer des colères de leurs parents. Le loup, le cerf, le paon et les bœufs vivent avec elles des aventures pleines de malice."
+  },
+  {
+    "title": "Éthiopiques",
+    "authors": [
+      {
+        "name": "Senghor",
+        "forename": "Léopold Sédar",
+        "dates": "1906-2001"
+      }
+    ],
+    "publisher": "Seuil",
+    "city": "Paris",
+    "year": 1956,
+    "genre": "contes-poesie",
+    "type": "Livre",
+    "subjects": [
+      "Négritude",
+      "Sénégal",
+      "Poésie"
+    ],
+    "dewey": "841",
+    "copies": 1,
+    "abstract": "Recueil de Senghor, poète et futur président du Sénégal. Ses poèmes, conçus pour être dits avec la kôra ou le balafong, célèbrent l’Afrique, ses femmes et ses paysages, et cherchent à réconcilier deux cultures."
+  },
+  {
+    "title": "Le Journal d’Anne Frank",
+    "authors": [
+      {
+        "name": "Frank",
+        "forename": "Anne",
+        "dates": "1929-1945"
+      }
+    ],
+    "publisher": "Le Livre de Poche",
+    "city": "Paris",
+    "year": 1950,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Seconde Guerre mondiale",
+      "Shoah",
+      "Témoignage"
+    ],
+    "dewey": "940.53",
+    "copies": 3,
+    "abstract": "De juin 1942 à août 1944, Anne Frank, jeune juive allemande, vit cachée avec sa famille et quatre autres personnes dans l’« Annexe », un appartement secret à Amsterdam. Dans son journal, qu’elle appelle Kitty, elle raconte la peur, la promiscuité, les disputes, mais aussi ses lectures, ses premiers sentiments et ses rêves d’écrivain.\n\nArrêtée avec les siens en août 1944, elle meurt à Bergen-Belsen quelques mois plus tard. Son père, seul survivant, fait publier le journal en 1947 : il est devenu l’un des témoignages les plus lus au monde.",
+    "isbn": "9782218054662"
+  },
+  {
+    "title": "Une brève histoire du temps",
+    "subtitle": "Du big bang aux trous noirs",
+    "authors": [
+      {
+        "name": "Hawking",
+        "forename": "Stephen",
+        "dates": "1942-2018"
+      }
+    ],
+    "publisher": "Flammarion",
+    "city": "Paris",
+    "year": 1989,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Cosmologie",
+      "Physique",
+      "Trous noirs"
+    ],
+    "dewey": "523.1",
+    "copies": 1,
+    "abstract": "D’où vient l’univers ? A-t-il un commencement et aura-t-il une fin ? Stephen Hawking explique sans équations l’espace, le temps, le big bang et les trous noirs.",
+    "isbn": "9782290033616",
+    "pages": "228 p."
+  },
+  {
+    "title": "Cosmos",
+    "authors": [
+      {
+        "name": "Sagan",
+        "forename": "Carl",
+        "dates": "1934-1996"
+      }
+    ],
+    "publisher": "Mazarine",
+    "city": "Paris",
+    "year": 1981,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Astronomie",
+      "Histoire des sciences"
+    ],
+    "dewey": "520",
+    "copies": 1,
+    "abstract": "Tiré de la célèbre série télévisée, un voyage à travers l’univers et l’histoire des sciences, des astronomes de l’Antiquité aux sondes Voyager.",
+    "isbn": "9782891325752",
+    "pages": "361 p."
+  },
+  {
+    "title": "L’Origine des espèces",
+    "authors": [
+      {
+        "name": "Darwin",
+        "forename": "Charles",
+        "dates": "1809-1882"
+      }
+    ],
+    "publisher": "Flammarion",
+    "city": "Paris",
+    "year": 1859,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Évolution",
+      "Sélection naturelle",
+      "Biologie"
+    ],
+    "dewey": "576.8",
+    "copies": 1,
+    "abstract": "L’ouvrage où Darwin expose la théorie de l’évolution par la sélection naturelle : les espèces ne sont pas fixes, elles se transforment au fil des générations, et celles qui survivent sont les mieux adaptées à leur milieu.",
+    "isbn": "9798545151417"
+  },
+  {
+    "title": "Un long chemin vers la liberté",
+    "authors": [
+      {
+        "name": "Mandela",
+        "forename": "Nelson",
+        "dates": "1918-2013"
+      }
+    ],
+    "publisher": "Fayard",
+    "city": "Paris",
+    "year": 1995,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Afrique du Sud",
+      "Apartheid",
+      "Autobiographie"
+    ],
+    "dewey": "968.06",
+    "copies": 2,
+    "abstract": "L’autobiographie de Nelson Mandela : son enfance dans le Transkei, ses études, son engagement à l’ANC contre l’apartheid, le procès de Rivonia et vingt-sept ans de prison, dont dix-huit à Robben Island.\n\nLe livre se termine avec sa libération en 1990 et son élection à la présidence de l’Afrique du Sud en 1994. Un témoignage sur la patience, la résistance et la réconciliation."
+  },
+  {
+    "title": "Le Racisme expliqué à ma fille",
+    "authors": [
+      {
+        "name": "Ben Jelloun",
+        "forename": "Tahar"
+      }
+    ],
+    "publisher": "Seuil",
+    "city": "Paris",
+    "year": 1998,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Racisme",
+      "Citoyenneté",
+      "Dialogue"
+    ],
+    "dewey": "305.8",
+    "copies": 2,
+    "abstract": "Sous la forme d’un dialogue avec sa fille de dix ans, Tahar Ben Jelloun explique ce qu’est le racisme, d’où il vient et comment on peut le combattre.",
+    "isbn": "9782020362757",
+    "pages": "92 p."
+  },
+  {
+    "title": "Printemps silencieux",
+    "authors": [
+      {
+        "name": "Carson",
+        "forename": "Rachel",
+        "dates": "1907-1964"
+      }
+    ],
+    "publisher": "Plon",
+    "city": "Paris",
+    "year": 1963,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Écologie",
+      "Pesticides",
+      "Environnement"
+    ],
+    "dewey": "363.7",
+    "copies": 1,
+    "abstract": "La biologiste Rachel Carson montre comment les pesticides comme le DDT empoisonnent les sols, les rivières et les oiseaux. Ce livre a fondé le mouvement écologiste moderne.",
+    "isbn": "9782918490999",
+    "pages": "352 p."
+  },
+  {
+    "title": "La Terre vue du ciel",
+    "authors": [
+      {
+        "name": "Arthus-Bertrand",
+        "forename": "Yann"
+      }
+    ],
+    "publisher": "La Martinière",
+    "city": "Paris",
+    "year": 1999,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Photographie aérienne",
+      "Géographie",
+      "Environnement"
+    ],
+    "dewey": "910",
+    "copies": 1,
+    "abstract": "Des photographies aériennes prises dans le monde entier, chacune accompagnée d’un texte qui explique ce qu’elle montre de notre planète et des hommes qui l’habitent.",
+    "isbn": "9782744131196",
+    "pages": "424 p."
+  },
+  {
+    "title": "Discours sur le colonialisme",
+    "authors": [
+      {
+        "name": "Césaire",
+        "forename": "Aimé",
+        "dates": "1913-2008"
+      }
+    ],
+    "publisher": "Présence africaine",
+    "city": "Paris",
+    "year": 1955,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Colonisation",
+      "Essai",
+      "Négritude"
+    ],
+    "dewey": "325.3",
+    "copies": 1,
+    "abstract": "Un pamphlet bref et violent où Aimé Césaire démonte le discours colonial et montre que la colonisation déshumanise le colonisé autant que le colonisateur.",
+    "isbn": "9782708705319",
+    "pages": "96 p."
+  },
+  {
+    "title": "Homo Deus",
+    "subtitle": "Une brève histoire de l’avenir",
+    "authors": [
+      {
+        "name": "Harari",
+        "forename": "Yuval Noah"
+      }
+    ],
+    "publisher": "Albin Michel",
+    "city": "Paris",
+    "year": 2017,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Futur",
+      "Technologie",
+      "Intelligence artificielle"
+    ],
+    "dewey": "303.4",
+    "copies": 1,
+    "abstract": "Après avoir largement vaincu la famine, les épidémies et la guerre, que va chercher l’humanité ? Yuval Noah Harari imagine un futur où les algorithmes et les biotechnologies transforment ce que signifie être humain.",
+    "isbn": "9782226393876",
+    "pages": "464 p."
+  },
+  {
+    "title": "L’homme qui prenait sa femme pour un chapeau",
+    "authors": [
+      {
+        "name": "Sacks",
+        "forename": "Oliver",
+        "dates": "1933-2015"
+      }
+    ],
+    "publisher": "Seuil",
+    "city": "Paris",
+    "year": 1988,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Neurologie",
+      "Cerveau",
+      "Médecine"
+    ],
+    "dewey": "616.8",
+    "copies": 1,
+    "abstract": "Le neurologue Oliver Sacks raconte des cas de patients atteints de troubles étonnants : un homme qui ne reconnaît plus les visages, une femme qui ne sent plus son corps. Des récits humains qui montrent comment le cerveau construit notre monde.",
+    "isbn": "9782020101011",
+    "pages": "312 p."
+  },
+  {
+    "title": "Une histoire de la lecture",
+    "authors": [
+      {
+        "name": "Manguel",
+        "forename": "Alberto"
+      }
+    ],
+    "publisher": "Actes Sud",
+    "city": "Arles",
+    "year": 1998,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Lecture",
+      "Livres",
+      "Bibliothèques"
+    ],
+    "dewey": "028",
+    "copies": 1,
+    "abstract": "Des tablettes d’argile aux livres de poche, de la lecture à voix haute à la lecture silencieuse, Alberto Manguel raconte comment les hommes ont lu à travers les siècles, et ce que la lecture a fait d’eux.",
+    "isbn": "9782290303535"
+  },
+  {
+    "title": "Le Gène égoïste",
+    "authors": [
+      {
+        "name": "Dawkins",
+        "forename": "Richard"
+      }
+    ],
+    "publisher": "Odile Jacob",
+    "city": "Paris",
+    "year": 1996,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Évolution",
+      "Génétique"
+    ],
+    "dewey": "576.5",
+    "copies": 1,
+    "abstract": "Richard Dawkins propose de regarder l’évolution du point de vue des gènes : les êtres vivants seraient des « machines » construites pour les transmettre.",
+    "isbn": "9782738112439",
+    "pages": "200 p."
+  },
+  {
+    "title": "Indignez-vous !",
+    "authors": [
+      {
+        "name": "Hessel",
+        "forename": "Stéphane",
+        "dates": "1917-2013"
+      }
+    ],
+    "publisher": "Indigène",
+    "city": "Montpellier",
+    "year": 2010,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Engagement",
+      "Droits de l’homme",
+      "Résistance"
+    ],
+    "dewey": "320",
+    "copies": 2,
+    "abstract": "Ancien résistant et l’un des rédacteurs de la Déclaration universelle des droits de l’homme, Stéphane Hessel, à 93 ans, appelle les jeunes à ne pas rester indifférents."
+  },
+  {
+    "title": "Le Petit Livre des couleurs",
+    "authors": [
+      {
+        "name": "Pastoureau",
+        "forename": "Michel"
+      },
+      {
+        "name": "Simonnet",
+        "forename": "Dominique"
+      }
+    ],
+    "publisher": "Points",
+    "city": "Paris",
+    "year": 2005,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Couleurs",
+      "Symboles",
+      "Histoire"
+    ],
+    "dewey": "701.85",
+    "copies": 2,
+    "abstract": "Pourquoi le bleu est-il devenu la couleur préférée des Européens ? Pourquoi le rouge est-il celui de l’amour et de la colère ? Dans un entretien, l’historien Michel Pastoureau raconte l’histoire et les symboles de six couleurs.",
+    "isbn": "9782755700343",
+    "pages": "107 p."
+  },
+  {
+    "title": "L’Afrique noire est mal partie",
+    "authors": [
+      {
+        "name": "Dumont",
+        "forename": "René",
+        "dates": "1904-2001"
+      }
+    ],
+    "publisher": "Seuil",
+    "city": "Paris",
+    "year": 1962,
+    "genre": "documentaires",
+    "type": "Livre",
+    "subjects": [
+      "Afrique",
+      "Développement",
+      "Agriculture"
+    ],
+    "dewey": "338.96",
+    "copies": 1,
+    "abstract": "Au lendemain des indépendances, l’agronome René Dumont dresse un bilan critique des choix économiques des nouveaux États africains et plaide pour une priorité donnée à l’agriculture paysanne."
+  },
+  {
+    "title": "Science & Vie Junior",
+    "authors": [],
+    "publisher": "Reworld Media",
+    "city": "Boulogne-Billancourt",
+    "year": 2026,
+    "genre": "revues",
+    "type": "Revue",
+    "subjects": [
+      "Sciences",
+      "Vulgarisation"
+    ],
+    "dewey": "505",
+    "copies": 2,
+    "reference": true,
+    "abstract": "Mensuel de vulgarisation scientifique pour les 10-15 ans : dossiers, expériences et actualité des sciences et des techniques."
+  },
+  {
+    "title": "Géo Ado",
+    "authors": [],
+    "publisher": "Prisma Media",
+    "city": "Gennevilliers",
+    "year": 2026,
+    "genre": "revues",
+    "type": "Revue",
+    "subjects": [
+      "Géographie",
+      "Monde",
+      "Nature"
+    ],
+    "dewey": "910.5",
+    "copies": 1,
+    "reference": true,
+    "abstract": "Le magazine qui fait découvrir le monde aux 10-15 ans : reportages, grandes photos, pays et cultures, nature et animaux."
+  },
+  {
+    "title": "Okapi",
+    "authors": [],
+    "publisher": "Bayard Presse",
+    "city": "Montrouge",
+    "year": 2026,
+    "genre": "revues",
+    "type": "Revue",
+    "subjects": [
+      "Actualité",
+      "Adolescence",
+      "Culture"
+    ],
+    "dewey": "050",
+    "copies": 2,
+    "reference": true,
+    "abstract": "Bimensuel pour les 10-15 ans : actualité expliquée, vie au collège, sciences, culture et bandes dessinées."
+  },
+  {
+    "title": "J’aime lire",
+    "authors": [],
+    "publisher": "Bayard Presse",
+    "city": "Montrouge",
+    "year": 2026,
+    "genre": "revues",
+    "type": "Revue",
+    "subjects": [
+      "Lecture",
+      "Premières lectures"
+    ],
+    "copies": 2,
+    "reference": true,
+    "abstract": "Chaque mois, un roman illustré, des bandes dessinées et des jeux pour les 7-10 ans qui apprennent à lire seuls."
+  },
+  {
+    "title": "Phosphore",
+    "authors": [],
+    "publisher": "Bayard Presse",
+    "city": "Montrouge",
+    "year": 2026,
+    "genre": "revues",
+    "type": "Revue",
+    "subjects": [
+      "Lycée",
+      "Orientation",
+      "Actualité"
+    ],
+    "dewey": "050",
+    "copies": 1,
+    "reference": true,
+    "abstract": "Le magazine des lycéens : orientation, études et métiers, actualité, société et culture. Utile pour préparer Parcoursup et le grand oral."
+  },
+  {
+    "title": "Images Doc",
+    "authors": [],
+    "publisher": "Bayard Presse",
+    "city": "Montrouge",
+    "year": 2026,
+    "genre": "revues",
+    "type": "Revue",
+    "subjects": [
+      "Histoire",
+      "Animaux",
+      "Sciences"
+    ],
+    "dewey": "050",
+    "copies": 1,
+    "reference": true,
+    "abstract": "Un magazine documentaire très illustré pour les 8-12 ans : histoire, animaux, sciences et pays du monde, avec des infographies et une BD."
+  }
+]

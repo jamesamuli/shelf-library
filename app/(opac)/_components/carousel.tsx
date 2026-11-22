@@ -128,7 +128,7 @@ export function Carousel({
       >
         {/* The arrows come before the row in the DOM, so the tab order is
             back, forward, then the cards — not two stray stops after the
-            twelfth card. Their position is absolute either way. */}
+            last one. Their position is absolute either way. */}
         <button
           type="button"
           onClick={() => scroll(-1)}

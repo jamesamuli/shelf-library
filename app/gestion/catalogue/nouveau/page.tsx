@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { aiConfigured, dailyLimit, usageToday } from "@/lib/ai";
 import type { Metadata } from "next";
 import { messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
@@ -40,6 +41,7 @@ export default async function NewRecordPage() {
           recordStatuses={options.recordStatuses}
           genres={options.genres}
           canDelete={granted.has("catalog.delete")}
+          assistant={{ enabled: aiConfigured(), used: await usageToday(), limit: dailyLimit() }}
           copyCount={0}
           messages={messages}
         />

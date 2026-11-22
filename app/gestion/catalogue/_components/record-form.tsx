@@ -4,7 +4,9 @@ import { useActionState } from "react";
 import { fill, type Messages } from "@/lib/i18n";
 import type { RecordInput } from "@/lib/cataloguing";
 import { deleteRecordAction, saveRecordAction } from "../_actions";
-import { RECORD_IDLE, type RecordFormState } from "../_lib/state";
+import { RECORD_IDLE, type AssistantUsage, type RecordFormState } from "../_lib/state";
+import { AbstractAssistant } from "./abstract-assistant";
+import { AuthorAssistant } from "./author-assistant";
 
 const FIELD =
   "min-h-11 w-full rounded-control border border-border bg-background px-3 text-body-sm outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring";
@@ -73,6 +75,7 @@ export function RecordForm({
   copyCount,
   messages,
   canDelete,
+  assistant,
 }: {
   id: number | null;
   values: RecordInput;
@@ -83,6 +86,8 @@ export function RecordForm({
   messages: Messages;
   /** The action refuses anyway; this keeps a button that cannot work off the page. */
   canDelete: boolean;
+  /** Paid AI requests today; `enabled` is false without a Gemini key. */
+  assistant: AssistantUsage;
 }) {
   const [state, formAction, pending] = useActionState(
     saveRecordAction,
@@ -183,14 +188,18 @@ export function RecordForm({
             />
           </Field>
 
-          <Field label={c.fieldAuthors} hint={c.hintAuthorFormat}>
-            <textarea
-              name="authors"
-              defaultValue={shown.authors}
-              rows={3}
-              className={`${FIELD} py-2`}
-            />
-          </Field>
+          {/* Full width: the assistant below lists each author's matches. */}
+          <div className="stack gap-2 sm:col-span-2">
+            <Field label={c.fieldAuthors} hint={c.hintAuthorFormat}>
+              <textarea
+                name="authors"
+                defaultValue={shown.authors}
+                rows={3}
+                className={`${FIELD} py-2`}
+              />
+            </Field>
+            <AuthorAssistant initialUsage={assistant} messages={messages} />
+          </div>
 
           <Field label={c.fieldPublishers} hint={c.hintOnePerLine}>
             <textarea
@@ -210,14 +219,17 @@ export function RecordForm({
             />
           </Field>
 
-          <Field label={c.fieldAbstract}>
-            <textarea
-              name="abstract"
-              defaultValue={shown.abstract}
-              rows={3}
-              className={`${FIELD} py-2`}
-            />
-          </Field>
+          <div className="stack gap-2">
+            <Field label={c.fieldAbstract}>
+              <textarea
+                name="abstract"
+                defaultValue={shown.abstract}
+                rows={5}
+                className={`${FIELD} py-2`}
+              />
+            </Field>
+            <AbstractAssistant initialUsage={assistant} messages={messages} />
+          </div>
 
           {genres.length === 0 ? null : (
             <fieldset className="stack gap-1.5 sm:col-span-2">

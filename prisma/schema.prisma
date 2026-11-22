@@ -139,6 +139,7 @@ model BibliographicRecord {
   recordPublishers RecordPublisher[]
   recordSubjects   RecordSubject[]
   recordGenres     RecordGenre[]
+  likes            RecordLike[]
   languages        RecordLanguage[]
   items            Item[]
   issues           Issue[]
@@ -234,6 +235,10 @@ model Author {
   isni       String?
   website    String?
   comment    String?
+  /// Open Library author key (e.g. "OL31353A"), from the cataloguing assistant.
+  openLibraryKey String? @unique @map("openlibrary_key")
+  /// Wikidata item (e.g. "Q34670"), from the cataloguing assistant.
+  wikidataId     String? @unique @map("wikidata_id")
 
   /// Legacy author_see — points at the preferred form of a non-preferred heading.
   seeAlsoId  Int?     @map("see_also_id")
@@ -434,6 +439,20 @@ model RecordGenre {
   @@map("record_genres")
 }
 
+/// A reader's "J'aime": their favourites, and counted, the record's tally.
+model RecordLike {
+  patronId  Int      @map("patron_id")
+  recordId  Int      @map("record_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  patron Patron              @relation(fields: [patronId], references: [id], onDelete: Cascade)
+  record BibliographicRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+
+  @@id([patronId, recordId])
+  @@index([recordId])
+  @@map("record_likes")
+}
+
 // ---------------------------------------------------------------------------
 // Holdings
 // ---------------------------------------------------------------------------
@@ -608,6 +627,7 @@ model Patron {
 
   loans Loan[]
   holds Hold[]
+  likes RecordLike[]
 
   @@index([lastName])
   @@index([categoryId])
@@ -762,7 +782,8 @@ model StaffUser {
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
-  roles StaffUserRole[]
+  roles      StaffUserRole[]
+  aiRequests AiRequest[]
 
   @@map("staff_users")
 }
@@ -830,4 +851,32 @@ model CustomFieldDefinition {
 
   @@unique([entity, key])
   @@map("custom_field_definitions")
+}
+
+// ---------------------------------------------------------------------------
+// Cataloguing assistant
+// ---------------------------------------------------------------------------
+
+/// One paid Gemini request and its answer: the cache (same kind and input
+/// within 90 days answers from here), the daily cap's count, and a cost log.
+/// See docs/18-author-enrichment.md.
+model AiRequest {
+  id           Int      @id @default(autoincrement())
+  /// "biography" or "abstract".
+  kind         String
+  /// sha256 of the kind and the normalised input.
+  inputHash    String   @map("input_hash")
+  staffUserId  Int?     @map("staff_user_id")
+  model        String
+  grounded     Boolean
+  promptTokens Int      @default(0) @map("prompt_tokens")
+  outputTokens Int      @default(0) @map("output_tokens")
+  response     Json
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  staffUser StaffUser? @relation(fields: [staffUserId], references: [id], onDelete: SetNull)
+
+  @@index([kind, inputHash])
+  @@index([createdAt])
+  @@map("ai_requests")
 }

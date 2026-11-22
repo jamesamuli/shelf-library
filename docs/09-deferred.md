@@ -11,7 +11,7 @@ Last reviewed: 2026-09-14, after the authorization module.
 | # | Item | Why it blocks |
 |---|---|---|
 | 1.1 | **No brute-force protection** on sign-in | Nothing rate-limits the login action; passwords can be guessed as fast as the server responds. Legacy blocked after 5 failures for 180s (`Pmb/Security/Library/Auth.php`). Needs a table + migration. scrypt raises the cost per guess but is not a substitute. |
-| 1.2 | **Seeded dev passwords are live** | `bibliothecaire` / `dev-gestion-2026`, card `E-2026-0001` / `dev-lecteur-2026`, and the `admin` account created by `scripts/create-admin.ts` all exist in the linked database. Rotate before anyone else can reach the app. |
+| 1.2 | **Seeded dev passwords are live** | `bibliothecaire` / `dev-gestion-2026`, card `E-2026-0001` / `dev-lecteur-2026`, and the `admin` account created by `scripts/create-admin.ts` all exist in the linked database, as does `administrateur` (every right) from `prisma/seed-demo.ts`. Rotate or remove them before anyone else can reach the app. The demo catalogue and readers (docs/17) share that database too, so the deployed OPAC shows them. |
 | 1.3 | **Production `AUTH_SECRET`** | Only set locally in `.env`. Sessions are signed with it; changing it invalidates every session. |
 | 1.4 | **Nothing is committed** | 1 commit (`Initial commit from Create Next App`), 24 uncommitted paths, branch `master`, no git remote. All work so far exists only in the working tree. |
 
@@ -300,3 +300,27 @@ Not our bugs, but they will bite whoever touches these next.
   on `globalThis` across HMR, so a newly added model reads as `undefined` and
   the page dies with "Cannot read properties of undefined (reading
   'findMany')".
+
+## 8. Catalogue results (2026-11-21)
+
+- **8.1 Filter counts.** The Support and Genre tiles show no result count,
+  so a combination can come up empty (comics + novels). Counting each
+  tile against the current query is one grouped query per facet; add it
+  if readers hit empty combinations in practice.
+- **8.2 Sample records' publisher.** The base seed gives its five sample
+  titles (*1984*, *L’Étranger*…) Presses Universitaires de France as
+  publisher, which now shows on the result cards. Seed data, like 6.4.
+- **8.3 The gold `warning` token fails contrast as text.** `#c8a56a` on
+  white is about 2.2:1. It colours "n jours de retard" in the reader's
+  account and several Gestion screens. axe flags it wherever a loan is
+  overdue. This is a design-system fix: a darker text variant of the token.
+  It predates the catalogue work.
+- **8.4 Biographies come from cataloguing, not a separate editor.** Built
+  2026-11-22 (docs/18-author-enrichment.md): when a book is added, the
+  assistant matches its authors and, on request, Gemini drafts the
+  biography of a new one.
+- ~~**8.5 A like asked for while signed out is not remembered.**~~ Done
+  2026-11-22: the sign-in returns with `?aimer=<id>`, which applies it.
+- **8.6 Publisher descriptions for new publishers.** Only the demo's 45
+  have one. Drafting them at cataloguing would reuse the Gemini assistant
+  (one grounded request per new publisher, cached and capped); not built.
