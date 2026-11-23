@@ -61,13 +61,16 @@ export async function askGemini({
   prompt,
   grounded,
   staffUserId,
+  maxTokens = 400,
 }: {
-  kind: "biography" | "abstract";
+  kind: "biography" | "abstract" | "translation";
   /** What makes two questions the same, for the cache. */
   input: unknown;
   prompt: string;
   grounded: boolean;
   staffUserId: number | null;
+  /** The answer's length cap; a translation must fit a whole abstract. */
+  maxTokens?: number;
 }): Promise<AiAnswer> {
   const limit = dailyLimit();
   const key = apiKey();
@@ -96,7 +99,7 @@ export async function askGemini({
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }] }],
         ...(grounded ? { tools: [{ google_search: {} }] } : {}),
-        generationConfig: { temperature: 0.2, maxOutputTokens: 400 },
+        generationConfig: { temperature: 0.2, maxOutputTokens: maxTokens },
       }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });

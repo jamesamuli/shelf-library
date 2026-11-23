@@ -94,3 +94,10 @@ paperback.
   `demo-catalogue.json`, written to `page_count`).
 - **Publisher descriptions**: `prisma/demo-publishers.json`, 45 short texts,
   written only where `publishers.comment` is empty.
+
+**English abstracts (2026-11-23).** `prisma/demo-abstracts-en.json`, keyed
+by title, holds an English abstract for each of the 104 records that have
+one: the 100 demo records and 4 base ones. They were translated by hand,
+not with Gemini. `seed:demo` fills `abstract_en` only where it is empty, so
+an English abstract the CDI has edited is never overwritten. After the run
+on 2026-11-23: 104 with a French abstract, 104 with an English one.

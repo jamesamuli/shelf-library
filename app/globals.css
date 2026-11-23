@@ -76,8 +76,11 @@
    * played once as the pointer reaches a row of the catalogue's list view
    * (CDI request). The tilt is kept small: a row spans the page, and at the
    * 15° first asked for its ends would sweep over the rows around it.
+   * Slow and eased at both ends (CDI request, the first 0.5 s felt abrupt):
+   * the timing function applies to each half, so it leaves and returns
+   * gently.
    */
-  --animate-nudge: nudge 0.5s ease-out;
+  --animate-nudge: nudge 1.1s ease-in-out;
 
   @keyframes nudge {
     0%,
@@ -85,9 +88,39 @@
       scale: 1;
       rotate: 0deg;
     }
-    40% {
-      scale: 1.02;
+    50% {
+      scale: 1.015;
       rotate: 1.5deg;
+    }
+  }
+
+  /*
+   * `animate-appear`: the loading screen (`RouteLoader`) fades in.
+   */
+  --animate-appear: appear 0.2s ease-out;
+
+  @keyframes appear {
+    from {
+      opacity: 0;
+    }
+  }
+
+  /*
+   * `animate-book-hop`: one book of the Shelf mark jumping and landing, the
+   * three set off one after another (`RouteLoader`, the OPAC's loading
+   * screen). In the SVG's own units: 14 is about an
+   * eighth of the mark's height.
+   */
+  --animate-book-hop: book-hop 1.2s ease-in-out infinite;
+
+  @keyframes book-hop {
+    0%,
+    55%,
+    100% {
+      translate: 0 0;
+    }
+    25% {
+      translate: 0 -14px;
     }
   }
 

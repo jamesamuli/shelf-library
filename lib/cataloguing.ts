@@ -17,6 +17,8 @@ export type RecordInput = {
   standardNumber: string;
   publicationYear: string;
   abstract: string;
+  /** The abstract in English, for the OPAC in English. */
+  abstractEn: string;
   documentTypeId: string;
   statusId: string;
   /** One `Surname, Forename` per line. */
@@ -200,6 +202,7 @@ export async function saveRecord(
       ? Number(input.publicationYear)
       : null,
     abstract: input.abstract.trim() || null,
+    abstractEn: input.abstractEn.trim() || null,
     documentTypeId: optionalId(input.documentTypeId),
     statusId: optionalId(input.statusId),
   };
@@ -423,6 +426,7 @@ export async function getRecordForEdit(id: number) {
       standardNumber: record.standardNumber ?? "",
       publicationYear: record.publicationYear?.toString() ?? "",
       abstract: record.abstract ?? "",
+      abstractEn: record.abstractEn ?? "",
       documentTypeId: record.documentTypeId?.toString() ?? "",
       statusId: record.statusId?.toString() ?? "",
       authors: record.contributions
@@ -487,6 +491,7 @@ export const EMPTY_RECORD: RecordInput = {
   standardNumber: "",
   publicationYear: "",
   abstract: "",
+  abstractEn: "",
   documentTypeId: "",
   statusId: "",
   authors: "",

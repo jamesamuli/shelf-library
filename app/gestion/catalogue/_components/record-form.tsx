@@ -5,7 +5,7 @@ import { fill, type Messages } from "@/lib/i18n";
 import type { RecordInput } from "@/lib/cataloguing";
 import { deleteRecordAction, saveRecordAction } from "../_actions";
 import { RECORD_IDLE, type AssistantUsage, type RecordFormState } from "../_lib/state";
-import { AbstractAssistant } from "./abstract-assistant";
+import { AbstractAssistant, TranslationAssistant } from "./abstract-assistant";
 import { AuthorAssistant } from "./author-assistant";
 
 const FIELD =
@@ -229,6 +229,19 @@ export function RecordForm({
               />
             </Field>
             <AbstractAssistant initialUsage={assistant} messages={messages} />
+          </div>
+
+          <div className="stack gap-2">
+            <Field label={c.fieldAbstractEn} hint={c.fieldAbstractEnHint}>
+              <textarea
+                name="abstractEn"
+                lang="en"
+                defaultValue={shown.abstractEn}
+                rows={5}
+                className={`${FIELD} py-2`}
+              />
+            </Field>
+            <TranslationAssistant initialUsage={assistant} messages={messages} />
           </div>
 
           {genres.length === 0 ? null : (

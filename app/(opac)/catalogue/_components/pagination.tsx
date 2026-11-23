@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { fill, type Messages } from "@/lib/i18n";
+import { LinkLoader } from "../../_components/route-loader";
 
 /** First, last, and the current page with its neighbours; gaps as null. */
 function pageList(page: number, pageCount: number): (number | null)[] {
@@ -38,6 +39,7 @@ export function Pagination({
         <Link href={href(page - 1)} className={STEP}>
           <ChevronLeft aria-hidden="true" className="size-4" />
           {c.previous}
+          <LinkLoader />
         </Link>
       ) : null}
 
@@ -58,6 +60,7 @@ export function Pagination({
                 }`}
               >
                 {n}
+                <LinkLoader />
               </Link>
             </li>
           ),
@@ -71,6 +74,7 @@ export function Pagination({
         <Link href={href(page + 1)} className={STEP}>
           {c.next}
           <ChevronRight aria-hidden="true" className="size-4" />
+          <LinkLoader />
         </Link>
       ) : null}
     </nav>

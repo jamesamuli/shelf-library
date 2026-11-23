@@ -11,7 +11,7 @@ import {
   type AuthorChoice,
   type RecordInput,
 } from "@/lib/cataloguing";
-import { checkAuthors, draftAbstract, draftBiography } from "@/lib/cataloguing-assistant";
+import { checkAuthors, draftAbstract, draftBiography, translateAbstract } from "@/lib/cataloguing-assistant";
 import type {
   AssistantUsage,
   AuthorCheckState,
@@ -32,6 +32,7 @@ function readRecord(formData: FormData): RecordInput {
     standardNumber: text(formData, "standardNumber"),
     publicationYear: text(formData, "publicationYear"),
     abstract: text(formData, "abstract"),
+    abstractEn: text(formData, "abstractEn"),
     documentTypeId: text(formData, "documentTypeId"),
     statusId: text(formData, "statusId"),
     authors: text(formData, "authors"),
@@ -130,6 +131,16 @@ export async function draftAbstractAction(input: {
   if (!answer.ok) return { kind: "error", reason: answer.reason, usage: used };
   if (!abstract) return { kind: "unknown", usage: used };
   return { kind: "draft", abstract, cached: answer.cached, usage: used };
+}
+
+/** "Traduire en anglais (IA)": one cheap paid request, unless cached. */
+export async function translateAbstractAction(french: string): Promise<AbstractDraftState> {
+  const session = await requirePermission("catalog.edit");
+  const { answer, english } = await translateAbstract(french.slice(0, 4000), Number(session.sub));
+  const used = { used: answer.used, limit: answer.limit, enabled: aiConfigured() };
+  if (!answer.ok) return { kind: "error", reason: answer.reason, usage: used };
+  if (!english) return { kind: "error", reason: "FAILED", usage: used };
+  return { kind: "draft", abstract: english, cached: answer.cached, usage: used };
 }
 
 const FIELD_ERRORS: Record<string, CataloguingMessageKey> = {

@@ -111,6 +111,9 @@ model BibliographicRecord {
   generalNote  String? @map("general_note")
   contentNote  String? @map("content_note")
   abstract     String?
+  /// The abstract in English, for the OPAC in English (CDI request); the
+  /// French `abstract` stands in where there is none. Not in legacy PMB.
+  abstractEn   String? @map("abstract_en")
   /// Legacy notices.thumbnail_url — a mediumblob holding a URL.
   thumbnailUrl String? @map("thumbnail_url")
 
@@ -862,7 +865,7 @@ model CustomFieldDefinition {
 /// See docs/18-author-enrichment.md.
 model AiRequest {
   id           Int      @id @default(autoincrement())
-  /// "biography" or "abstract".
+  /// "biography", "abstract" or "translation".
   kind         String
   /// sha256 of the kind and the normalised input.
   inputHash    String   @map("input_hash")

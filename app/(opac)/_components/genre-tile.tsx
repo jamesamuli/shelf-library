@@ -1,10 +1,12 @@
 import Link from "next/link";
 import {
+  ArrowRight,
   BookImage,
   BookOpen,
   BookText,
   Drama,
   Feather,
+  Library,
   MessagesSquare,
   Newspaper,
   WandSparkles,
@@ -65,8 +67,39 @@ export function GenreTile({ genre }: { genre: Genre }) {
   );
 }
 
-/** The genre tiles as a list: the home's "Découvrir" panel and the phone sheet. */
-export function GenreList({ genres }: { genres: Genre[] }) {
+/**
+ * The last line of Découvrir, the whole row's width: every book, no filter
+ * (CDI request). Dressed like the carousel's "Voir plus" tile — dashed teal
+ * border on the plain surface, its arrow in a filled circle — with a teal
+ * icon rather than a filled block, so it reads apart from the genres.
+ */
+function WholeCatalogueTile({ label, hint }: { label: string; hint: string }) {
+  return (
+    <Link
+      href="/catalogue?q="
+      className="group flex min-h-16 items-stretch overflow-hidden rounded-card border-3 border-dashed border-accent bg-surface shadow-card outline-offset-2 transition-shadow duration-300 hover:shadow-popover focus-visible:outline-2 focus-visible:outline-ring"
+    >
+      <span className="grid w-12 shrink-0 place-items-center text-accent sm:w-14">
+        <Library aria-hidden="true" className="size-7" strokeWidth={2} />
+      </span>
+      <span className="stack flex-1 justify-center py-2 pr-3">
+        <span className="text-body-sm font-semibold underline-offset-2 group-hover:underline">{label}</span>
+        <span className="text-caption text-foreground-muted">{hint}</span>
+      </span>
+      <span aria-hidden="true" className="grid place-items-center pr-3">
+        <span className="grid size-10 place-items-center rounded-full bg-accent text-primary-foreground transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none">
+          <ArrowRight className="size-5" strokeWidth={2.5} />
+        </span>
+      </span>
+    </Link>
+  );
+}
+
+/**
+ * The genre tiles as a list: the home's "Découvrir" panel and the phone
+ * sheet, both ending with the whole catalogue (CDI request).
+ */
+export function GenreList({ genres, all }: { genres: Genre[]; all: { label: string; hint: string } }) {
   return (
     <ul className="grid gap-2 min-[26rem]:grid-cols-2 sm:gap-3">
       {genres.map((genre) => (
@@ -74,6 +107,9 @@ export function GenreList({ genres }: { genres: Genre[] }) {
           <GenreTile genre={genre} />
         </li>
       ))}
+      <li className="grid col-span-full">
+        <WholeCatalogueTile label={all.label} hint={all.hint} />
+      </li>
     </ul>
   );
 }

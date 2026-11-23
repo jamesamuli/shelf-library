@@ -8,6 +8,7 @@ import { getLocale, getTheme } from "@/lib/preferences";
 import { getSession } from "@/app/(auth)/_lib/session";
 import { GenreList } from "./_components/genre-tile";
 import { MobileDock } from "./_components/mobile-dock";
+import { RouteLoader } from "./_components/route-loader";
 import { SearchSheet } from "./_components/search-sheet";
 
 /**
@@ -82,7 +83,7 @@ export default async function CatalogueLayout({ children }: LayoutProps<"/">) {
         discover={{
           title: c.discover,
           button: c.discover,
-          content: <GenreList genres={genres} />,
+          content: <GenreList genres={genres} all={{ label: c.discoverAll, hint: c.discoverAllHint }} />,
         }}
         search={{
           title: c.searchPanelTitle,
@@ -91,6 +92,8 @@ export default async function CatalogueLayout({ children }: LayoutProps<"/">) {
         }}
         account={account}
       />
+
+      <RouteLoader label={c.loadingPage} />
     </div>
   );
 }

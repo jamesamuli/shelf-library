@@ -664,3 +664,174 @@ Verified:
 - Hovering a row runs `nudge` once and ends at rest (no rotate, no scale);
   a click on its publisher text opens the book.
 - "disponible(s)" appears once on the book page; axe clean.
+
+## 13. View switch without reloading, loading bar, clickable cards (2026-11-23)
+
+CDI requests, all on the results page unless noted.
+
+- **The list view's animation is slower and eased.** `nudge` now takes
+  1.1 s with `ease-in-out` on each half (it was 0.5 s, `ease-out`), peaking
+  at 1.015 and 1.5°.
+- **The view is a preference, not part of the URL.**
+  - The server renders both views of the page; the switch
+    (`ResultViews`) shows one or the other. The records are already there,
+    so switching is instant: no request, no new page.
+  - The choice is kept in a `catalogue-view` cookie, so the next page of
+    results, a reload or Back from a book open in the same layout.
+  - `vue=` still works (the switch's links without JavaScript, old links)
+    and overrides the cookie for that page. The client then removes it
+    from the address on the next switch.
+  - Cost: the page's HTML holds both layouts (12 records twice), and there
+    is not a single extra database operation.
+- **Phones have no list view.** The switch is hidden below `sm`, and the
+  cards are shown whatever the cookie says.
+- **A loading bar while a page is on its way.**
+  - It is a thin teal bar running along the top of the screen.
+  - It is shown for pagination, filters, the filter chips, live search,
+    and opening a book from a card or a row.
+  - It is built on `useLinkStatus` (`PendingBar`, placed inside each link
+    and moved to the body so a row's tilt cannot carry it along). Live
+    search and the clickable cards use their transition's `pending`
+    state instead.
+  - It fades in only after 150 ms, so quick answers never flash it. With
+    reduced motion it is a still bar.
+- **The detailed card (desktop) opens the book wherever it is clicked**:
+  the cover, the summary, the empty space.
+  - These keep their own job: the authors (their dialog), the buttons,
+    the dialogs they open, and a text selection.
+  - The title remains the real link, for the keyboard, screen readers, a
+    new tab, and pages without JavaScript.
+  - The card wrapper (`ClickableCard`) only widens the target for the
+    pointer. On hover the border turns teal and the title underlines.
+  - The cover is no longer a separate link.
+- **Home** (docs/16-opac-home.md): Découvrir ends with a full-width tile,
+  "Découvrir tout le catalogue", which leads to `/catalogue?q=`. It is on
+  the home only, not in the phone's genre sheet.
+
+Verified in Edge:
+- Liste ⇄ Étendu: 0 requests, the URL is unchanged, and the cookie is set.
+- Page 2 and Back from a book stay in the list view.
+- The bar shows while page 2 loads, then disappears.
+- Phone with the cookie set to `liste`: 12 cards, 0 rows, no switch.
+- Clicking a card's summary or cover opens the book; clicking an author
+  opens the dialog and stays on the list.
+- The home tile is as wide as the genre grid (578 px) and leads to the
+  whole catalogue.
+- axe is clean everywhere.
+
+## 14. English abstracts, loading mark, narrow phone filters (2026-11-23)
+
+- **The abstract follows the interface language** (CDI request).
+  - Records have a second, optional abstract, `abstract_en` (migration
+    `20261123090000_abstract_en`).
+  - `abstractFor(record, locale)` picks it in English and falls back to
+    the French one. It is used on the cards (desktop and phone) and on the
+    book page.
+  - Search still runs on the French abstract only.
+  - The cataloguing side is in docs/18-author-enrichment.md (step 5); the
+    demo data in docs/17-demo-data.md.
+- **A loading mark in place of the thin bar**, a CDI trial: the bar was
+  too easy to miss.
+  - It is the Shelf mark on a small card in the middle of the screen, its
+    three books hopping in turn (`ShelfMark hopping`, `animate-book-hop`).
+  - It fades in after 150 ms and lets clicks through. It is rendered into
+    the body, so no ancestor's tilt or clipping moves it.
+  - `LinkLoader` goes inside links (`useLinkStatus`); `PageLoader` is shown
+    directly by live search and the clickable cards.
+  - With reduced motion the books stay still.
+- **Phone filters: a narrower panel at the right** (max 18rem, `ml-auto`),
+  closed and open.
+  - The filter tiles now go to two columns by the panel's own width
+    (container query `@md`), not the screen's. The narrow panel and the
+    desktop aside both get one column.
+  - The panel opens with a visually hidden h2, "Filtrer la recherche", so
+    its h3 groups no longer skip a level (axe `heading-order`, seen once
+    the panel was open).
+
+Verified in Edge:
+- "Petit Pays" shows its French abstract in French and its English one in
+  English, on the card and on the book page.
+- Page 2 delayed by 1.5 s: the loader appears with its 3 hopping books, in
+  both themes, and is gone once the page has arrived.
+- Phone filters: 288 px wide, flush right, one column, no overflow.
+- Desktop aside: one column.
+- axe clean.
+
+## 15. Catalogue UX pass (2026-11-23)
+
+CDI-approved items from the UX review (6, highlighting, was left out).
+
+- **"Disponible maintenant"** (`dispo=1`): only records with a copy on the
+  shelf, loanable and shown in the OPAC.
+  - It uses the same test as the "available" count (`onShelf` in
+    `searchCatalogue`).
+  - It is the first filter, styled as a switch but built as a link, like
+    every filter. It has its own chip.
+- **The number of results per option.**
+  - Each type, genre and language shows what it would give, with the
+    other filters as they are. "Disponible maintenant" shows its count
+    too.
+  - An option that would give nothing is dimmed and is not a link.
+  - Counted in one extra query (`withFacets`): each matching record is
+    flagged once per filter, then counted per facet leaving that facet's
+    own filter out.
+  - Cost: one more database operation per results page (about 5 instead
+    of 4).
+- **A compact header.**
+  - The title and the count share one line; then the search; then the
+    chips, only when there are some.
+  - The top pagination is gone.
+  - The live search's "Recherche…" now sits inside the field, and stays a
+    status for screen readers. Before, it kept an empty line in the
+    header.
+  - The band is about 167 px tall on desktop.
+- **A sticky toolbar.**
+  - The view switch, "1–12 sur 106" and the sort stay at the top while
+    the list scrolls.
+  - On phones the sort is at the right and narrower (max 10rem).
+- **Phones get "Revenir en haut"** after 1.5 screens of scrolling, above
+  the bottom bar.
+- **Réserver is the filled button, Localiser the outlined one**, and
+  Réserver comes first. Inverted at the CDI's request, since reserving is
+  the reader's main action. The book page's Réserver changes with it (same
+  component).
+- **No results: ways out.** The page offers:
+  - one chip per active filter, to lift it;
+  - "Chercher « … » dans tout le catalogue", or "Voir tout le catalogue";
+  - the genres.
+- **Phones: "Voir plus de livres"** instead of pages (`page=N&suite=1`).
+  - The server renders pages 1 to N as one list, from one query with a
+    larger LIMIT.
+  - The link keeps the scroll position, so the next books appear beneath
+    the reader.
+  - The URL can be shared, and Back works.
+  - From `sm` up, the pagination stays.
+- **The loading screen** (`RouteLoader`, mounted once in the OPAC layout).
+  - It shows the Shelf mark, large, with its books hopping, over the page
+    blurred behind it.
+  - It shows at once and stays at least 900 ms, then fades out (CDI
+    request: long enough to be seen, even when the page is already
+    there).
+  - Links start it through `LinkLoader`, and the clickable cards through
+    `useRouteLoader`.
+  - Live search does not use it: blurring the page at every pause in the
+    typing would get in the way.
+- **Phone filters are back to full width**, as before §14 (CDI request:
+  the narrow panel at the right was not wanted). The container-query
+  columns stay.
+
+Verified in Edge:
+- The facet counts add up (Livre 74 + Revue 6 + Album 12 + BD 14 = 106).
+- "Disponible maintenant" shows 97, and switching it on gives 97 results
+  and a chip.
+- `langue=eng` gives 0 results, with 13 options dimmed.
+- After scrolling, the toolbar is at top 0.
+- Réserver is filled and comes before Localiser.
+- Page 2: the loader shows, then is gone once the page is there.
+- Phone:
+  - "Voir plus" gives `page=2&suite=1`, 24 cards, and the same scroll
+    position.
+  - "Revenir en haut" brings the reader back to the top.
+  - The filters are full width; the sort is 160 px, at the right.
+- No results: the chip, the "search everywhere" link and the genres.
+- axe is clean on every page tested, the phone filters open included.

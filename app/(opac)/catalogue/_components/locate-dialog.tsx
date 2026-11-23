@@ -61,7 +61,7 @@ export function LocateButton({
         type="button"
         aria-haspopup="dialog"
         onClick={() => dialog.current?.showModal()}
-        className="flex min-h-11 items-center gap-2 rounded-control bg-accent px-4 text-body-sm font-semibold text-primary-foreground outline-offset-2 transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-ring"
+        className="flex min-h-11 items-center gap-2 rounded-control border-2 border-accent bg-surface px-4 text-body-sm font-semibold text-accent outline-offset-2 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
       >
         <MapPin aria-hidden="true" className="size-4" strokeWidth={2.25} />
         {c.locateBook}

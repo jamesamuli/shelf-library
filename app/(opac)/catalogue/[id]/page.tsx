@@ -5,7 +5,7 @@ import { MapPin } from "lucide-react";
 import { ShelfMark } from "@/app/_components/shelf-mark";
 import { fill, messagesFor } from "@/lib/i18n";
 import { getLocale } from "@/lib/preferences";
-import { getRecord } from "@/lib/catalogue";
+import { abstractFor, getRecord } from "@/lib/catalogue";
 import { PICKUP_DAYS } from "@/lib/holds";
 import { getSession } from "@/app/(auth)/_lib/session";
 import { googleConfig } from "@/app/(auth)/_lib/google";
@@ -167,7 +167,7 @@ export default async function RecordPage({ params, searchParams }: PageProps<"/c
             {collation ? <p className="text-body-sm text-foreground-muted">{collation}</p> : null}
           </div>
 
-          {record.abstract ? <p className="max-w-prose text-body leading-relaxed">{record.abstract}</p> : null}
+          {record.abstract ? <p className="max-w-prose text-body leading-relaxed">{abstractFor(record, locale)}</p> : null}
 
           {facts.length > 0 ? (
             <dl className="grid gap-x-8 gap-y-2 text-body-sm sm:grid-cols-2">

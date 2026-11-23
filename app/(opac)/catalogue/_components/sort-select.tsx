@@ -35,7 +35,7 @@ export function SortSelect({
           name="tri"
           defaultValue={value}
           onChange={(event) => event.currentTarget.form?.requestSubmit()}
-          className="min-h-11 w-full max-w-60 truncate appearance-none rounded-control border border-border-strong bg-surface py-2 pl-3 pr-9 text-body-sm text-foreground outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
+          className="min-h-11 w-full max-w-60 truncate appearance-none max-sm:max-w-40 rounded-control border border-border-strong bg-surface py-2 pl-3 pr-9 text-body-sm text-foreground outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring"
         >
           {options.map((option) => (
             <option key={option.value} value={option.value}>

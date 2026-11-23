@@ -134,3 +134,30 @@ test record and author were deleted afterwards.
 - Applying the ISBN's other data (title, publisher, year) to the form.
 - A Gestion screen for the AI log (`ai_requests`). For now, the count shows
   in the assistant.
+
+## Step 5: the English abstract (2026-11-23)
+
+The OPAC in English shows `abstract_en` where there is one (docs/10-catalogue.md §14).
+
+**In the record form.** A "Résumé en anglais" field sits under the French
+abstract, with **"Traduire le résumé (IA)"** beneath it.
+
+**The request.**
+- One ungrounded request (`translateAbstract`, kind `translation`). It is
+  the cheapest kind, since the whole text is given.
+- The answer cap is 900 tokens instead of 400, so two paragraphs fit
+  (`askGemini`'s new `maxTokens`).
+- It is cached on the French text, so the same abstract is never paid for
+  twice.
+- With no French abstract typed, the button says so and spends nothing.
+- The answer fills the field for the librarian to read. Replacing an
+  English abstract already typed asks first. Nothing is saved until the
+  record is.
+
+**Measured.** One test request ("La Peste", one sentence) answered in
+English and the field was filled; the record was not saved.
+
+**The demo data was not translated by Gemini.** The 104 abstracts in the
+database were translated once by hand into `prisma/demo-abstracts-en.json`,
+and `seed:demo` fills `abstract_en` where it is empty. This cost no
+requests.

@@ -499,3 +499,25 @@ stay ticked and the record appears under both tiles.
 9782081471757, which is Houellebecq's *Sérotonine* — its cover gives it
 away. A seed-data error, not a code one; see
 [09-deferred.md](09-deferred.md) 6.4.
+
+**"Découvrir tout le catalogue" (2026-11-23).** The Découvrir panel ends
+with one more line, a tile the width of the genre grid: the whole
+catalogue, no filter (`/catalogue?q=`). It is styled like a genre tile, in
+the accent colour, with a short hint and an arrow. It is on the home only:
+the tile lives in `home.tsx`, not in `GenreList`, which the phone's
+Découvrir sheet shares.
+Restyled the same day (CDI request) to match the carousel's "Voir plus"
+tile: a 3 px dashed teal border on the plain surface, with a card shadow.
+The genre-style icon block stays on the left, and the arrow sits in a
+filled teal circle.
+
+**The same tile in the phone's Découvrir sheet (2026-11-23, CDI request,
+replacing "home only").**
+- The tile now lives in `GenreList` (`all` prop) and ends both lists.
+- Its icon is drawn in Shelf teal on the plain surface, without a filled
+  block, so it reads apart from the genre tiles.
+- Verified:
+  - On the phone, Découvrir → the tile closes the sheet and opens
+    `/catalogue?q=`.
+  - The tile's icon has no fill in either theme.
+  - axe is clean.

@@ -73,7 +73,9 @@ export function ReserveButton({
         className={
           icon
             ? "grid size-11 place-items-center rounded-full text-foreground outline-offset-2 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
-            : "flex min-h-11 items-center gap-2 rounded-control border-2 border-accent bg-surface px-4 text-body-sm font-semibold text-accent outline-offset-2 hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-ring"
+            : // The reader's main action, so the filled button (CDI request);
+              // "Localiser" beside it is the outlined one.
+              "flex min-h-11 items-center gap-2 rounded-control border-2 border-accent bg-accent px-4 text-body-sm font-semibold text-primary-foreground outline-offset-2 transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-ring"
         }
       >
         <Icon aria-hidden="true" className={icon ? "size-7" : "size-4"} strokeWidth={icon ? 1.75 : 2.25} />

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronDown, MapPin } from "lucide-react";
 import { ShelfMark } from "@/app/_components/shelf-mark";
-import type { SearchHit } from "@/lib/catalogue";
+import { abstractFor, type SearchHit } from "@/lib/catalogue";
 import { PICKUP_DAYS } from "@/lib/holds";
 import { fill, type Messages } from "@/lib/i18n";
 import type { Locale } from "@/lib/preferences";
@@ -11,11 +11,13 @@ import { genreStyle } from "../../_components/genre-tile";
 import { eanOf } from "../_lib/identifiers";
 import { languageName } from "../_lib/language";
 import { AuthorLinks } from "./author-links";
+import { ClickableCard } from "./clickable-card";
 import { documentTypeStyle } from "./filters";
 import { LikeButton } from "./like-button";
 import { LocateButton } from "./locate-dialog";
 import { ShareButton } from "./share-button";
 import { ReserveButton } from "./reserve-button";
+import { LinkLoader } from "../../_components/route-loader";
 
 /** What a card needs to know about the page it sits on. */
 export type CardContext = {
@@ -55,7 +57,7 @@ export function Ribbon({
   const { Icon, fill: colour } = genre ? genreStyle(genre.icon, genre.colour) : documentTypeStyle(documentType ?? "");
   if (!documentType && !genreLabel) return null;
   return (
-    <div className={`absolute top-0 z-10 flex items-start gap-2 ${variant === "small" ? "right-3" : compact ? "right-4" : "right-5"}`}>
+    <div className={`pointer-events-none absolute top-0 z-10 flex items-start gap-2 ${variant === "small" ? "right-3" : compact ? "right-4" : "right-5"}`}>
       <p className={compact ? "sr-only" : "stack pt-2 text-right"}>
         {documentType ? (
           <span className="text-caption font-semibold uppercase tracking-wide text-accent">{documentType}</span>
@@ -131,7 +133,8 @@ function Like({ hit, context, large = false }: { hit: SearchHit; context: CardCo
  * The detailed view, from `sm` up (CDI request): the cover filling the
  * card's left side, then title, authors (each opening their dialog), the
  * summary, language, ISBN and call number, the two actions, and the heart
- * in the bottom right corner.
+ * in the bottom right corner. A click anywhere else on the card opens the
+ * book (CDI request).
  */
 function DetailedCard({ hit, eager, context }: { hit: SearchHit; eager: boolean; context: CardContext }) {
   const { messages, locale } = context;
@@ -145,17 +148,13 @@ function DetailedCard({ hit, eager, context }: { hit: SearchHit; eager: boolean;
   ].filter((fact): fact is string[] => fact !== null);
 
   return (
-    <article className="group/card relative grid grid-cols-[10rem_1fr] overflow-hidden rounded-card border border-border bg-surface shadow-card transition-shadow duration-300 hover:shadow-popover max-sm:hidden lg:grid-cols-[12rem_1fr]">
-      {/* The title link names the record; the cover is a larger target for
-          the same place, so it stays out of the tab order and silent. */}
-      <Link
-        href={`/catalogue/${hit.id}`}
-        tabIndex={-1}
-        aria-hidden="true"
-        className="relative min-h-60 overflow-hidden lg:min-h-72"
-      >
+    <ClickableCard
+      href={`/catalogue/${hit.id}`}
+      className="group/card relative grid grid-cols-[10rem_1fr] overflow-hidden rounded-card border border-border bg-surface shadow-card transition-[box-shadow,border-color] duration-300 hover:border-accent hover:shadow-popover max-sm:hidden lg:grid-cols-[12rem_1fr]"
+    >
+      <div className="relative min-h-60 overflow-hidden lg:min-h-72">
         <Cover hit={hit} eager={eager} sizes="12rem" />
-      </Link>
+      </div>
 
       <div className="stack min-w-0 gap-3 p-5 lg:p-6">
         <Ribbon documentType={hit.documentType} genre={hit.genre} locale={locale} />
@@ -163,13 +162,14 @@ function DetailedCard({ hit, eager, context }: { hit: SearchHit; eager: boolean;
         <h2 className="pr-44 font-heading text-heading-3 leading-tight text-balance">
           <Link
             href={`/catalogue/${hit.id}`}
-            className="rounded-control outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+            className="rounded-control outline-offset-2 group-hover/card:underline focus-visible:outline-2 focus-visible:outline-ring"
           >
             {hit.title}
+            <LinkLoader />
           </Link>
         </h2>
         <AuthorLinks authors={hit.authors} className="-mt-1 text-body-sm font-semibold text-accent" messages={messages} />
-        {hit.abstract ? <p className="line-clamp-4 text-body-sm text-foreground-muted">{hit.abstract}</p> : null}
+        {hit.abstract ? <p className="line-clamp-4 text-body-sm text-foreground-muted">{abstractFor(hit, locale)}</p> : null}
         {facts.length > 0 || hit.callNumber ? (
           <dl className="flex flex-wrap gap-x-6 gap-y-1 text-body-sm">
             {facts.map(([label, value]) => (
@@ -194,17 +194,18 @@ function DetailedCard({ hit, eager, context }: { hit: SearchHit; eager: boolean;
           </dl>
         ) : null}
         <div className="mt-auto flex flex-wrap items-center gap-3 pt-1">
+          {/* Reserve first, the main action; Localiser second (CDI request). */}
+          {canReserve(hit) ? <Reserve hit={hit} context={context} /> : null}
           {hit.holdings.length > 0 ? (
             <LocateButton recordId={hit.id} title={hit.title} holdings={hit.holdings} messages={messages} locale={locale} />
           ) : null}
-          {canReserve(hit) ? <Reserve hit={hit} context={context} /> : null}
           <Availability totalItems={hit.totalItems} availableItems={hit.availableItems} messages={messages} />
           <span className="ml-auto">
             <Like hit={hit} context={context} />
           </span>
         </div>
       </div>
-    </article>
+    </ClickableCard>
   );
 }
 
@@ -240,6 +241,7 @@ function PostCard({ hit, eager, context }: { hit: SearchHit; eager: boolean; con
               className="rounded-control outline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
             >
               {hit.title}
+              <LinkLoader />
             </Link>
           </h2>
           <details className="details-smooth group/more">
@@ -252,7 +254,7 @@ function PostCard({ hit, eager, context }: { hit: SearchHit; eager: boolean; con
             </summary>
             <div className="stack gap-2 pb-1">
               <AuthorLinks authors={hit.authors} className="text-body-sm font-semibold text-accent" messages={messages} />
-              {hit.abstract ? <p className="text-body-sm text-foreground-muted">{hit.abstract}</p> : null}
+              {hit.abstract ? <p className="text-body-sm text-foreground-muted">{abstractFor(hit, locale)}</p> : null}
               <Availability totalItems={hit.totalItems} availableItems={hit.availableItems} messages={messages} />
             </div>
           </details>
@@ -330,6 +332,7 @@ export function ListResult({ hit, context }: { hit: SearchHit; context: CardCont
         {[
           <span key="title" className="font-semibold group-hover:underline">
             {hit.title}
+            <LinkLoader />
           </span>,
           hit.documentType ? <span key="type" className="font-semibold text-accent">{hit.documentType}</span> : null,
           genre ? <span key="genre" className="font-semibold text-accent">{genre}</span> : null,

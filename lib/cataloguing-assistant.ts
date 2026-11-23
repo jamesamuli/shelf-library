@@ -318,3 +318,34 @@ export async function draftAbstract(
   const text = answer.text.trim();
   return { answer, abstract: /^INCONNU\.?$/i.test(text) ? null : text.slice(0, 2000) };
 }
+
+/**
+ * "Traduire en anglais (IA)": the French abstract, as the librarian has it
+ * in the form, into English for the OPAC in English. The cheapest kind of
+ * request — no search, the whole text given — and cached on the text, so
+ * translating the same abstract twice costs once. Longer answers allowed
+ * than for a draft (900 tokens), since an abstract can run to two
+ * paragraphs.
+ */
+export async function translateAbstract(
+  french: string,
+  staffUserId: number | null,
+): Promise<{ answer: AiAnswer; english: string | null }> {
+  const prompt = [
+    "Translate this French summary of a book from a school library (readers aged 10 to 18) into English.",
+    "Keep the meaning, the paragraphs and the plain style. Keep proper names as they are, but use the usual English names of well-known characters and works.",
+    "Reply with the translation only.",
+    "",
+    french,
+  ].join("\n");
+  const answer = await askGemini({
+    kind: "translation",
+    input: { v: 1, text: french.trim() },
+    prompt,
+    grounded: false,
+    staffUserId,
+    maxTokens: 900,
+  });
+  if (!answer.ok) return { answer, english: null };
+  return { answer, english: answer.text.trim().slice(0, 3000) || null };
+}

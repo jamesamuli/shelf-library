@@ -94,9 +94,12 @@ type CatalogueCopy = {
   searchTipsTitle: string;
   searchTips: string[];
   searching: string;
+  loadingPage: string;
   /** Contains a {count} placeholder. */
   seeAllResults: string;
   discover: string;
+  discoverAll: string;
+  discoverAllHint: string;
   /** Names the phone's bottom bar. */
   dockLabel: string;
   practicalTitle: string;
@@ -123,6 +126,18 @@ type CatalogueCopy = {
   filterLanguage: string;
   /** Contains a {count} placeholder: the active filters. */
   filtersButton: string;
+  filterAvailability: string;
+  availableNow: string;
+  availableNowHint: string;
+  facetCount: string;
+  resultsShort: string;
+  loadMore: string;
+  loadMoreHint: string;
+  backToTop: string;
+  noResultsRemove: string;
+  noResultsEverywhere: string;
+  noResultsWhole: string;
+  noResultsGenres: string;
   clearFilters: string;
   /** Contains a {label} placeholder. */
   removeFilter: string;
@@ -309,6 +324,8 @@ type CataloguingCopy = {
   fieldIsbn: string;
   fieldYear: string;
   fieldAbstract: string;
+  fieldAbstractEn: string;
+  fieldAbstractEnHint: string;
   fieldDocumentType: string;
   fieldStatus: string;
   fieldAuthors: string;
@@ -363,6 +380,9 @@ type CataloguingCopy = {
   noCandidate: string;
   proposeBiography: string;
   proposeAbstract: string;
+  translateAbstract: string;
+  translateNeedsFrench: string;
+  translationFilled: string;
   aiWorking: string;
   aiUsage: string;
   aiCached: string;
@@ -630,6 +650,7 @@ const fr: Messages = {
     searchPanelTitle: "Rechercher un document",
     searchTipsTitle: "Astuces",
     searching: "Recherche…",
+    loadingPage: "Chargement de la page…",
     seeAllResults: "Voir les {count} résultats",
     searchTips: [
       "Mélangez titre et auteur : « camus peste » fonctionne.",
@@ -637,6 +658,8 @@ const fr: Messages = {
       "Le début d’un mot suffit : « biblio » trouve « bibliothèque ».",
     ],
     discover: "Découvrir",
+    discoverAll: "Découvrir tout le catalogue",
+    discoverAllHint: "Tous les livres du CDI, sans filtre",
     dockLabel: "Explorer le catalogue",
     practicalTitle: "Infos pratiques",
     hoursTitle: "Horaires",
@@ -658,6 +681,18 @@ const fr: Messages = {
     filterGenre: "Genre",
     filterLanguage: "Langue",
     filtersButton: "Filtres ({count})",
+    filterAvailability: "Disponibilité",
+    availableNow: "Disponible maintenant",
+    availableNowHint: "En rayon, à emprunter tout de suite",
+    facetCount: "{count} résultat(s)",
+    resultsShort: "{from}–{to} sur {total}",
+    loadMore: "Voir plus de livres",
+    loadMoreHint: "Encore {count} livre(s)",
+    backToTop: "Revenir en haut",
+    noResultsRemove: "Retirer un filtre :",
+    noResultsEverywhere: "Chercher « {query} » dans tout le catalogue",
+    noResultsWhole: "Voir tout le catalogue",
+    noResultsGenres: "Ou parcourez un genre :",
     clearFilters: "Effacer les filtres",
     removeFilter: "Retirer le filtre « {label} »",
     viewLabel: "Affichage",
@@ -832,6 +867,8 @@ const fr: Messages = {
     fieldIsbn: "ISBN / EAN",
     fieldYear: "Année de publication",
     fieldAbstract: "Résumé",
+    fieldAbstractEn: "Résumé en anglais",
+    fieldAbstractEnHint: "Affiché quand l’OPAC est en anglais ; sinon, le résumé en français.",
     fieldDocumentType: "Type de document",
     fieldStatus: "Statut de la notice",
     fieldAuthors: "Auteurs",
@@ -885,6 +922,9 @@ const fr: Messages = {
     noCandidate: "Pas encore au catalogue : un nouvel auteur sera créé.",
     proposeBiography: "Proposer une biographie (IA)",
     proposeAbstract: "Proposer un résumé (IA)",
+    translateAbstract: "Traduire le résumé (IA)",
+    translateNeedsFrench: "Saisissez d’abord le résumé en français.",
+    translationFilled: "Traduction proposée : relisez-la avant d’enregistrer.",
     aiWorking: "Gemini rédige…",
     aiUsage: "IA : {used} / {limit} requêtes aujourd’hui",
     aiCached: "Réponse déjà connue : aucun coût.",
@@ -1182,6 +1222,7 @@ const en: Messages = {
     searchPanelTitle: "Find a document",
     searchTipsTitle: "Tips",
     searching: "Searching…",
+    loadingPage: "Loading the page…",
     seeAllResults: "See all {count} results",
     searchTips: [
       "Mix title and author: “camus peste” works.",
@@ -1189,6 +1230,8 @@ const en: Messages = {
       "The start of a word is enough: “biblio” finds “bibliothèque”.",
     ],
     discover: "Discover",
+    discoverAll: "Discover the whole catalogue",
+    discoverAllHint: "Every book in the library, unfiltered",
     dockLabel: "Explore the catalogue",
     practicalTitle: "Practical information",
     hoursTitle: "Opening hours",
@@ -1210,6 +1253,18 @@ const en: Messages = {
     filterGenre: "Genre",
     filterLanguage: "Language",
     filtersButton: "Filters ({count})",
+    filterAvailability: "Availability",
+    availableNow: "Available now",
+    availableNowHint: "On the shelf, ready to borrow",
+    facetCount: "{count} result(s)",
+    resultsShort: "{from}–{to} of {total}",
+    loadMore: "Show more books",
+    loadMoreHint: "{count} more book(s)",
+    backToTop: "Back to top",
+    noResultsRemove: "Remove a filter:",
+    noResultsEverywhere: "Search “{query}” in the whole catalogue",
+    noResultsWhole: "See the whole catalogue",
+    noResultsGenres: "Or browse a genre:",
     clearFilters: "Clear filters",
     removeFilter: "Remove the “{label}” filter",
     viewLabel: "View",
@@ -1384,6 +1439,8 @@ const en: Messages = {
     fieldIsbn: "ISBN / EAN",
     fieldYear: "Year of publication",
     fieldAbstract: "Abstract",
+    fieldAbstractEn: "Abstract in English",
+    fieldAbstractEnHint: "Shown when the OPAC is in English; otherwise, the French abstract.",
     fieldDocumentType: "Document type",
     fieldStatus: "Record status",
     fieldAuthors: "Authors",
@@ -1436,6 +1493,9 @@ const en: Messages = {
     noCandidate: "Not in the catalogue yet: a new author will be created.",
     proposeBiography: "Suggest a biography (AI)",
     proposeAbstract: "Suggest a summary (AI)",
+    translateAbstract: "Translate the abstract (AI)",
+    translateNeedsFrench: "Type the French abstract first.",
+    translationFilled: "Translation suggested: read it through before saving.",
     aiWorking: "Gemini is writing…",
     aiUsage: "AI: {used} / {limit} requests today",
     aiCached: "Answer already known: no cost.",

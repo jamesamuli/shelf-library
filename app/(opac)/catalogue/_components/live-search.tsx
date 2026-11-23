@@ -67,7 +67,7 @@ export function LiveSearch({
   };
 
   return (
-    <div className="stack gap-1" aria-busy={pending || undefined}>
+    <div className="relative" aria-busy={pending || undefined}>
       <SearchBar
         messages={messages}
         defaultValue={defaultValue}
@@ -84,9 +84,19 @@ export function LiveSearch({
           else timer.current = window.setTimeout(() => show(value), PAUSE_MS);
         }}
       />
-      <p role="status" className="min-h-5 text-caption text-foreground-muted">
+      {/* Inside the field, by the search button, rather than on a line of
+          its own that the compact header would keep empty most of the time. */}
+      <p role="status" className="sr-only">
         {pending ? messages.catalogue.searching : ""}
       </p>
+      {pending ? (
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-16 top-1/2 -translate-y-1/2 rounded-control bg-surface px-1.5 text-caption text-foreground-muted"
+        >
+          {messages.catalogue.searching}
+        </span>
+      ) : null}
     </div>
   );
 }

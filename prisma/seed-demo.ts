@@ -5,6 +5,7 @@ import { hashPassword } from "../app/(auth)/_lib/password";
 import biographies from "./demo-authors.json";
 import publisherNotes from "./demo-publishers.json";
 import catalogue from "./demo-catalogue.json";
+import englishAbstracts from "./demo-abstracts-en.json";
 
 /**
  * Demonstration data: a hundred records across every genre, their copies, a
@@ -354,6 +355,13 @@ async function main() {
   // The publisher dialog's descriptions, likewise only where none is written.
   for (const [name, description] of Object.entries(publisherNotes as Record<string, string>)) {
     await prisma.publisher.updateMany({ where: { name, comment: null }, data: { comment: description } });
+  }
+
+  // The English abstracts, keyed by title, for the demo records and the
+  // base ones that have an abstract. Translated once by hand rather than by the cataloguing
+  // assistant, so seeding costs no Gemini request. Only empty ones are filled.
+  for (const [title, abstractEn] of Object.entries(englishAbstracts as Record<string, string>)) {
+    await prisma.bibliographicRecord.updateMany({ where: { title, abstractEn: null }, data: { abstractEn } });
   }
 
   // Readers ------------------------------------------------------------------

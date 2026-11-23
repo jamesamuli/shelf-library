@@ -21,6 +21,8 @@ export type SearchHit = {
   documentType: string | null;
   authors: AuthorLink[];
   abstract: string | null;
+  /** The English abstract, where one is written; see `abstractFor`. */
+  abstractEn: string | null;
   totalItems: number;
   availableItems: number;
   coverUrl: string | null;
@@ -65,11 +67,25 @@ export type AuthorDetail = {
 
 export type DocumentTypeOption = { id: number; label: string };
 
+/**
+ * How many results each filter option would give, the other filters as they
+ * are: document type ids, genre slugs and language codes to counts, and the
+ * records with a copy on the shelf. An option missing from a map has none.
+ */
+export type Facets = {
+  types: Record<string, number>;
+  genres: Record<string, number>;
+  languages: Record<string, number>;
+  available: number;
+};
+
 export type SearchResults = {
   hits: SearchHit[];
   total: number;
   page: number;
   pageCount: number;
+  /** Only when asked for (`withFacets`). */
+  facets: Facets | null;
 };
 
 export type Holding = {
@@ -88,11 +104,20 @@ export type Holding = {
   acquiredOn: string | null;
 };
 
+/**
+ * The abstract in the reader's language: the English one in English where
+ * the CDI has written it, the French one otherwise (CDI request).
+ */
+export function abstractFor(record: { abstract: string | null; abstractEn: string | null }, locale: Locale) {
+  return (locale === "en" ? record.abstractEn : null) ?? record.abstract;
+}
+
 export type RecordDetail = {
   id: number;
   title: string;
   subtitle: string | null;
   abstract: string | null;
+  abstractEn: string | null;
   publicationYear: number | null;
   standardNumber: string | null;
   documentType: string | null;
@@ -207,6 +232,7 @@ type HitRow = {
   standard_number: string | null;
   thumbnail_url: string | null;
   abstract: string | null;
+  abstract_en: string | null;
   document_type: string | null;
   authors: AuthorLink[];
   languages: string[] | null;
@@ -418,6 +444,9 @@ export async function searchCatalogue({
   authorId = null,
   publisherId = null,
   patronId = null,
+  availableOnly = false,
+  cumulative = false,
+  withFacets = false,
   sort,
 }: {
   query: string;
@@ -433,11 +462,21 @@ export async function searchCatalogue({
   publisherId?: number | null;
   /** The signed-in reader, whose likes are marked on the hits. */
   patronId?: number | null;
+  /** Only records with a copy on the shelf and loanable right now. */
+  availableOnly?: boolean;
+  /**
+   * Pages 1 to `page` at once rather than `page` alone: the phone's "Voir
+   * plus de livres", which grows the list instead of replacing it.
+   */
+  cumulative?: boolean;
+  /** Also count what each filter option would give (the results page). */
+  withFacets?: boolean;
   sort: Sort;
 }): Promise<SearchResults> {
   const terms = parseTerms(rawQuery);
   const currentPage = Math.max(1, page);
-  const offset = (currentPage - 1) * PER_PAGE;
+  const offset = cumulative ? 0 : (currentPage - 1) * PER_PAGE;
+  const limit = cumulative ? currentPage * PER_PAGE : PER_PAGE;
 
   /**
    * Every term must match SOMEWHERE on the record — its own text, one of its
@@ -467,23 +506,36 @@ export async function searchCatalogue({
     ? Prisma.sql`AND ${Prisma.join(terms.map(termMatch), " AND ")}`
     : Prisma.empty;
 
+  // The four filters a reader picks, each a condition that is plain `true`
+  // when not chosen, so the facet counts below can leave one out at a time.
   const inGenre = genreSlug
-    ? Prisma.sql`AND EXISTS (
+    ? Prisma.sql`EXISTS (
         SELECT 1 FROM record_genres rg
         JOIN genres g ON g.id = rg.genre_id
         WHERE rg.record_id = r.id AND g.slug = ${genreSlug}
       )`
-    : Prisma.empty;
+    : Prisma.sql`true`;
 
   const inLanguage = language
-    ? Prisma.sql`AND EXISTS (
+    ? Prisma.sql`EXISTS (
         SELECT 1 FROM record_languages rl WHERE rl.record_id = r.id AND rl.language_code = ${language}
       )`
-    : Prisma.empty;
+    : Prisma.sql`true`;
 
-  const ofType = documentTypeId
-    ? Prisma.sql`AND r.document_type_id = ${documentTypeId}`
-    : Prisma.empty;
+  const ofType = documentTypeId ? Prisma.sql`r.document_type_id = ${documentTypeId}` : Prisma.sql`true`;
+
+  // A copy on the shelf, loanable, and shown in the OPAC: the same test as
+  // `holdingCounts`' "available".
+  const onShelf = Prisma.sql`EXISTS (
+    SELECT 1 FROM items i
+    LEFT JOIN sections sec ON sec.id = i.section_id
+    LEFT JOIN item_statuses ist ON ist.id = i.status_id
+    WHERE i.record_id = r.id
+      AND ${visibleHoldings(isSubscriber)}
+      AND COALESCE(ist.allows_loan, true)
+      AND NOT EXISTS (SELECT 1 FROM loans l WHERE l.item_id = i.id AND l.returned_at IS NULL)
+  )`;
+  const isAvailable = availableOnly ? onShelf : Prisma.sql`true`;
 
   // Accents folded and case ignored, so "Éthiopiques" files under E and
   // "L’Étranger" beside "Le…", not after Z. The title is every sort's
@@ -524,11 +576,14 @@ export async function searchCatalogue({
       )`
     : Prisma.empty;
 
-  const filters = Prisma.sql`WHERE true ${match} ${inGenre} ${ofType} ${inLanguage} ${byAuthor} ${byPublisher}`;
+  const filters = Prisma.sql`
+    WHERE ${inGenre} AND ${ofType} AND ${inLanguage} AND ${isAvailable}
+    ${match} ${byAuthor} ${byPublisher}
+  `;
 
   // The page's ids are picked first, so the per-record lookups below run for
   // one page rather than for every match — as for the new arrivals.
-  const [rows, countRows] = await Promise.all([
+  const [rows, countRows, facetRows] = await Promise.all([
     prisma.$queryRaw<HitRow[]>`
       SELECT
         r.id,
@@ -538,6 +593,7 @@ export async function searchCatalogue({
         r.standard_number,
         r.thumbnail_url,
         r.abstract,
+        r.abstract_en,
         r.page_count,
         dt.label AS document_type,
         ${authorLinks} AS authors,
@@ -578,7 +634,7 @@ export async function searchCatalogue({
         ${visibleRecords(isSubscriber)}
         ${filters}
         ORDER BY position
-        LIMIT ${PER_PAGE} OFFSET ${offset}
+        LIMIT ${limit} OFFSET ${offset}
       ) page
       JOIN bibliographic_records r ON r.id = page.id
       ${visibleRecords(isSubscriber)}
@@ -592,7 +648,61 @@ export async function searchCatalogue({
       ${visibleRecords(isSubscriber)}
       ${filters}
     `,
+    // What each option of each filter would give with the others as they
+    // are (CDI request: "Romans · 18", empty ones dimmed). One query, so one
+    // more database operation per results page: each matching record is
+    // flagged once for every filter, then counted per facet leaving that
+    // facet's own filter out.
+    withFacets
+      ? prisma.$queryRaw<{ facet: string; key: string; count: number }[]>`
+          WITH m AS (
+            SELECT
+              r.id,
+              r.document_type_id,
+              ${inGenre} AS in_genre,
+              ${ofType} AS of_type,
+              ${inLanguage} AS in_language,
+              ${onShelf} AS on_shelf
+            FROM bibliographic_records r
+            ${visibleRecords(isSubscriber)}
+            WHERE true ${match} ${byAuthor} ${byPublisher}
+          ),
+          f AS (
+            SELECT *, (on_shelf OR NOT ${availableOnly}) AS available_ok FROM m
+          )
+          SELECT 'type' AS facet, document_type_id::text AS key, count(*)::int AS count
+          FROM f WHERE in_genre AND in_language AND available_ok AND document_type_id IS NOT NULL
+          GROUP BY document_type_id
+          UNION ALL
+          SELECT 'genre', g.slug, count(DISTINCT f.id)::int
+          FROM f
+          JOIN record_genres rg ON rg.record_id = f.id
+          JOIN genres g ON g.id = rg.genre_id
+          WHERE of_type AND in_language AND available_ok
+          GROUP BY g.slug
+          UNION ALL
+          SELECT 'language', rl.language_code, count(DISTINCT f.id)::int
+          FROM f
+          JOIN record_languages rl ON rl.record_id = f.id
+          WHERE of_type AND in_genre AND available_ok
+          GROUP BY rl.language_code
+          UNION ALL
+          SELECT 'available', 'on_shelf', count(*)::int
+          FROM f WHERE of_type AND in_genre AND in_language AND on_shelf
+        `
+      : Promise.resolve(null),
   ]);
+
+  const facets: Facets | null = facetRows
+    ? { types: {}, genres: {}, languages: {}, available: 0 }
+    : null;
+  for (const row of facetRows ?? []) {
+    if (!facets) break;
+    if (row.facet === "type") facets.types[row.key] = row.count;
+    else if (row.facet === "genre") facets.genres[row.key] = row.count;
+    else if (row.facet === "language") facets.languages[row.key] = row.count;
+    else facets.available = row.count;
+  }
 
   const total = Number(countRows[0]?.count ?? 0);
 
@@ -605,6 +715,7 @@ export async function searchCatalogue({
       documentType: row.document_type,
       authors: row.authors,
       abstract: row.abstract,
+      abstractEn: row.abstract_en,
       totalItems: row.total ?? 0,
       availableItems: row.available ?? 0,
       coverUrl: coverUrl(row.thumbnail_url, row.standard_number),
@@ -621,6 +732,7 @@ export async function searchCatalogue({
     total,
     page: currentPage,
     pageCount: Math.max(1, Math.ceil(total / PER_PAGE)),
+    facets,
   };
 }
 
@@ -629,6 +741,7 @@ type DetailRow = {
   title: string;
   subtitle: string | null;
   abstract: string | null;
+  abstract_en: string | null;
   publication_year: number | null;
   standard_number: string | null;
   document_type: string | null;
@@ -674,6 +787,7 @@ export const getRecord = cache(async function getRecord(
       r.title,
       r.subtitle,
       r.abstract,
+      r.abstract_en,
       r.publication_year,
       r.standard_number,
       dt.label AS document_type,
@@ -736,6 +850,7 @@ export const getRecord = cache(async function getRecord(
     title: row.title,
     subtitle: row.subtitle,
     abstract: row.abstract,
+    abstractEn: row.abstract_en,
     publicationYear: row.publication_year,
     standardNumber: row.standard_number,
     documentType: row.document_type,

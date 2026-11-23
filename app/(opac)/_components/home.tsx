@@ -235,7 +235,7 @@ export async function CatalogueHome({
             <h2 id="discover" className="font-heading text-heading-2">
               {c.discover}
             </h2>
-            <GenreList genres={genres} />
+            <GenreList genres={genres} all={{ label: c.discoverAll, hint: c.discoverAllHint }} />
           </section>
         )}
 
